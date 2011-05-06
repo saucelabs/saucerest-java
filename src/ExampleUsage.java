@@ -3,11 +3,11 @@ import java.util.*;
 import com.saucelabs.saucerest.SauceREST;
 
 /* to get your jobID:
- * Selenium 1: browser.getEval("selenium.sessionId");
- * Selenium 2: ((RemoteWebDriver) driver).getSessionId().toString();
+ * Selenium 1: String jobID = browser.getEval("selenium.sessionId");
+ * Selenium 2: String jobID = ((RemoteWebDriver) driver).getSessionId().toString();
  */
 
-public class TestingREST {
+public class ExampleUsage {
     public static void main(String[] args) throws IOException {
         SauceREST client = new SauceREST("<your-username>", "<your-access-key>");
         /* Using a map of udpates:
