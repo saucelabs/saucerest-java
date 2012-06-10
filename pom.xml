@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.saucelabs</groupId>
+    <artifactId>saucerest</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>saucerest</name>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>Sauce Labs</name>
+        <url>http://www.saucelabs.com/</url>
+    </organization>
+    <developers>
+
+        <developer>
+            <organization>Sauce Labs</organization>
+            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
+        </developer>
+
+    </developers>
+    <scm>
+        <connection>scm:git:git://github.com/saucelabs/saucerest-java.git</connection>
+        <developerConnection>scm:git:git@github.com:saucelabs/saucerest-java.git</developerConnection>
+        <url>git@github.com:saucelabs/saucerest-java.git</url>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>cloudbees-private-release-repository</id>
+            <url>dav:https://repository-saucelabs.forge.cloudbees.com/release</url>
+        </repository>
+    </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
