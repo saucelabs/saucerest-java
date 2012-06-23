@@ -6,3 +6,5 @@ target
 .idea/*
 
 .DS_Store
+
+atlassian-ide-plugin.xml
