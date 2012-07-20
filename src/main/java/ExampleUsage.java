@@ -1,6 +1,6 @@
-import java.io.*;
-import java.util.*;
 import com.saucelabs.saucerest.SauceREST;
+
+import java.io.IOException;
 
 /* to get your jobID:
  * Selenium 1: String jobID = browser.getEval("selenium.sessionId");
@@ -10,7 +10,7 @@ import com.saucelabs.saucerest.SauceREST;
 public class ExampleUsage {
     public static void main(String[] args) throws IOException {
         SauceREST client = new SauceREST("<your-username>", "<your-access-key>");
-        /* Using a map of udpates:
+        /* Using a map of updates:
          * (http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods)
          *
          * Map<String, Object> updates = new HashMap<String, Object>();
@@ -22,5 +22,6 @@ public class ExampleUsage {
 
         client.jobPassed("<your-job-id>");
         //client.jobFailed("<your-job-id>");
+        //client.downloadVideo("<your-job-id>", "download-location");
     }
 }
