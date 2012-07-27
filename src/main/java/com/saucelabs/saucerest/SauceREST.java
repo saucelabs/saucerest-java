@@ -85,7 +85,12 @@ public class SauceREST {
         return retrieveResults(restEndpoint);
     }
 
-    private String retrieveResults(URL restEndpoint) throws IOException {
+    public String getJobInfo(String jobId) throws IOException {
+        URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+        return retrieveResults(restEndpoint);
+    }
+
+    public String retrieveResults(URL restEndpoint) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
         connection.setDoOutput(true);
         String auth = encodeAuthentication();
