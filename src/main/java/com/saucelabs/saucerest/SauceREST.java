@@ -5,16 +5,22 @@ import sun.misc.BASE64Encoder;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simple Java API that invokes the Sauce REST API.
  */
 public class SauceREST {
+
+    private static final Logger logger = Logger.getLogger(SauceREST.class.getName());
+
     protected String username;
     protected String accessKey;
 
@@ -36,7 +42,7 @@ public class SauceREST {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @throws IOException thrown if an error occurs invoking the REST request
      */
-    public void jobPassed(String jobId) throws IOException {
+    public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
         updates.put("passed", true);
         updateJobInfo(jobId, updates);
@@ -48,7 +54,7 @@ public class SauceREST {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @throws IOException thrown if an error occurs invoking the REST request
      */
-    public void jobFailed(String jobId) throws IOException {
+    public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
         updates.put("passed", false);
         updateJobInfo(jobId, updates);
@@ -62,8 +68,13 @@ public class SauceREST {
      * @param location
      * @throws IOException thrown if an error occurs invoking the REST request
      */
-    public void downloadVideo(String jobId, String location) throws IOException {
-        URL restEndpoint = new URL(String.format(DOWNLOAD_VIDEO_FORMAT, username, jobId));
+    public void downloadVideo(String jobId, String location) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(DOWNLOAD_VIDEO_FORMAT, username, jobId));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
         downloadFile(jobId, location, restEndpoint);
     }
 
@@ -75,71 +86,117 @@ public class SauceREST {
      * @param location
      * @throws IOException thrown if an error occurs invoking the REST request
      */
-    public void downloadLog(String jobId, String location) throws IOException {
-        URL restEndpoint = new URL(String.format(DOWNLOAD_LOG_FORMAT, username, jobId));
+    public void downloadLog(String jobId, String location) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(DOWNLOAD_LOG_FORMAT, username, jobId));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
         downloadFile(jobId, location, restEndpoint);
     }
 
-    public String retrieveResults(String path) throws IOException {
-        URL restEndpoint = new URL(String.format(USER_RESULT_FORMAT, username, path));
-        return retrieveResults(restEndpoint);
-    }
-
-    public String getJobInfo(String jobId) throws IOException {
-        URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
-        return retrieveResults(restEndpoint);
-    }
-
-    public String retrieveResults(URL restEndpoint) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
-        connection.setDoOutput(true);
-        String auth = encodeAuthentication();
-        connection.setRequestProperty("Authorization", auth);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder builder = new StringBuilder();
-        String inputLine;
-        while ((inputLine = reader.readLine()) != null) {
-            builder.append(inputLine);
+    public String retrieveResults(String path) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(USER_RESULT_FORMAT, username, path));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        reader.close();
+        return retrieveResults(restEndpoint);
+    }
+
+    public String getJobInfo(String jobId) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    public String retrieveResults(URL restEndpoint) {
+        BufferedReader reader = null;
+        StringBuilder builder = new StringBuilder();
+        try {
+            HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
+
+            connection.setDoOutput(true);
+            String auth = encodeAuthentication();
+            connection.setRequestProperty("Authorization", auth);
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null) {
+                builder.append(inputLine);
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error retrieving Sauce Results", e);
+        }
+        try {
+            if (reader != null) {
+                reader.close();
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing Sauce input stream", e);
+        }
         return builder.toString();
     }
 
-    private void downloadFile(String jobId, String location, URL restEndpoint) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
-        connection.setDoOutput(true);
-        connection.setRequestMethod("PUT");
-        String auth = encodeAuthentication();
-        connection.setRequestProperty("Authorization", auth);
+    private void downloadFile(String jobId, String location, URL restEndpoint) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
 
-        InputStream stream = connection.getInputStream();
-        BufferedInputStream in = new BufferedInputStream(stream);
-        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String saveName = jobId + format.format(new Date());
-        if (restEndpoint.getPath().endsWith(".flv")) {
-            saveName = saveName + ".flv";
-        } else {
-            saveName = saveName + ".log";
+            connection.setDoOutput(true);
+            connection.setRequestMethod("PUT");
+            String auth = encodeAuthentication();
+            connection.setRequestProperty("Authorization", auth);
+
+            InputStream stream = connection.getInputStream();
+            BufferedInputStream in = new BufferedInputStream(stream);
+            SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+            String saveName = jobId + format.format(new Date());
+            if (restEndpoint.getPath().endsWith(".flv")) {
+                saveName = saveName + ".flv";
+            } else {
+                saveName = saveName + ".log";
+            }
+            FileOutputStream file = new FileOutputStream(new File(location, saveName));
+            BufferedOutputStream out = new BufferedOutputStream(file);
+            int i;
+            while ((i = in.read()) != -1) {
+                out.write(i);
+            }
+            out.flush();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error downloading Sauce Results");
         }
-        FileOutputStream file = new FileOutputStream(new File(location, saveName));
-        BufferedOutputStream out = new BufferedOutputStream(file);
-        int i;
-        while ((i = in.read()) != -1) {
-            out.write(i);
-        }
-        out.flush();
     }
 
-    public void updateJobInfo(String jobId, Map<String, Object> updates) throws IOException {
-        URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
-        HttpURLConnection postBack = (HttpURLConnection) restEndpoint.openConnection();
-        postBack.setDoOutput(true);
-        postBack.setRequestMethod("PUT");
-        String auth = encodeAuthentication();
-        postBack.setRequestProperty("Authorization", auth);
-        String jsonText = JSONValue.toJSONString(updates);
-        postBack.getOutputStream().write(jsonText.getBytes());
-        postBack.getInputStream().close();
+    public void updateJobInfo(String jobId, Map<String, Object> updates) {
+        HttpURLConnection postBack = null;
+        try {
+            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+            postBack = (HttpURLConnection) restEndpoint.openConnection();
+            postBack.setDoOutput(true);
+            postBack.setRequestMethod("PUT");
+            String auth = encodeAuthentication();
+            postBack.setRequestProperty("Authorization", auth);
+            String jsonText = JSONValue.toJSONString(updates);
+            postBack.getOutputStream().write(jsonText.getBytes());
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error updating Sauce Results", e);
+        }
+
+        try {
+            if (postBack != null) {
+                postBack.getInputStream().close();
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing result stream");
+        }
+
     }
 
     private String encodeAuthentication() {

@@ -19,19 +19,19 @@ public class SauceREST {
         this.accessKey = accessKey;
     }
 
-    public void jobPassed(String jobId) throws IOException {
+    public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
         updates.put("passed", true);
         updateJobInfo(jobId, updates);
     }
 
-    public void jobFailed(String jobId) throws IOException {
+    public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
         updates.put("passed", false);
         updateJobInfo(jobId, updates);
     }
 
-    public void updateJobInfo(String jobId, Map<String,Object> updates) throws IOException {
+    public void updateJobInfo(String jobId, Map<String,Object> updates) {
         URL restEndpoint = new URL(RESTURL+"/v1/"+username+"/jobs/"+jobId);
         String auth = username + ":" + accessKey;
         BASE64Encoder encoder = new BASE64Encoder();
