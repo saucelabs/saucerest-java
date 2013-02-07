@@ -1,4 +1,6 @@
 import java.io.*;
+import java.lang.String;
+import java.lang.System;
 import java.util.*;
 import com.saucelabs.saucerest.SauceREST;
 
@@ -9,7 +11,11 @@ import com.saucelabs.saucerest.SauceREST;
 
 public class ExampleUsage {
     public static void main(String[] args) throws IOException {
-        SauceREST client = new SauceREST("<your-username>", "<your-access-key>");
+        if (args.length == 0) {
+            System.out.println("Usage: java -cp saucerest-java.jar ExampleUsage <userid> <accessKey> <jobid>");
+        }
+
+        SauceREST client = new SauceREST(args[0], args[1]);
         /* Using a map of udpates:
          * (http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods)
          *
@@ -19,8 +25,9 @@ public class ExampleUsage {
          * updates.put("build", "c234");
          * client.updateJobInfo("<your-job-id>", updates);
          */
-
-        client.jobPassed("<your-job-id>");
+        String jobInfo = client.getJobInfo(args[2]);
+        System.out.println("Job info: " + jobInfo);
+        client.jobPassed(args[2]);
         //client.jobFailed("<your-job-id>");
     }
 }

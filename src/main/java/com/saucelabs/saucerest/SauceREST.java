@@ -24,7 +24,7 @@ public class SauceREST {
     protected String username;
     protected String accessKey;
 
-    public static final String RESTURL = "http://saucelabs.com/rest/v1/%1$s";
+    public static final String RESTURL = "https://saucelabs.com/rest/v1/%1$s";
     private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
     private static final String JOB_RESULT_FORMAT = RESTURL + "/jobs/%2$s";
     private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/results/video.flv";
@@ -194,7 +194,7 @@ public class SauceREST {
                 postBack.getInputStream().close();
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing result stream");
+            logger.log(Level.WARNING, "Error closing result stream", e);
         }
 
     }
