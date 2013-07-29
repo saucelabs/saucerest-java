@@ -1,12 +1,25 @@
 package com.saucelabs.saucerest;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.FileRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import sun.misc.BASE64Encoder;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.rmi.UnexpectedException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -195,6 +208,63 @@ public class SauceREST {
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error closing result stream", e);
+        }
+
+    }
+
+    /**
+     * Uploads a file to Sauce storage.
+     *
+     * @param file the file to upload
+     * -param fileName uses file.getName() to store in sauce
+     * -param overwrite set to true
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException
+     */
+    public String uploadFile(File file) throws IOException {
+        return uploadFile(file, file.getName());
+    }
+
+    /**
+     * Uploads a file to Sauce storage.
+     *
+     * @param file the file to upload
+     * @param fileName name of the file in sauce storage
+     * -param overwrite set to true
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException
+     */
+    public String uploadFile(File file, String fileName) throws IOException {
+        return uploadFile(file, fileName, true);
+    }
+
+    /**
+     * Uploads a file to Sauce storage.
+     *
+     * @param file the file to upload
+     * @param fileName name of the file in sauce storage
+     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException
+     */
+    public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
+        PostMethod post = new PostMethod("http://saucelabs.com/rest/v1/storage/" +
+                username + "/" + fileName +"?overwrite=" + overwrite.toString());
+        post.setDoAuthentication(true);
+        post.addRequestHeader("Authorization", encodeAuthentication());
+        post.addRequestHeader("Content-Type", "application/octet-stream");
+        post.setRequestEntity(new FileRequestEntity(file, "application/octet-stream"));
+        HttpClient client = new HttpClient();
+        client.executeMethod(post);
+        try {
+            JSONObject sauceUploadResponse = new JSONObject(post.getResponseBodyAsString());
+            if (sauceUploadResponse.has("error")) {
+                throw new UnexpectedException("Failed to upload to sauce-storage: "
+                        + sauceUploadResponse.getString("error"));
+            }
+            return sauceUploadResponse.getString("md5");
+        } catch (JSONException j) {
+            throw new UnexpectedException("Failed to parse json response.", j);
         }
 
     }
