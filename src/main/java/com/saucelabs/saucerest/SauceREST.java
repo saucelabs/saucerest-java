@@ -133,7 +133,7 @@ public class SauceREST {
         BufferedReader reader = null;
         StringBuilder builder = new StringBuilder();
         try {
-            HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
+            HttpURLConnection connection = openConnection(restEndpoint);
 
             connection.setDoOutput(true);
             String auth = encodeAuthentication();
@@ -159,7 +159,7 @@ public class SauceREST {
 
     private void downloadFile(String jobId, String location, URL restEndpoint) {
         try {
-            HttpURLConnection connection = (HttpURLConnection) restEndpoint.openConnection();
+            HttpURLConnection connection = openConnection(restEndpoint);
 
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
@@ -191,7 +191,7 @@ public class SauceREST {
         HttpURLConnection postBack = null;
         try {
             URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
-            postBack = (HttpURLConnection) restEndpoint.openConnection();
+            postBack = openConnection(restEndpoint);
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
             String auth = encodeAuthentication();
@@ -210,6 +210,10 @@ public class SauceREST {
             logger.log(Level.WARNING, "Error closing result stream", e);
         }
 
+    }
+
+    public HttpURLConnection openConnection(URL url) throws IOException {
+        return (HttpURLConnection) url.openConnection();
     }
 
     /**
