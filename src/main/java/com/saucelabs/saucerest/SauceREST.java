@@ -8,14 +8,7 @@ import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import sun.misc.BASE64Encoder;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -212,6 +205,36 @@ public class SauceREST {
 
     }
 
+    public void stopJob(String jobId) {
+        HttpURLConnection postBack = null;
+        BufferedReader reader = null;
+                StringBuilder builder = new StringBuilder();
+        try {
+            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+            postBack = openConnection(restEndpoint);
+            postBack.setDoOutput(true);
+            postBack.setRequestMethod("PUT");
+            String auth = encodeAuthentication();
+            postBack.setRequestProperty("Authorization", auth);
+            reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null) {
+                builder.append(inputLine);
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error updating Sauce Results", e);
+        }
+
+        try {
+            if (postBack != null) {
+                postBack.getInputStream().close();
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing result stream", e);
+        }
+
+    }
+
     public HttpURLConnection openConnection(URL url) throws IOException {
         return (HttpURLConnection) url.openConnection();
     }
@@ -220,8 +243,8 @@ public class SauceREST {
      * Uploads a file to Sauce storage.
      *
      * @param file the file to upload
-     * -param fileName uses file.getName() to store in sauce
-     * -param overwrite set to true
+     *             -param fileName uses file.getName() to store in sauce
+     *             -param overwrite set to true
      * @return the md5 hash returned by sauce of the file
      * @throws IOException
      */
@@ -232,9 +255,9 @@ public class SauceREST {
     /**
      * Uploads a file to Sauce storage.
      *
-     * @param file the file to upload
+     * @param file     the file to upload
      * @param fileName name of the file in sauce storage
-     * -param overwrite set to true
+     *                 -param overwrite set to true
      * @return the md5 hash returned by sauce of the file
      * @throws IOException
      */
@@ -245,15 +268,15 @@ public class SauceREST {
     /**
      * Uploads a file to Sauce storage.
      *
-     * @param file the file to upload
-     * @param fileName name of the file in sauce storage
+     * @param file      the file to upload
+     * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
      * @throws IOException
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
         PostMethod post = new PostMethod("http://saucelabs.com/rest/v1/storage/" +
-                username + "/" + fileName +"?overwrite=" + overwrite.toString());
+                username + "/" + fileName + "?overwrite=" + overwrite.toString());
         post.setDoAuthentication(true);
         post.addRequestHeader("Authorization", encodeAuthentication());
         post.addRequestHeader("Content-Type", "application/octet-stream");
