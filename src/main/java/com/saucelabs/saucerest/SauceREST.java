@@ -1,8 +1,11 @@
 package com.saucelabs.saucerest;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -208,7 +211,7 @@ public class SauceREST {
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
         BufferedReader reader = null;
-                StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         try {
             URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
             postBack = openConnection(restEndpoint);
@@ -275,16 +278,27 @@ public class SauceREST {
      * @throws IOException
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
-        PostMethod post = new PostMethod("http://saucelabs.com/rest/v1/storage/" +
+
+        HttpClient client = new DefaultHttpClient();
+        HttpPost post = new HttpPost("http://saucelabs.com/rest/v1/storage/" +
                 username + "/" + fileName + "?overwrite=" + overwrite.toString());
-        post.setDoAuthentication(true);
-        post.addRequestHeader("Authorization", encodeAuthentication());
-        post.addRequestHeader("Content-Type", "application/octet-stream");
-        post.setRequestEntity(new FileRequestEntity(file, "application/octet-stream"));
-        HttpClient client = new HttpClient();
-        client.executeMethod(post);
+        FileEntity entity = new FileEntity(file);
+            entity.setContentType(new BasicHeader("Content-Type",
+                "application/octet-stream"));
+        post.setEntity(entity);
+
+        post.setHeader("Content-Type", "application/octet-stream");
+        post.setHeader("Authorization", encodeAuthentication());
+        HttpResponse response = client.execute(post);
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        String line;
+        StringBuilder builder = new StringBuilder();
+        while ((line = rd.readLine()) != null) {
+            builder.append(line);
+        }
+
         try {
-            JSONObject sauceUploadResponse = new JSONObject(post.getResponseBodyAsString());
+            JSONObject sauceUploadResponse = new JSONObject(builder.toString());
             if (sauceUploadResponse.has("error")) {
                 throw new UnexpectedException("Failed to upload to sauce-storage: "
                         + sauceUploadResponse.getString("error"));
