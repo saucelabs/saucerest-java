@@ -324,7 +324,7 @@ public class SauceREST {
     */
     public String getPublicJobLink(String jobId) {
         try {
-            String key = "isaacm:119fb0ff-6d9a-4925-a7ae-46375368c906";
+            String key = username + ":" + accessKey;
             String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
             String link = "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
 
