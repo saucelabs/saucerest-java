@@ -16,18 +16,17 @@ public class SecurityUtils {
             Mac mac = Mac.getInstance(algorithm);
             mac.init(key);
             return byteArrayToHex(mac.doFinal(input.getBytes()));
-        } catch(NoSuchAlgorithmException ex) {
             throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
         }
     }
 
-    protected static String byteArrayToHex(byte [] a) {
+    protected static String byteArrayToHex(byte [] bytes) {
         int hn, ln, cx;
         String hexDigitChars = "0123456789abcdef";
         StringBuffer buf = new StringBuffer(a.length * 2);
-        for(cx = 0; cx < a.length; cx++) {
-            hn = ((int)(a[cx]) & 0x00ff) / 16;
-            ln = ((int)(a[cx]) & 0x000f);
+        for(cx = 0; cx < bytes.length; cx++) {
+            hn = ((int)(bytes[cx]) & 0x00ff) / 16;
+            ln = ((int)(bytes[cx]) & 0x000f);
             buf.append(hexDigitChars.charAt(hn));
             buf.append(hexDigitChars.charAt(ln));
         }
