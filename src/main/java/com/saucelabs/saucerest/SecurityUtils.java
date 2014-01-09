@@ -1,6 +1,8 @@
-package com.saucelabs.common;
+package com.saucelabs.saucerest;
 
 import java.security.Key;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Hex;
@@ -19,6 +21,8 @@ public class SecurityUtils {
             return byteArrayToHex(mac.doFinal(input.getBytes()));
         } catch(NoSuchAlgorithmException ex) {
             throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
+        } catch(InvalidKeyException ex) {
+            throw new IllegalArgumentException("Illegal key: " + privateKey);
         }
     }
 
