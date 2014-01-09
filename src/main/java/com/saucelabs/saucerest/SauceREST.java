@@ -330,7 +330,9 @@ public class SauceREST {
 
             return link;
         } catch(IllegalArgumentException ex) {
-            // someone messed up!
+            // someone messed up on the algorithm to hmacEncode
+            // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
+            // we only want to use 'HmacMD5'
             System.err.println(ex);
         }
     }
