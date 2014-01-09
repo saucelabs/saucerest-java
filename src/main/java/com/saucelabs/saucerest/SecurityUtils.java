@@ -3,6 +3,7 @@ package com.saucelabs.common;
 import java.security.Key;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.codec.binary.Hex;
 
 /*
  * Modelled after code from {@linkhttp://www.tomred.net/tutorials/tomred-java-generate-hmac-md5-sha1.html}
@@ -21,13 +22,13 @@ public class SecurityUtils {
         }
     }
 
-    protected static String byteArrayToHex(byte [] a) {
+    protected static String byteArrayToHex(byte [] bytes) {
         int hn, ln, cx;
         String hexDigitChars = "0123456789abcdef";
-        StringBuffer buf = new StringBuffer(a.length * 2);
-        for(cx = 0; cx < a.length; cx++) {
-            hn = ((int)(a[cx]) & 0x00ff) / 16;
-            ln = ((int)(a[cx]) & 0x000f);
+        StringBuffer buf = new StringBuffer(bytes.length * 2);
+        for(cx = 0; cx < bytes.length; cx++) {
+            hn = ((int)(bytes[cx]) & 0x00ff) / 16;
+            ln = ((int)(bytes[cx]) & 0x000f);
             buf.append(hexDigitChars.charAt(hn));
             buf.append(hexDigitChars.charAt(ln));
         }
