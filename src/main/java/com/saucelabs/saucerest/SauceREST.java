@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest;
 
+import com.saucelabs.common.SecurityUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -308,6 +310,29 @@ public class SauceREST {
             throw new UnexpectedException("Failed to parse json response.", j);
         }
 
+    }
+
+    /**
+     * Generates a link to the job page on Saucelabs.com, which can be accessed
+     * without the user's credentials. Auth token is HMAC/MD5 of the job ID
+     * with the key <username>:<api key>
+     * (see {@link http://saucelabs.com/docs/integration#public-job-links}).
+     *
+     * @param   jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return  link to the job page with authorization token
+     * @throws  ;
+    */
+    public String getPublicJobLink(String jobId) {
+        try {
+            String key = "isaacm:119fb0ff-6d9a-4925-a7ae-46375368c906";
+            String auth_token = SecurityUtils.hmacEncode("HmacMD5", job_id, key);
+            String link = "https://saucelabs.com/jobs/" + job_id + "?auth=" + auth_token;
+
+            return link;
+        } catch(IllegalArgumentException ex) {
+            // someone messed up!
+            System.err.println(ex);
+        }
     }
 
     private String encodeAuthentication() {
