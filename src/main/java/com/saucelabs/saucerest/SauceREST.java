@@ -1,6 +1,6 @@
 package com.saucelabs.saucerest;
 
-import com.saucelabs.common.SecurityUtils;
+import com.saucelabs.saucerest.SecurityUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -325,15 +325,17 @@ public class SauceREST {
     public String getPublicJobLink(String jobId) {
         try {
             String key = "isaacm:119fb0ff-6d9a-4925-a7ae-46375368c906";
-            String auth_token = SecurityUtils.hmacEncode("HmacMD5", job_id, key);
-            String link = "https://saucelabs.com/jobs/" + job_id + "?auth=" + auth_token;
+            String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
+            String link = "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
 
             return link;
         } catch(IllegalArgumentException ex) {
             // someone messed up on the algorithm to hmacEncode
             // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
             // we only want to use 'HmacMD5'
+            System.err.println("Unable to create an authenticated public link to job:");
             System.err.println(ex);
+            return "";
         }
     }
 
