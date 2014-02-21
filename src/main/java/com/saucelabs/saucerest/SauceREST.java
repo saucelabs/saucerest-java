@@ -134,8 +134,9 @@ public class SauceREST {
             HttpURLConnection connection = openConnection(restEndpoint);
 
             connection.setDoOutput(true);
-            String auth = encodeAuthentication();
-            connection.setRequestProperty("Authorization", auth);
+
+            addAuthenticationProperty(connection);
+
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
@@ -161,8 +162,7 @@ public class SauceREST {
 
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
-            String auth = encodeAuthentication();
-            connection.setRequestProperty("Authorization", auth);
+            addAuthenticationProperty(connection);
 
             InputStream stream = connection.getInputStream();
             BufferedInputStream in = new BufferedInputStream(stream);
@@ -185,6 +185,13 @@ public class SauceREST {
         }
     }
 
+    private void addAuthenticationProperty(HttpURLConnection connection) {
+        if (username != null && accessKey != null) {
+            String auth = encodeAuthentication();
+            connection.setRequestProperty("Authorization", auth);
+        }
+    }
+
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
         try {
@@ -192,8 +199,7 @@ public class SauceREST {
             postBack = openConnection(restEndpoint);
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
-            String auth = encodeAuthentication();
-            postBack.setRequestProperty("Authorization", auth);
+            addAuthenticationProperty(postBack);
             String jsonText = JSONValue.toJSONString(updates);
             postBack.getOutputStream().write(jsonText.getBytes());
         } catch (IOException e) {
@@ -219,8 +225,7 @@ public class SauceREST {
             postBack = openConnection(restEndpoint);
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
-            String auth = encodeAuthentication();
-            postBack.setRequestProperty("Authorization", auth);
+            addAuthenticationProperty(postBack);
             reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
             String inputLine;
             while ((inputLine = reader.readLine()) != null) {
@@ -285,7 +290,7 @@ public class SauceREST {
         HttpPost post = new HttpPost("http://saucelabs.com/rest/v1/storage/" +
                 username + "/" + fileName + "?overwrite=" + overwrite.toString());
         FileEntity entity = new FileEntity(file);
-            entity.setContentType(new BasicHeader("Content-Type",
+        entity.setContentType(new BasicHeader("Content-Type",
                 "application/octet-stream"));
         post.setEntity(entity);
 
@@ -318,10 +323,10 @@ public class SauceREST {
      * with the key <username>:<api key>
      * (see {@link http://saucelabs.com/docs/integration#public-job-links}).
      *
-     * @param   jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return  link to the job page with authorization token
-     * @throws  ;
-    */
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return link to the job page with authorization token
+     * @throws ;
+     */
     public String getPublicJobLink(String jobId) {
         try {
             String key = username + ":" + accessKey;
@@ -329,7 +334,7 @@ public class SauceREST {
             String link = "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
 
             return link;
-        } catch(IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // someone messed up on the algorithm to hmacEncode
             // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
             // we only want to use 'HmacMD5'
