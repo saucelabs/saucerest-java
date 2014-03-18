@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +32,9 @@ import java.util.logging.Logger;
 public class SauceREST {
 
     private static final Logger logger = Logger.getLogger(SauceREST.class.getName());
+    private static final long HTTP_READ_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+    private static final long HTTP_CONNECT_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+
 
     protected String username;
     protected String accessKey;
@@ -246,7 +250,10 @@ public class SauceREST {
     }
 
     public HttpURLConnection openConnection(URL url) throws IOException {
-        return (HttpURLConnection) url.openConnection();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setReadTimeout((int) HTTP_READ_TIMEOUT_SECONDS);
+        con.setConnectTimeout((int) HTTP_CONNECT_TIMEOUT_SECONDS);
+        return con;
     }
 
     /**
