@@ -1,7 +1,5 @@
 package com.saucelabs.saucerest;
 
-import com.saucelabs.saucerest.SecurityUtils;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -42,6 +40,7 @@ public class SauceREST {
     public static final String RESTURL = "https://saucelabs.com/rest/v1/%1$s";
     private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
     private static final String JOB_RESULT_FORMAT = RESTURL + "/jobs/%2$s";
+    private static final String STOP_JOB_FORMAT = JOB_RESULT_FORMAT + "/stop";
     private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/results/video.flv";
     private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/results/video.flv";
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
@@ -222,21 +221,16 @@ public class SauceREST {
 
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
-        BufferedReader reader = null;
-        StringBuilder builder = new StringBuilder();
+
         try {
-            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+            URL restEndpoint = new URL(String.format(STOP_JOB_FORMAT, username, jobId));
             postBack = openConnection(restEndpoint);
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
             addAuthenticationProperty(postBack);
-            reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
-            String inputLine;
-            while ((inputLine = reader.readLine()) != null) {
-                builder.append(inputLine);
-            }
+            postBack.getOutputStream().write("".getBytes());
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error updating Sauce Results", e);
+            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
         }
 
         try {
