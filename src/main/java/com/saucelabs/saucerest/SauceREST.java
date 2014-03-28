@@ -134,6 +134,7 @@ public class SauceREST {
         BufferedReader reader = null;
         StringBuilder builder = new StringBuilder();
         try {
+
             HttpURLConnection connection = openConnection(restEndpoint);
 
             connection.setDoOutput(true);
@@ -192,6 +193,9 @@ public class SauceREST {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
             connection.setRequestProperty("Authorization", auth);
+            logger.info("Invoking Sauce REST API for " + connection.getURL() + " for user: " + username);
+        } else {
+            logger.info("Invoking Sauce REST API for " + connection.getURL());
         }
     }
 
