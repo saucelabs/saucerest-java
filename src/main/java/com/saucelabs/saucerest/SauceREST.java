@@ -1,10 +1,12 @@
 package com.saucelabs.saucerest;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -291,9 +293,18 @@ public class SauceREST {
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
 
-        HttpClient client = new DefaultHttpClient();
+        RequestConfig globalConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.BEST_MATCH)
+                .build();
+        CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(globalConfig)
+                .build();
+        RequestConfig localConfig = RequestConfig.copy(globalConfig)
+                .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+                .build();
         HttpPost post = new HttpPost("http://saucelabs.com/rest/v1/storage/" +
                 username + "/" + fileName + "?overwrite=" + overwrite.toString());
+        post.setConfig(localConfig);
         FileEntity entity = new FileEntity(file);
         entity.setContentType(new BasicHeader("Content-Type",
                 "application/octet-stream"));
@@ -330,7 +341,6 @@ public class SauceREST {
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @return link to the job page with authorization token
-     * @throws ;
      */
     public String getPublicJobLink(String jobId) {
         try {
