@@ -203,10 +203,8 @@ public class SauceREST {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
             connection.setRequestProperty("Authorization", auth);
-            logger.info("Invoking Sauce REST API for " + connection.getURL() + " for user: " + username);
-        } else {
-            logger.info("Invoking Sauce REST API for " + connection.getURL());
         }
+
     }
 
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
