@@ -4,10 +4,18 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.DateUtils;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.cookie.*;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.cookie.BestMatchSpecFactory;
+import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HttpContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -293,18 +301,36 @@ public class SauceREST {
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
 
-        RequestConfig globalConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.BEST_MATCH)
+        CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
+            public CookieSpec create(HttpContext context) {
+                return new BrowserCompatSpec(new String[]{DateUtils.PATTERN_RFC1123,
+                        DateUtils.PATTERN_RFC1036,
+                        DateUtils.PATTERN_ASCTIME,
+                        "\"EEE, dd-MMM-yyyy HH:mm:ss z\""});
+            }
+
+        };
+        Registry<CookieSpecProvider> r = RegistryBuilder.<CookieSpecProvider>create()
+                .register(CookieSpecs.BEST_MATCH,
+                        new BestMatchSpecFactory())
+                .register("custom", customSpecProvider)
                 .build();
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCookieSpec("custom")
+                .build();
+
         CloseableHttpClient client = HttpClients.custom()
-                .setDefaultRequestConfig(globalConfig)
+                .setDefaultCookieSpecRegistry(r)
+                .setDefaultRequestConfig(requestConfig)
                 .build();
-        RequestConfig localConfig = RequestConfig.copy(globalConfig)
-                .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
-                .build();
+
+        HttpClientContext context = HttpClientContext.create();
+        context.setCookieSpecRegistry(r);
+
         HttpPost post = new HttpPost("http://saucelabs.com/rest/v1/storage/" +
                 username + "/" + fileName + "?overwrite=" + overwrite.toString());
-        post.setConfig(localConfig);
+
         FileEntity entity = new FileEntity(file);
         entity.setContentType(new BasicHeader("Content-Type",
                 "application/octet-stream"));
@@ -312,7 +338,7 @@ public class SauceREST {
 
         post.setHeader("Content-Type", "application/octet-stream");
         post.setHeader("Authorization", encodeAuthentication());
-        HttpResponse response = client.execute(post);
+        HttpResponse response = client.execute(post, context);
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
         String line;
         StringBuilder builder = new StringBuilder();
@@ -371,4 +397,6 @@ public class SauceREST {
         auth = "Basic " + new String(encoder.encode(auth.getBytes()));
         return auth;
     }
+
+
 }
