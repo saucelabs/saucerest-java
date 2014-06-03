@@ -51,8 +51,8 @@ public class SauceREST {
     private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
     private static final String JOB_RESULT_FORMAT = RESTURL + "/jobs/%2$s";
     private static final String STOP_JOB_FORMAT = JOB_RESULT_FORMAT + "/stop";
-    private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/results/video.flv";
-    private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/results/selenium-server.log";
+    private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/assets/video.flv";
+    private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/assets/selenium-server.log";
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
 
     public SauceREST(String username, String accessKey) {
@@ -175,7 +175,7 @@ public class SauceREST {
             HttpURLConnection connection = openConnection(restEndpoint);
 
             connection.setDoOutput(true);
-            connection.setRequestMethod("PUT");
+            connection.setRequestMethod("GET");
             addAuthenticationProperty(connection);
 
             InputStream stream = connection.getInputStream();
