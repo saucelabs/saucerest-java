@@ -199,7 +199,7 @@ public class SauceREST {
         }
     }
 
-    private void addAuthenticationProperty(HttpURLConnection connection) {
+    protected void addAuthenticationProperty(HttpURLConnection connection) {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
             connection.setRequestProperty("Authorization", auth);
@@ -383,7 +383,7 @@ public class SauceREST {
         }
     }
 
-    private String encodeAuthentication() {
+    protected String encodeAuthentication() {
         String auth = username + ":" + accessKey;
         //Handle long strings encoded using BASE64Encoder - see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6947917
         BASE64Encoder encoder = new BASE64Encoder() {
