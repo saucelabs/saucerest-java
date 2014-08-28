@@ -29,6 +29,7 @@ import java.rmi.UnexpectedException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -53,6 +54,9 @@ public class SauceREST {
     private static final String STOP_JOB_FORMAT = JOB_RESULT_FORMAT + "/stop";
     private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/assets/video.flv";
     private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/assets/selenium-server.log";
+
+    private static final String GET_TUNNEL_FORMAT = RESTURL + "/tunnels";
+    private static final String DELETE_TUNNEL_FORMAT = GET_TUNNEL_FORMAT + "/%2$s";
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
 
     public SauceREST(String username, String accessKey) {
@@ -146,11 +150,8 @@ public class SauceREST {
         try {
 
             HttpURLConnection connection = openConnection(restEndpoint);
-
             connection.setDoOutput(true);
-
             addAuthenticationProperty(connection);
-
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
@@ -394,6 +395,39 @@ public class SauceREST {
         };
         auth = "Basic " + new String(encoder.encode(auth.getBytes()));
         return auth;
+    }
+
+    public void deleteTunnel(String tunnelId) {
+
+        HttpURLConnection postBack = null;
+        try {
+            URL restEndpoint = new URL(String.format(DELETE_TUNNEL_FORMAT, username, tunnelId));
+            postBack = openConnection(restEndpoint);
+            postBack.setDoOutput(true);
+            postBack.setRequestMethod("DELETE");
+            addAuthenticationProperty(postBack);
+            postBack.getOutputStream().write("".getBytes());
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
+        }
+
+        try {
+            if (postBack != null) {
+                postBack.getInputStream().close();
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error closing result stream", e);
+        }
+    }
+
+    public String getTunnels() {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
     }
 
 
