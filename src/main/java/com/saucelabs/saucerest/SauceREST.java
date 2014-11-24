@@ -8,7 +8,8 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.DateUtils;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.cookie.*;
+import org.apache.http.cookie.CookieSpec;
+import org.apache.http.cookie.CookieSpecProvider;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,7 +30,6 @@ import java.rmi.UnexpectedException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -172,6 +172,7 @@ public class SauceREST {
     }
 
     private void downloadFile(String jobId, String location, URL restEndpoint) {
+        BufferedOutputStream out = null;
         try {
             HttpURLConnection connection = openConnection(restEndpoint);
 
@@ -189,7 +190,7 @@ public class SauceREST {
                 saveName = saveName + ".log";
             }
             FileOutputStream file = new FileOutputStream(new File(location, saveName));
-            BufferedOutputStream out = new BufferedOutputStream(file);
+            out = new BufferedOutputStream(file);
             int i;
             while ((i = in.read()) != -1) {
                 out.write(i);
@@ -198,6 +199,16 @@ public class SauceREST {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results");
         }
+        finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+        }
+
     }
 
     protected void addAuthenticationProperty(HttpURLConnection connection) {
