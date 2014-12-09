@@ -36,29 +36,85 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Simple Java API that invokes the Sauce REST API.
+ * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API functionality is available from
+ * <a href="https://docs.saucelabs.com/reference/rest-api">https://docs.saucelabs.com/reference/rest-api</a>.
+ *
+ * @author Ross Rowe
  */
 public class SauceREST {
 
+    /**
+     * Logger instance.
+     */
     private static final Logger logger = Logger.getLogger(SauceREST.class.getName());
+    /**
+     * 10 seconds in milliseconds.
+     */
     private static final long HTTP_READ_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+    /**
+     * 10 seconds in milliseconds.
+     */
     private static final long HTTP_CONNECT_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
-
-
+    /**
+     * The username to use when performing HTTP requests to the Sauce REST API.
+     */
     protected String username;
+    /**
+     * The access key to use when performing HTTP requests to the Sauce REST API.
+     */
     protected String accessKey;
 
+    /**
+     * The initial component of the Sauce REST API URL.
+     */
     public static final String RESTURL = "https://saucelabs.com/rest/v1/%1$s";
+    /**
+     * The String format used to retrieve Sauce Job results for a specific user from the Sauce REST API.
+     */
     private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
+    /**
+     * The String format used to retrieve Sauce Job results from the Sauce REST API.
+     */
     private static final String JOB_RESULT_FORMAT = RESTURL + "/jobs/%2$s";
+    /**
+     * The String format used to stop a running job via the Sauce REST API.
+     */
     private static final String STOP_JOB_FORMAT = JOB_RESULT_FORMAT + "/stop";
+    /**
+     * The String format used to download a video for a Sauce job via the Sauce REST API.
+     */
     private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/assets/video.flv";
+    /**
+     * The String format used to download a log for a Sauce job via the Sauce REST API.
+     */
     private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/assets/selenium-server.log";
-
+    /**
+     * The String format used to retrieve the tunnel information via the Sauce REST API.
+     */
     private static final String GET_TUNNEL_FORMAT = RESTURL + "/tunnels";
+    /**
+     * The String format used to retrieve the user activity information via the Sauce REST API.
+     */
+    private static final String GET_ACTIVITY_FORMAT = RESTURL + "/activity";
+    /**
+     * The String format used to delete a tunnel via the Sauce REST API.
+     */
     private static final String DELETE_TUNNEL_FORMAT = GET_TUNNEL_FORMAT + "/%2$s";
+    /**
+     * The String format used to retrieve the user concurrency information via the Sauce REST API.
+     */
+    private static final String GET_CONCURRENCY_FORMAT = USER_RESULT_FORMAT + "/concurrency";
+    /**
+     * Date format used as part of the file name for downloaded files.
+     */
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
 
+    /**
+     * Constructs a new instance of the SauceREST class.
+     *
+     * @param username  The username to use when performing HTTP requests to the Sauce REST API
+     * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     */
     public SauceREST(String username, String accessKey) {
         this.username = username;
         this.accessKey = accessKey;
@@ -68,7 +124,6 @@ public class SauceREST {
      * Marks a Sauce Job as 'passed'.
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @throws IOException thrown if an error occurs invoking the REST request
      */
     public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
@@ -80,7 +135,6 @@ public class SauceREST {
      * Marks a Sauce Job as 'failed'.
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @throws IOException thrown if an error occurs invoking the REST request
      */
     public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<String, Object>();
@@ -93,8 +147,7 @@ public class SauceREST {
      * a directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location
-     * @throws IOException thrown if an error occurs invoking the REST request
+     * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadVideo(String jobId, String location) {
         URL restEndpoint = null;
@@ -111,8 +164,7 @@ public class SauceREST {
      * a directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location
-     * @throws IOException thrown if an error occurs invoking the REST request
+     * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadLog(String jobId, String location) {
         URL restEndpoint = null;
@@ -124,6 +176,12 @@ public class SauceREST {
         downloadFile(jobId, location, restEndpoint);
     }
 
+    /**
+     * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/username/path.
+     *
+     * @param path path to append to the url
+     * @return HTTP response contents
+     */
     public String retrieveResults(String path) {
         URL restEndpoint = null;
         try {
@@ -134,6 +192,12 @@ public class SauceREST {
         return retrieveResults(restEndpoint);
     }
 
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @param jobId the Sauce Job id to retrieve
+     * @return String (in JSON format) representing the details for a Sauce job
+     */
     public String getJobInfo(String jobId) {
         URL restEndpoint = null;
         try {
@@ -144,6 +208,10 @@ public class SauceREST {
         return retrieveResults(restEndpoint);
     }
 
+    /**
+     * @param restEndpoint the URL to perform a HTTP GET
+     * @return Returns the response from invoking a HTTP GET for the restEndpoint
+     */
     public String retrieveResults(URL restEndpoint) {
         BufferedReader reader = null;
         StringBuilder builder = new StringBuilder();
@@ -171,6 +239,14 @@ public class SauceREST {
         return builder.toString();
     }
 
+    /**
+     * Stores the result of a HTTP GET to the value of the <code>restEndpoint</code> parameter,
+     * saving the resulting file to the directory defined by the <code>location</code> parameter.
+     *
+     * @param jobId        the Sauce Job id
+     * @param location     represents the location that the result file should be stored in
+     * @param restEndpoint the URL to perform a HTTP GET
+     */
     private void downloadFile(String jobId, String location, URL restEndpoint) {
         BufferedOutputStream out = null;
         try {
@@ -198,8 +274,7 @@ public class SauceREST {
             out.flush();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results");
-        }
-        finally {
+        } finally {
             if (out != null) {
                 try {
                     out.close();
@@ -211,6 +286,11 @@ public class SauceREST {
 
     }
 
+    /**
+     * Adds an Authorization request property to the HTTP connection.
+     *
+     * @param connection HttpURLConnection instance which represents the current HTTP request
+     */
     protected void addAuthenticationProperty(HttpURLConnection connection) {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
@@ -219,6 +299,13 @@ public class SauceREST {
 
     }
 
+    /**
+     * Invokes the Sauce REST API to update the details of a Sauce job, using the details included in the <code>updates</code>
+     * parameter.
+     *
+     * @param jobId   the Sauce job id to update
+     * @param updates Map of attributes to update
+     */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
         try {
@@ -243,6 +330,11 @@ public class SauceREST {
 
     }
 
+    /**
+     * Invokes the Sauce REST API to stop a running job.
+     *
+     * @param jobId the Sauce Job id
+     */
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
 
@@ -267,6 +359,13 @@ public class SauceREST {
 
     }
 
+    /**
+     * Opens a connection to a url.
+     *
+     * @param url URL to connect to
+     * @return HttpURLConnection instance representing the URL connection
+     * @throws IOException
+     */
     public HttpURLConnection openConnection(URL url) throws IOException {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setReadTimeout((int) HTTP_READ_TIMEOUT_SECONDS);
@@ -373,7 +472,7 @@ public class SauceREST {
      * Generates a link to the job page on Saucelabs.com, which can be accessed
      * without the user's credentials. Auth token is HMAC/MD5 of the job ID
      * with the key <username>:<api key>
-     * (see {@link http://saucelabs.com/docs/integration#public-job-links}).
+     * (see <a href="http://saucelabs.com/docs/integration#public-job-links">http://saucelabs.com/docs/integration#public-job-links</a>).
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @return link to the job page with authorization token
@@ -395,6 +494,9 @@ public class SauceREST {
         }
     }
 
+    /**
+     * @return base64 encoded String representing the username/access key
+     */
     protected String encodeAuthentication() {
         String auth = username + ":" + accessKey;
         //Handle long strings encoded using BASE64Encoder - see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6947917
@@ -408,6 +510,11 @@ public class SauceREST {
         return auth;
     }
 
+    /**
+     * Invokes the Sauce REST API to delete a tunnel.
+     *
+     * @param tunnelId Identifier of the tunnel to delete
+     */
     public void deleteTunnel(String tunnelId) {
 
         HttpURLConnection postBack = null;
@@ -431,10 +538,45 @@ public class SauceREST {
         }
     }
 
+    /**
+     * Invokes the Sauce REST API to retrieve the details of the tunnels currently associated with the user.
+     *
+     * @return String (in JSON format) representing the tunnel information
+     */
     public String getTunnels() {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Invokes the Sauce REST API to retrieve the concurrency details of the user.
+     *
+     * @return String (in JSON format) representing the concurrency information
+     */
+    public String getConcurrency() {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(GET_CONCURRENCY_FORMAT, "users", username));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Invokes the Sauce REST API to retrieve the activity details of the user.
+     *
+     * @return String (in JSON format) representing the activity information
+     */
+    public String getActivity() {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(GET_ACTIVITY_FORMAT, username));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
