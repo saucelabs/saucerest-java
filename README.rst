@@ -24,18 +24,7 @@ Maven:
         <version>1.0.17</version>
         <scope>test</scope>
       </dependency>
-    </dependencies>
-    
-    <repository>
-      <id>saucelabs-repository</id>
-      <url>https://repository-saucelabs.forge.cloudbees.com/release</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
+    </dependencies
 
 
 Note: The latest version can always be found in `the repository <http://repository-saucelabs.forge.cloudbees.com/release/com/saucelabs/saucerest/>`_.

@@ -91,7 +91,7 @@ public class SauceREST {
     /**
      * The String format used to retrieve the tunnel information via the Sauce REST API.
      */
-    private static final String GET_TUNNEL_FORMAT = RESTURL + "/tunnels";
+    private static final String GET_TUNNELS_FORMAT = RESTURL + "/tunnels";
     /**
      * The String format used to retrieve the user activity information via the Sauce REST API.
      */
@@ -99,7 +99,7 @@ public class SauceREST {
     /**
      * The String format used to delete a tunnel via the Sauce REST API.
      */
-    private static final String DELETE_TUNNEL_FORMAT = GET_TUNNEL_FORMAT + "/%2$s";
+    private static final String GET_TUNNEL_FORMAT = GET_TUNNELS_FORMAT + "/%2$s";
     /**
      * The String format used to retrieve the user concurrency information via the Sauce REST API.
      */
@@ -519,7 +519,7 @@ public class SauceREST {
 
         HttpURLConnection postBack = null;
         try {
-            URL restEndpoint = new URL(String.format(DELETE_TUNNEL_FORMAT, username, tunnelId));
+            URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
             postBack = openConnection(restEndpoint);
             postBack.setDoOutput(true);
             postBack.setRequestMethod("DELETE");
@@ -546,7 +546,22 @@ public class SauceREST {
     public String getTunnels() {
         URL restEndpoint = null;
         try {
-            restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username));
+            restEndpoint = new URL(String.format(GET_TUNNELS_FORMAT, username));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Invokes the Sauce REST API to retrieve the details of the tunnel.
+     *
+     * @return String (in JSON format) representing the tunnel information
+     */
+    public String getTunnelInformation(String tunnelId) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
