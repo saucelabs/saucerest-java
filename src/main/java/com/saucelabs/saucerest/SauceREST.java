@@ -25,6 +25,7 @@ import sun.misc.BASE64Encoder;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.rmi.UnexpectedException;
 import java.text.SimpleDateFormat;
@@ -226,8 +227,10 @@ public class SauceREST {
             while ((inputLine = reader.readLine()) != null) {
                 builder.append(inputLine);
             }
+        } catch (SocketTimeoutException e) {
+            logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error retrieving Sauce Results", e);
+            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
         }
         try {
             if (reader != null) {
@@ -320,13 +323,7 @@ public class SauceREST {
             logger.log(Level.WARNING, "Error updating Sauce Results", e);
         }
 
-        try {
-            if (postBack != null) {
-                postBack.getInputStream().close();
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing result stream", e);
-        }
+        closeInputStream(postBack);
 
     }
 
@@ -349,10 +346,17 @@ public class SauceREST {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
         }
 
+        closeInputStream(postBack);
+
+    }
+
+    private void closeInputStream(HttpURLConnection connection) {
         try {
-            if (postBack != null) {
-                postBack.getInputStream().close();
+            if (connection != null) {
+                connection.getInputStream().close();
             }
+        } catch (SocketTimeoutException e) {
+            logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error closing result stream", e);
         }
@@ -481,15 +485,12 @@ public class SauceREST {
         try {
             String key = username + ":" + accessKey;
             String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
-            String link = "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
-
-            return link;
+            return "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
         } catch (IllegalArgumentException ex) {
             // someone messed up on the algorithm to hmacEncode
             // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
             // we only want to use 'HmacMD5'
-            System.err.println("Unable to create an authenticated public link to job:");
-            System.err.println(ex);
+            logger.log(Level.WARNING, "Unable to create an authenticated public link to job:", ex);
             return "";
         }
     }
@@ -517,25 +518,19 @@ public class SauceREST {
      */
     public void deleteTunnel(String tunnelId) {
 
-        HttpURLConnection postBack = null;
+        HttpURLConnection connection = null;
         try {
             URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
-            postBack = openConnection(restEndpoint);
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("DELETE");
-            addAuthenticationProperty(postBack);
-            postBack.getOutputStream().write("".getBytes());
+            connection = openConnection(restEndpoint);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("DELETE");
+            addAuthenticationProperty(connection);
+            connection.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
         }
 
-        try {
-            if (postBack != null) {
-                postBack.getInputStream().close();
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing result stream", e);
-        }
+        closeInputStream(connection);
     }
 
     /**
