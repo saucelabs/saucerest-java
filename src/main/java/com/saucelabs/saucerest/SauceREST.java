@@ -22,12 +22,15 @@ import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import sun.misc.BASE64Encoder;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.rmi.UnexpectedException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -219,6 +222,12 @@ public class SauceREST {
         try {
 
             HttpURLConnection connection = openConnection(restEndpoint);
+            if (connection instanceof HttpsURLConnection) {
+                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
+                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
+            }
+
+            connection.setRequestProperty("charset", "utf-8");
             connection.setDoOutput(true);
             addAuthenticationProperty(connection);
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -230,6 +239,10 @@ public class SauceREST {
         } catch (SocketTimeoutException e) {
             logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
         } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
+        } catch (NoSuchAlgorithmException e) {
+            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
+        } catch (KeyManagementException e) {
             logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
         }
         try {
