@@ -77,9 +77,13 @@ public class SauceREST {
      */
     private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
     /**
+     * The String format used to retrieve the jobs information via the Sauce REST API.
+     */
+    private static final String GET_JOBS_FORMAT = RESTURL + "/jobs";
+    /**
      * The String format used to retrieve Sauce Job results from the Sauce REST API.
      */
-    private static final String JOB_RESULT_FORMAT = RESTURL + "/jobs/%2$s";
+    private static final String JOB_RESULT_FORMAT = GET_JOBS_FORMAT + "/%2$s";
     /**
      * The String format used to stop a running job via the Sauce REST API.
      */
@@ -606,5 +610,30 @@ public class SauceREST {
         return retrieveResults(restEndpoint);
     }
 
-
+    /**
+     * Invokes the Sauce REST API to retrieve a jobs info
+     *
+     * @param args array that is the request query parameters in "key=value" format
+     * @return String (in JSON format) representing the jobs list
+     */
+    public String getJobsList(String[] args) {
+        URL restEndpoint = null;
+        try {
+            StringBuilder url = new StringBuilder(String.format(GET_JOBS_FORMAT, username));
+            if (args != null && args.length > 0) {
+                int len = args.length;
+                url.append("?");
+                for (int i = 0; i < len; i++) {
+                    url.append(args[i]);
+                    if ((len > 1) && (i != len - 1)) {
+                        url.append("&");
+                    }
+                }
+                restEndpoint = new URL(url.toString());
+            }
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
 }
