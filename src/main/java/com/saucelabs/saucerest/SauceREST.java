@@ -458,8 +458,8 @@ public class SauceREST {
         HttpClientContext context = HttpClientContext.create();
         context.setCookieSpecRegistry(r);
 
-        HttpPost post = new HttpPost("http://saucelabs.com/rest/v1/storage/" +
-                username + "/" + fileName + "?overwrite=" + overwrite.toString());
+        HttpPost post = new HttpPost(String.format(RESTURL, "storage/")
+                + username + "/" + fileName + "?overwrite=" + overwrite.toString());
 
         FileEntity entity = new FileEntity(file);
         entity.setContentType(new BasicHeader("Content-Type",
@@ -568,6 +568,7 @@ public class SauceREST {
     /**
      * Invokes the Sauce REST API to retrieve the details of the tunnel.
      *
+     * @param tunnelId the Sauce Tunnel id
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnelInformation(String tunnelId) {
@@ -631,6 +632,21 @@ public class SauceREST {
                 }
                 restEndpoint = new URL(url.toString());
             }
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+    
+    /**
+     * Returns a String (in JSON format) representing the stored files list
+     *
+     * @return String (in JSON format) representing the stored files list
+     */
+    public String getStoredFiles() {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(RESTURL, "storage") + "/" + username);
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
