@@ -671,7 +671,7 @@ public class SauceREST {
     /**
      * Returns a String (in JSON format) representing the list of objects describing all the OS and browser platforms
      * currently supported on Sauce Labs.
-     *
+     * (see <a href="https://docs.saucelabs.com/reference/rest-api/#get-supported-platforms">https://docs.saucelabs.com/reference/rest-api/#get-supported-platforms</a>).
      * @param automationApi the automation API name
      * @return String (in JSON format) representing the supported platforms information
      */
