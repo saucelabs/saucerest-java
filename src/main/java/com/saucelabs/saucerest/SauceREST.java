@@ -434,9 +434,9 @@ public class SauceREST {
         CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
             public CookieSpec create(HttpContext context) {
                 return new BrowserCompatSpec(new String[]{DateUtils.PATTERN_RFC1123,
-                        DateUtils.PATTERN_RFC1036,
-                        DateUtils.PATTERN_ASCTIME,
-                        "\"EEE, dd-MMM-yyyy HH:mm:ss z\""});
+                    DateUtils.PATTERN_RFC1036,
+                    DateUtils.PATTERN_ASCTIME,
+                    "\"EEE, dd-MMM-yyyy HH:mm:ss z\""});
             }
 
         };
@@ -662,6 +662,23 @@ public class SauceREST {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(USER_RESULT_FORMAT, "users", username));
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the list of objects describing all the OS and browser platforms
+     * currently supported on Sauce Labs.
+     *
+     * @param automationApi the automation API name
+     * @return String (in JSON format) representing the supported platforms information
+     */
+    public String getSupportedPlatforms(String automationApi) {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(RESTURL, "info/platforms/" + automationApi));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
