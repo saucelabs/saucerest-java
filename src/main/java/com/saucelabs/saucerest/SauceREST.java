@@ -637,7 +637,7 @@ public class SauceREST {
         }
         return retrieveResults(restEndpoint);
     }
-    
+
     /**
      * Returns a String (in JSON format) representing the stored files list
      *
@@ -647,6 +647,21 @@ public class SauceREST {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(RESTURL, "storage") + "/" + username);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+        }
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the basic account information
+     *
+     * @return String (in JSON format) representing the basic account information
+     */
+    public String getUser() {
+        URL restEndpoint = null;
+        try {
+            restEndpoint = new URL(String.format(USER_RESULT_FORMAT, "users", username));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
