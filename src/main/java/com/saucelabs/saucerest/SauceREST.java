@@ -20,7 +20,6 @@ import org.apache.http.protocol.HttpContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
-import sun.misc.BASE64Encoder;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -38,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API functionality is available from
@@ -517,14 +517,7 @@ public class SauceREST {
      */
     protected String encodeAuthentication() {
         String auth = username + ":" + accessKey;
-        //Handle long strings encoded using BASE64Encoder - see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6947917
-        BASE64Encoder encoder = new BASE64Encoder() {
-            @Override
-            protected int bytesPerLine() {
-                return 9999;
-            }
-        };
-        auth = "Basic " + new String(encoder.encode(auth.getBytes()));
+        auth = "Basic " + DatatypeConverter.printBase64Binary(auth.getBytes());
         return auth;
     }
 
