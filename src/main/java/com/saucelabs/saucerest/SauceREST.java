@@ -117,6 +117,9 @@ public class SauceREST {
      */
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
 
+    private String server;
+    private static final String BASE_URL = System.getenv("SAUCE_REST_ENDPOINT") != null ? System.getenv("SAUCE_REST_ENDPOINT") : "https://saucelabs.com/";
+
     /**
      * Constructs a new instance of the SauceREST class.
      *
@@ -126,7 +129,84 @@ public class SauceREST {
     public SauceREST(String username, String accessKey) {
         this.username = username;
         this.accessKey = accessKey;
+        this.server = BASE_URL;
     }
+
+    /**
+     * Build the url to be
+     *
+     * @param endpoint    Endpoint url, example "info/platforms/appium"
+     * @return URL to use in direct fetch functions
+     */
+    protected URL buildURL(String endpoint) {
+        try {
+            return new URL(new URL(this.server), "/rest/" + endpoint);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+            return null;
+        }
+    }
+
+    protected String getUserAgent() {
+        return "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
+    }
+
+    public String doJSONPOST(URL url, JSONObject body) throws SauceException
+    {
+        HttpURLConnection postBack = null;
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = null;
+
+        try {
+            postBack = openConnection(url);
+            postBack.setRequestProperty("User-Agent", this.getUserAgent());
+
+            if (postBack instanceof HttpsURLConnection) {
+                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
+                ((HttpsURLConnection) postBack).setSSLSocketFactory(factory);
+            }
+            postBack.setDoOutput(true);
+            postBack.setRequestMethod("POST");
+            postBack.setRequestProperty("Content-Type", "application/json");
+            addAuthenticationProperty(postBack);
+
+            String jsonText = JSONValue.toJSONString(body);
+            postBack.getOutputStream().write(jsonText.getBytes());
+
+            reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
+
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null) {
+                builder.append(inputLine);
+            }
+        } catch (IOException e) {
+            try {
+                if (postBack.getResponseCode() == 401) {
+                    throw new SauceException.NotAuthorized();
+                }
+            } catch (IOException e1) {
+                logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + " and getting status code: ", e);
+            }
+
+            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
+        } catch (NoSuchAlgorithmException e) {
+            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
+        } catch (KeyManagementException e) {
+            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
+        } finally {
+            closeInputStream(postBack);
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error closing Sauce input stream", e);
+            }
+        }
+        return builder.toString();
+    }
+
+
 
     /**
      * Marks a Sauce Job as 'passed'.
@@ -226,6 +306,8 @@ public class SauceREST {
         try {
 
             HttpURLConnection connection = openConnection(restEndpoint);
+            connection.setRequestProperty("User-Agent", this.getUserAgent());
+
             if (connection instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
                 ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
@@ -234,6 +316,7 @@ public class SauceREST {
             connection.setRequestProperty("charset", "utf-8");
             connection.setDoOutput(true);
             addAuthenticationProperty(connection);
+
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
@@ -271,6 +354,7 @@ public class SauceREST {
         BufferedOutputStream out = null;
         try {
             HttpURLConnection connection = openConnection(restEndpoint);
+            connection.setRequestProperty("User-Agent", this.getUserAgent());
 
             connection.setDoOutput(true);
             connection.setRequestMethod("GET");
@@ -327,10 +411,12 @@ public class SauceREST {
      * @param updates Map of attributes to update
      */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
+        URL restEndpoint = this.buildURL("jobs/" + username + "/" + jobId);
+
         HttpURLConnection postBack = null;
         try {
-            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
             postBack = openConnection(restEndpoint);
+            postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
             addAuthenticationProperty(postBack);
@@ -355,6 +441,7 @@ public class SauceREST {
         try {
             URL restEndpoint = new URL(String.format(STOP_JOB_FORMAT, username, jobId));
             postBack = openConnection(restEndpoint);
+            postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
             addAuthenticationProperty(postBack);
@@ -532,6 +619,7 @@ public class SauceREST {
         try {
             URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
             connection = openConnection(restEndpoint);
+            connection.setRequestProperty("User-Agent", this.getUserAgent());
             connection.setDoOutput(true);
             connection.setRequestMethod("DELETE");
             addAuthenticationProperty(connection);
@@ -669,12 +757,28 @@ public class SauceREST {
      * @return String (in JSON format) representing the supported platforms information
      */
     public String getSupportedPlatforms(String automationApi) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(RESTURL, "info/platforms/" + automationApi));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
         return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Record CI Usage to Sauce Labs
+     *
+     * @param platform Platform string. Such as "jenkins", "bamboo", "teamcity"
+     * @param platformVersion Version string. Such as "1.1.1"
+     * @return if it was a success or not
+     */
+    public boolean recordCI(String platform, String platformVersion) {
+        URL restEndpoint = this.buildURL("v1/stats/ci");
+        JSONObject obj = new JSONObject();
+        obj.put("platform", platform);
+        obj.put("platformVersion", platformVersion);
+
+        try {
+            doJSONPOST(restEndpoint, obj);
+        } catch (SauceException e) {
+            return false;
+        }
+        return true;
     }
 }

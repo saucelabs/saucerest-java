@@ -7,4 +7,5 @@ target
 
 .DS_Store
 
+saucerest.iml
 atlassian-ide-plugin.xml
