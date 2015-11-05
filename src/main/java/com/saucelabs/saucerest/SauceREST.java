@@ -771,8 +771,14 @@ public class SauceREST {
     public boolean recordCI(String platform, String platformVersion) {
         URL restEndpoint = this.buildURL("v1/stats/ci");
         JSONObject obj = new JSONObject();
-        obj.put("platform", platform);
-        obj.put("platformVersion", platformVersion);
+        try {
+            obj.put("platform", platform);
+            obj.put("platformVersion", platformVersion);
+        } catch (JSONException e) {
+            // JSONException - If the key is null.
+            logger.log(Level.SEVERE, "Error attempting to craft json:", e);
+            return false;
+        }
 
         try {
             doJSONPOST(restEndpoint, obj);
