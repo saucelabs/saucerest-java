@@ -1,0 +1,35 @@
+SauceREST Java
+==============
+
+A java client for Sauce OnDemand’s REST API. This supercedes the old [sauce-rest-api].
+
+Using this client you can update Job info, including pass/fail status and other information supported.
+
+<http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods>
+
+Usage
+-----
+
+```java
+SauceREST r = new SauceREST(“username”, “access-key”);
+String tunnels = r.getTunnels();
+```
+
+
+Maven
+-----
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>com.saucelabs</groupId>
+    <artifactId>saucerest</artifactId>
+    <version>1.0.27</version>
+    <scope>test</scope>
+  </dependency>
+</dependencies
+```
+
+* [![Build Status](https://travis-ci.org/saucelabs/saucerest-java.svg?branch=master)](https://travis-ci.org/saucelabs/saucerest-java)
+* [sauce-rest-api](http://repository-saucelabs.forge.cloudbees.com/release/com/saucelabs/sauce-rest-api/)
+* [the repository](http://repository-saucelabs.forge.cloudbees.com/release/com/saucelabs/saucerest/)
