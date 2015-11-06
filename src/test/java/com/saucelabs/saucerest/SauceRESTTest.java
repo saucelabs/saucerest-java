@@ -150,6 +150,8 @@ public class SauceRESTTest extends TestCase {
         ));
         sauceREST.recordCI("jenkins", "1.1");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/stats/ci");
+        String output = ((MockOutputStream) this.urlConnection.getOutputStream()).toString();
+        assertEquals(output, "{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}");
     }
 
 

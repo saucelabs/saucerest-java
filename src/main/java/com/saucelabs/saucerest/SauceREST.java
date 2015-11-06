@@ -772,7 +772,7 @@ public class SauceREST {
         JSONObject obj = new JSONObject();
         try {
             obj.put("platform", platform);
-            obj.put("platformVersion", platformVersion);
+            obj.put("platform_version", platformVersion);
         } catch (JSONException e) {
             // JSONException - If the key is null.
             logger.log(Level.SEVERE, "Error attempting to craft json:", e);
