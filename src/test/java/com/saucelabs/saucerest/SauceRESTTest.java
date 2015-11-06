@@ -2,6 +2,7 @@ package com.saucelabs.saucerest;
 
 import junit.framework.TestCase;
 import org.json.JSONObject;
+import org.json.simple.JSONValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -150,8 +151,8 @@ public class SauceRESTTest extends TestCase {
         ));
         sauceREST.recordCI("jenkins", "1.1");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/stats/ci");
-        String output = ((MockOutputStream) this.urlConnection.getOutputStream()).toString();
-        assertEquals(output, "{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}");
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}"));
     }
 
 
@@ -184,8 +185,8 @@ public class SauceRESTTest extends TestCase {
         sauceREST.updateJobInfo("12345", updates);
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/jobs/12345");
 
-        String output = ((MockOutputStream) this.urlConnection.getOutputStream()).toString();
-        assertEquals(output, "{\"public\":\"shared\"}");
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
     }
 
     /*
