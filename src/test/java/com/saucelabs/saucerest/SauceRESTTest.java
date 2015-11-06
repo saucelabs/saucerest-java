@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class SauceRESTTest extends TestCase {
     @Rule
@@ -18,6 +19,20 @@ public class SauceRESTTest extends TestCase {
 
     private SauceREST sauceREST;
     private MockHttpURLConnection urlConnection;
+
+    public class MockOutputStream extends OutputStream {
+        public StringBuffer output = new StringBuffer();
+
+        @Override
+        public void write(int b) throws IOException {
+            output.append((char) b);
+        }
+
+        @Override
+        public String toString() {
+            return output.toString();
+        }
+    }
 
     private class MockHttpURLConnection extends HttpURLConnection {
         private URL realURL;
@@ -34,7 +49,7 @@ public class SauceRESTTest extends TestCase {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            this.mockOutputStream = new ByteArrayOutputStream();
+            this.mockOutputStream = new MockOutputStream();
         }
 
         @Override
@@ -156,6 +171,21 @@ public class SauceRESTTest extends TestCase {
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/fakeuser");
     }
 
+    @Test
+    public void testUpdateJobInfo() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream(
+            "[]".getBytes("UTF-8")
+        ));
+        HashMap<String, Object> updates = new HashMap<String, Object>();
+        updates.put("public", "shared");
+        sauceREST.updateJobInfo("12345", updates);
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/jobs/12345");
+
+        String output = ((MockOutputStream) this.urlConnection.getOutputStream()).toString();
+        assertEquals(output, "{\"public\":\"shared\"}");
+    }
+
     /*
     public void testJobPassed() throws Exception {
 
@@ -186,10 +216,6 @@ public class SauceRESTTest extends TestCase {
     }
 
     public void testAddAuthenticationProperty() throws Exception {
-
-    }
-
-    public void testUpdateJobInfo() throws Exception {
 
     }
 

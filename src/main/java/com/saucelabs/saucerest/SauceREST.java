@@ -411,10 +411,9 @@ public class SauceREST {
      * @param updates Map of attributes to update
      */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
-        URL restEndpoint = this.buildURL("jobs/" + username + "/" + jobId);
-
         HttpURLConnection postBack = null;
         try {
+            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
