@@ -471,7 +471,7 @@ public class SauceREST {
      *
      * @param url URL to connect to
      * @return HttpURLConnection instance representing the URL connection
-     * @throws IOException
+     * @throws IOException when a bad url is provided
      */
     public HttpURLConnection openConnection(URL url) throws IOException {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -487,7 +487,7 @@ public class SauceREST {
      *             -param fileName uses file.getName() to store in sauce
      *             -param overwrite set to true
      * @return the md5 hash returned by sauce of the file
-     * @throws IOException
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
      */
     public String uploadFile(File file) throws IOException {
         return uploadFile(file, file.getName());
@@ -500,7 +500,7 @@ public class SauceREST {
      * @param fileName name of the file in sauce storage
      *                 -param overwrite set to true
      * @return the md5 hash returned by sauce of the file
-     * @throws IOException
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
      */
     public String uploadFile(File file, String fileName) throws IOException {
         return uploadFile(file, fileName, true);
@@ -513,8 +513,8 @@ public class SauceREST {
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
-     * @throws IOException
-     */
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
+         */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
 
         CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
@@ -578,7 +578,7 @@ public class SauceREST {
     /**
      * Generates a link to the job page on Saucelabs.com, which can be accessed
      * without the user's credentials. Auth token is HMAC/MD5 of the job ID
-     * with the key <username>:<api key>
+     * with the key &lt;username&gt;:&lt;api key&gt;
      * (see <a href="http://saucelabs.com/docs/integration#public-job-links">http://saucelabs.com/docs/integration#public-job-links</a>).
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
