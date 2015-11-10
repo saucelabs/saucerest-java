@@ -20,6 +20,12 @@
     </organization>
     <developers>
         <developer>
+            <name>Gavin Mogan</name>
+            <email>gavin@saucelabs.com</email>
+            <organization>Sauce Labs</organization>
+            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
+        </developer>
+        <developer>
             <name>Ross Rowe</name>
             <email>piaross@gmail.com</email>
             <organization>Sauce Labs</organization>
