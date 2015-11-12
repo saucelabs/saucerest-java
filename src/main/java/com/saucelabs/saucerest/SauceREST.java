@@ -636,12 +636,7 @@ public class SauceREST {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnels() {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(GET_TUNNELS_FORMAT, username));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels");
         return retrieveResults(restEndpoint);
     }
 
@@ -652,12 +647,7 @@ public class SauceREST {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnelInformation(String tunnelId) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
         return retrieveResults(restEndpoint);
     }
 

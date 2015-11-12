@@ -189,6 +189,19 @@ public class SauceRESTTest extends TestCase {
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
     }
 
+
+    public void testGetTunnels() throws Exception {
+        urlConnection.setResponseCode(200);
+        String userInfo = sauceREST.getTunnels();
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/tunnels");
+    }
+
+    public void testGetTunnelInformation() throws Exception {
+        urlConnection.setResponseCode(200);
+        String userInfo = sauceREST.getTunnelInformation("1234-1234-1231-123-123");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/tunnels/1234-1234-1231-123-123");
+    }
+
     /*
     public void testJobPassed() throws Exception {
 
