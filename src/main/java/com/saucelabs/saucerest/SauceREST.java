@@ -709,8 +709,8 @@ public class SauceREST {
                         url.append("&");
                     }
                 }
-                restEndpoint = new URL(url.toString());
             }
+            restEndpoint = new URL(url.toString());
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
