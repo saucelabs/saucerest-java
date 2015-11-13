@@ -133,6 +133,15 @@ public class SauceREST {
     }
 
     /**
+     * Returns username assigned to this interface
+     *
+     * @return Returns username assigned to this interface
+     */
+    public String getUsername() {
+        return this.username;
+    }
+
+    /**
      * Build the url to be
      *
      * @param endpoint    Endpoint url, example "info/platforms/appium"
