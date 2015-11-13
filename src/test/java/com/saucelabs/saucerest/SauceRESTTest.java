@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -161,7 +162,7 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/user_test.json").openStream());
         String userInfo = sauceREST.getUser();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/fakeuser");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "");
     }
 
     @Test
@@ -171,7 +172,7 @@ public class SauceRESTTest extends TestCase {
             "[]".getBytes("UTF-8")
         ));
         String userInfo = sauceREST.getStoredFiles();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/fakeuser");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/" + this.sauceREST.getUsername() + "");
     }
 
     @Test
@@ -183,7 +184,7 @@ public class SauceRESTTest extends TestCase {
         HashMap<String, Object> updates = new HashMap<String, Object>();
         updates.put("public", "shared");
         sauceREST.updateJobInfo("12345", updates);
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/jobs/12345");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/12345");
 
         String output = this.urlConnection.getOutputStream().toString();
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
@@ -193,13 +194,32 @@ public class SauceRESTTest extends TestCase {
     public void testGetTunnels() throws Exception {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnels();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/tunnels");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels");
     }
 
     public void testGetTunnelInformation() throws Exception {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnelInformation("1234-1234-1231-123-123");
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/fakeuser/tunnels/1234-1234-1231-123-123");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/1234-1234-1231-123-123");
+    }
+
+    public void testGetActivity() throws Exception {
+        urlConnection.setResponseCode(200);
+        String userInfo = sauceREST.getActivity();
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");
+    }
+
+    //@Ignore("No idea what this done")
+    public void testGetJobsList() throws Exception {
+        urlConnection.setResponseCode(200);
+
+        sauceREST.getJobsList(new String[] {});
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getJobsList(new String[] {"hey=1"});
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
+        assertEquals(this.urlConnection.getRealURL().getQuery(), "hey=1");
     }
 
     /*
@@ -276,14 +296,6 @@ public class SauceRESTTest extends TestCase {
     }
 
     public void testGetConcurrency() throws Exception {
-
-    }
-
-    public void testGetActivity() throws Exception {
-
-    }
-
-    public void testGetJobsList() throws Exception {
 
     }
     */
