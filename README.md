@@ -14,7 +14,7 @@ Usage
 -----
 
 ```java
-SauceREST r = new SauceREST(“username”, “access-key”);
+SauceREST r = new SauceREST("username", "access-key");
 String tunnels = r.getTunnels();
 ```
 
