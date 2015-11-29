@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.saucelabs.saucerest.objects.Job;
 import com.saucelabs.saucerest.objects.JobList;
+import com.saucelabs.saucerest.objects.Platform;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
@@ -53,8 +54,7 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class SauceREST {
     private static final String HMAC_KEY = "HMACMD5";
-    private static final JsonFactory factory = new JsonFactory();
-
+    private static final ObjectMapper mapper = new ObjectMapper();
     /**
      * Logger instance.
      */
@@ -732,7 +732,6 @@ public class SauceREST {
     public List<Job> getBuildJobs(String build, boolean full) throws SauceException {
         URL restEndpoint = this.buildURL("v1/" + this.getUsername() + "/build/" + build + "/jobs" + (full ? "?full=1" : ""));
         String json = retrieveResults(restEndpoint);
-        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
         try {
             JobList jobs = mapper.readValue(json, JobList.class);
             return jobs.getJobs();
@@ -780,9 +779,16 @@ public class SauceREST {
      * @param automationApi the automation API name
      * @return String (in JSON format) representing the supported platforms information
      */
-    public String getSupportedPlatforms(String automationApi) {
+    public List<Platform> getSupportedPlatforms(String automationApi) {
         URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, new TypeReference<ArrayList<Platform>>() {});
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest;
 
 import com.saucelabs.saucerest.objects.Job;
+import com.saucelabs.saucerest.objects.Platform;
 import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -13,10 +14,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -145,8 +143,17 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/appium.json").openStream());
 
-        String results = sauceREST.getSupportedPlatforms("appium");
+        List<Platform> platforms = sauceREST.getSupportedPlatforms("appium");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/info/platforms/appium");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(platforms);
+        assertEquals(86, platforms.size());
+        assertEquals("iPad", platforms.get(0).longName);
+        assertEquals(
+            Arrays.asList("1.0.0", "1.1.0", "1.2.0", "1.2.4", "1.3.3", "1.3.4", "1.3.6", "1.4.3", "1.4.7", "1.4.10"),
+            platforms.get(0).deprecatedBackendVersions
+        );
+        assertEquals("iPhone", platforms.get(3).longName);
     }
 
     @Test

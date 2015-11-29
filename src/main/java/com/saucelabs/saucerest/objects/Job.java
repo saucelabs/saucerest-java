@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.saucelabs.saucerest.deserializers.UnixtimeDeserializer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,17 +17,6 @@ import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Job {
-    public static class JobDateImpl extends StdDeserializer<Date> {
-        public JobDateImpl() {
-            super(Date.class);
-        }
-
-        @Override
-        public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-            return new Date(Long.parseLong(jsonParser.getValueAsString())*1000);
-        }
-    }
-
 //    "browser_version": "10.0.9200.17089.",
     @JsonProperty("browser_short_version")
     private String browserShortVersion;
@@ -37,23 +27,23 @@ public class Job {
     private URL logURL;
 
     @JsonProperty("creation_time")
-    @JsonDeserialize(using=JobDateImpl.class)
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
     private Date creationTime;
 
     @JsonProperty("deletion_time")
-    @JsonDeserialize(using=JobDateImpl.class)
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
     private Date deletionTime;
 
     @JsonProperty("start_time")
-    @JsonDeserialize(using=JobDateImpl.class)
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
     private Date startTime;
 
     @JsonProperty("modification_time")
-    @JsonDeserialize(using=JobDateImpl.class)
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
     private Date modificationTime;
 
     @JsonProperty("end_time")
-    @JsonDeserialize(using=JobDateImpl.class)
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
     private Date endTime;
 
     private String owner;
