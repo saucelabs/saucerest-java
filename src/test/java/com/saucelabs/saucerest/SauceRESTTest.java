@@ -139,11 +139,12 @@ public class SauceRESTTest extends TestCase {
     }
 
     @Test
-    public void testGetSupportedPlatforms_appium() throws Exception {
+    public void testGetSupportedPlatforms() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/appium.json").openStream());
+        List<Platform> platforms;
 
-        List<Platform> platforms = sauceREST.getSupportedPlatforms("appium");
+        urlConnection.setInputStream(getClass().getResource("/appium.json").openStream());
+        platforms = sauceREST.getSupportedPlatforms("appium");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/info/platforms/appium");
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(platforms);
@@ -154,6 +155,16 @@ public class SauceRESTTest extends TestCase {
             platforms.get(0).deprecatedBackendVersions
         );
         assertEquals("iPhone", platforms.get(3).longName);
+
+        urlConnection.setInputStream(getClass().getResource("/webdriver.json").openStream());
+        platforms = sauceREST.getSupportedPlatforms("webdriver");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/info/platforms/webdriver");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(platforms);
+        assertEquals(686, platforms.size());
+        assertEquals("iPad", platforms.get(0).longName);
+        assertNull(platforms.get(0).deprecatedBackendVersions);
+        assertEquals("Firefox", platforms.get(3).longName);
     }
 
     @Test
