@@ -1,1 +1,39 @@
-{"domain": null, "last_name": null, "creation_time": 1265155800, "user_type": "free", "concurrency_limit": {"mac": 2, "scout": 2, "overall": 2, "real_device": 0}, "manual_minutes": 45, "can_run_manual": true, "prevent_emails": ["marketing"], "id": "test", "first_name": null, "verified": false, "subscribed": false, "title": null, "ancestor_allows_subaccounts": true, "email": "test@test.com", "username": "test", "vm_lockdown": false, "parent": null, "is_admin": null, "access_key": "this-is-a-fake-access-key", "name": null, "is_sso": false, "entity_type": "individual", "ancestor_concurrency_limit": {"mac": 2, "scout": 2, "overall": 2, "real_device": 0}, "minutes": 160}
+{
+  "domain": null,
+  "last_name": "Last Test",
+  "creation_time": 1265155800,
+  "user_type": "free",
+  "concurrency_limit": {
+    "mac": 2,
+    "scout": 2,
+    "overall": 2,
+    "real_device": 0
+  },
+  "manual_minutes": 45,
+  "can_run_manual": true,
+  "prevent_emails": [
+    "marketing"
+  ],
+  "id": "test",
+  "first_name": "First Test",
+  "verified": false,
+  "subscribed": false,
+  "title": null,
+  "ancestor_allows_subaccounts": true,
+  "email": "test@test.com",
+  "username": "test",
+  "vm_lockdown": false,
+  "parent": null,
+  "is_admin": null,
+  "access_key": "this-is-a-fake-access-key",
+  "name": null,
+  "is_sso": false,
+  "entity_type": "individual",
+  "ancestor_concurrency_limit": {
+    "mac": 2,
+    "scout": 2,
+    "overall": 2,
+    "real_device": 0
+  },
+  "minutes": 160
+}

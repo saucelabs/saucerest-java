@@ -2,6 +2,7 @@ package com.saucelabs.saucerest;
 
 import com.saucelabs.saucerest.objects.Job;
 import com.saucelabs.saucerest.objects.Platform;
+import com.saucelabs.saucerest.objects.User;
 import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -184,8 +185,52 @@ public class SauceRESTTest extends TestCase {
     public void testGetUser() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/user_test.json").openStream());
-        String userInfo = sauceREST.getUser();
+        User userInfo = sauceREST.getUser();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "");
+        assertNotNull(userInfo);
+
+        assertEquals("this-is-a-fake-access-key", userInfo.getAccessKey());
+        assertEquals(null, userInfo.getDomain());
+        assertEquals("Last Test", userInfo.getLastName());
+        assertEquals("First Test", userInfo.getFirstName());
+        assertEquals("test", userInfo.getId());
+        assertEquals(null, userInfo.getName());
+        assertEquals(null, userInfo.getTitle());
+        assertEquals("test@test.com", userInfo.getEmail());
+        assertEquals("individual", userInfo.getEntityType());
+
+        assertEquals(new Date((long)1265155800 * 1000), userInfo.getCreationTime());
+        assertEquals("free", userInfo.getUserType());
+
+        assertEquals(2, userInfo.getConcurrencyLimit().getMac());
+        assertEquals(2, userInfo.getConcurrencyLimit().getScout());
+        assertEquals(2, userInfo.getConcurrencyLimit().getOverall());
+        assertEquals(0, userInfo.getConcurrencyLimit().getRealDevice());
+
+        assertEquals(2, userInfo.getAncestorConcurrencyLimit().getMac());
+        assertEquals(2, userInfo.getAncestorConcurrencyLimit().getScout());
+        assertEquals(2, userInfo.getAncestorConcurrencyLimit().getOverall());
+        assertEquals(0, userInfo.getAncestorConcurrencyLimit().getRealDevice());
+
+        assertEquals(45, userInfo.getManualMinutes());
+        assertEquals(160, userInfo.getMinutes());
+
+        assertEquals(Arrays.asList("marketing"), userInfo.getPreventEmails());
+
+        assertEquals(false, userInfo.getVerified());
+        assertEquals(false, userInfo.getSubscribed());
+        assertEquals(true, userInfo.getAncestorAllowsSubaccounts());
+        assertEquals(false, userInfo.getVmLockdown());
+        assertEquals(null, userInfo.getParent());
+        assertEquals(null, userInfo.getIsAdmin());
+        assertEquals(true, userInfo.getCanRunManual());
+        assertEquals(false, userInfo.getIsSso());
+
+        urlConnection.setResponseCode(401);
+        urlConnection.setInputStream(new ByteArrayInputStream(
+            "{\"error\": \"user does not exist or access denied\"}".getBytes("UTF-8")
+        ));
+        assertNull(sauceREST.getUser());
     }
 
     @Test

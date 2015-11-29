@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.saucelabs.saucerest.objects.Job;
 import com.saucelabs.saucerest.objects.JobList;
 import com.saucelabs.saucerest.objects.Platform;
+import com.saucelabs.saucerest.objects.User;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
@@ -762,14 +763,21 @@ public class SauceREST {
      *
      * @return String (in JSON format) representing the basic account information
      */
-    public String getUser() {
+    public User getUser() {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(USER_RESULT_FORMAT, "users", username));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, User.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**
