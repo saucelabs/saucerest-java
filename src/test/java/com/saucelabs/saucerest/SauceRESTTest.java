@@ -1,10 +1,10 @@
 package com.saucelabs.saucerest;
 
+import com.saucelabs.saucerest.objects.Job;
 import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -13,7 +13,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SauceRESTTest extends TestCase {
     @Rule
@@ -124,7 +129,7 @@ public class SauceRESTTest extends TestCase {
             "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes("UTF-8")
         ));
         urlConnection.setResponseCode(201);
-        this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
+        this.sauceREST.doRESTPost(new URL("http://example.org/blah"), new JSONObject());
     }
 
     @Test(expected=SauceException.NotAuthorized.class)
@@ -132,7 +137,7 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(401);
 
         thrown.expect(SauceException.NotAuthorized.class);
-        this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
+        this.sauceREST.doRESTPost(new URL("http://example.org/blah"), new JSONObject());
     }
 
     @Test
@@ -207,6 +212,38 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getActivity();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");
+    }
+
+    public void testGetBuildJobs() throws Exception {
+        urlConnection.setResponseCode(200);
+        List<Job> jobs;
+
+        urlConnection.setInputStream(getClass().getResource("/build_jobs_full.json").openStream());
+        jobs = sauceREST.getBuildJobs("test_sauce__22", true);
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/build/test_sauce__22/jobs");
+        assertEquals(this.urlConnection.getRealURL().getQuery(), "full=1");
+        assertNotNull(jobs);
+        assertEquals(6, jobs.size());
+        assertEquals("Sauce Sample Test", jobs.get(0).getName());
+        assertEquals("5f119101b8b14db89b25250bf33341d7", jobs.get(0).getId());
+        assertEquals(new Date(1000 * (long) 1445299850), jobs.get(0).getCreationTime());
+        assertEquals("Sauce Sample Test", jobs.get(1).getName());
+        assertEquals("6c0b4b2076c44c4791f14c747eab7545", jobs.get(1).getId());
+
+        urlConnection.setInputStream(getClass().getResource("/build_jobs.json").openStream());
+        jobs = sauceREST.getBuildJobs("test_sauce__22", false);
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/build/test_sauce__22/jobs");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals(6, jobs.size());
+        assertNull(jobs.get(0).getName());
+        assertEquals("5f119101b8b14db89b25250bf33341d7", jobs.get(0).getId());
+        assertEquals(new Date(1000 * (long) 1445299850), jobs.get(0).getCreationTime());
+
+        urlConnection.setInputStream(getClass().getResource("/build_jobs_empty.json").openStream());
+        jobs = sauceREST.getBuildJobs("test_sauce__8000000", false);
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/build/test_sauce__8000000/jobs");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals(0, jobs.size());
     }
 
     //@Ignore("No idea what this done")

@@ -1,11 +1,19 @@
 package com.saucelabs.saucerest;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.saucelabs.saucerest.objects.Job;
+import com.saucelabs.saucerest.objects.JobList;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.DateUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.cookie.CookieSpec;
@@ -21,19 +29,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import java.net.*;
 import java.rmi.UnexpectedException;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +52,8 @@ import javax.xml.bind.DatatypeConverter;
  * @author Ross Rowe
  */
 public class SauceREST {
+    private static final String HMAC_KEY = "HMACMD5";
+    private static final JsonFactory factory = new JsonFactory();
 
     /**
      * Logger instance.
@@ -160,7 +168,7 @@ public class SauceREST {
         return "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
     }
 
-    public String doJSONPOST(URL url, JSONObject body) throws SauceException
+    public String doRESTPost(URL url, JSONObject body) throws SauceException
     {
         HttpURLConnection postBack = null;
         StringBuilder builder = new StringBuilder();
@@ -699,22 +707,40 @@ public class SauceREST {
     public String getJobsList(String[] args) {
         URL restEndpoint = null;
         try {
-            StringBuilder url = new StringBuilder(String.format(GET_JOBS_FORMAT, username));
+            URIBuilder ub = new URIBuilder(String.format(GET_JOBS_FORMAT, username));
             if (args != null && args.length > 0) {
-                int len = args.length;
-                url.append("?");
-                for (int i = 0; i < len; i++) {
-                    url.append(args[i]);
-                    if ((len > 1) && (i != len - 1)) {
-                        url.append("&");
-                    }
+                for(String arg : args)
+                {
+                    String[] parts = arg.split("=", 2);
+                    ub.addParameter(parts[0], parts[1]);
                 }
             }
-            restEndpoint = new URL(url.toString());
+            restEndpoint = new URL(ub.toString());
+        } catch (URISyntaxException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
         return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * @param build Build Name
+     * @param full Should just return full job information
+     * @return API Results
+     */
+    public List<Job> getBuildJobs(String build, boolean full) throws SauceException {
+        URL restEndpoint = this.buildURL("v1/" + this.getUsername() + "/build/" + build + "/jobs" + (full ? "?full=1" : ""));
+        String json = retrieveResults(restEndpoint);
+        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+        try {
+            JobList jobs = mapper.readValue(json, JobList.class);
+            return jobs.getJobs();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**
@@ -779,10 +805,34 @@ public class SauceREST {
         }
 
         try {
-            doJSONPOST(restEndpoint, obj);
+            doRESTPost(restEndpoint, obj);
         } catch (SauceException e) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param username Sauce Username
+     * @param accessKey Sauce Access key
+     * @param jobId job id
+     * @return HMAC token
+     * @throws NoSuchAlgorithmException     thrown if an error occurs generating the key
+     * @throws InvalidKeyException          thrown if an error occurs generating the key
+     * @throws UnsupportedEncodingException thrown if an error occurs generating the key
+     */
+    public String calcHMAC(String username, String accessKey, String jobId) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String key = username + ":" + accessKey + ":" + format.format(calendar.getTime());
+        byte[] keyBytes = key.getBytes();
+        SecretKeySpec sks = new SecretKeySpec(keyBytes, HMAC_KEY);
+        Mac mac = Mac.getInstance(sks.getAlgorithm());
+        mac.init(sks);
+        byte[] hmacBytes = mac.doFinal(jobId.getBytes());
+        byte[] hexBytes = new Hex().encode(hmacBytes);
+        return new String(hexBytes, "ISO-8859-1");
     }
 }

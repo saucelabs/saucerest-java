@@ -1,0 +1,125 @@
+{
+  "jobs": [
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "VISTA",
+        "browserName": "internet explorer",
+        "version": "10",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 85,
+        "Error": 76
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "5f119101b8b14db89b25250bf33341d7",
+      "breakpointed": null
+    },
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "OSX 10.8",
+        "browserName": "safari",
+        "version": "6",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 125,
+        "Error": 112
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "6c0b4b2076c44c4791f14c747eab7545",
+      "breakpointed": null
+    },
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "OSX 10.8",
+        "browserName": "safari",
+        "version": "6",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 124,
+        "Error": 112
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "99516cefb7f9403f99299119a76df746",
+      "breakpointed": null
+    },
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "WIN8_1",
+        "browserName": "internet explorer",
+        "version": "11",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 99,
+        "Error": 88
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "a9c736951e0a4b2e811af8b8ece23c66",
+      "breakpointed": null
+    },
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "VISTA",
+        "browserName": "internet explorer",
+        "version": "10",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 98,
+        "Error": 88
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "e1cbb6954acd449baae17d88247420fa",
+      "breakpointed": null
+    },
+    {
+      "status": "complete",
+      "base_config": {
+        "platform": "WIN8_1",
+        "browserName": "internet explorer",
+        "version": "11",
+        "name": "Sauce Sample Test"
+      },
+      "command_counts": {
+        "All": 85,
+        "Error": 76
+      },
+      "deletion_time": null,
+      "url": null,
+      "creation_time": 1445299850,
+      "public": null,
+      "assigned_tunnel_id": null,
+      "id": "f00168b3a7004ab9a6ee7e84c8429f7a",
+      "breakpointed": null
+    }
+  ],
+  "truncated": false
+}
