@@ -307,7 +307,33 @@ public class SauceRESTTest extends TestCase {
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/0ec525b62b4e47a6a77e5185e9f40b2d");
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tunnel);
+        assertEquals("running", tunnel.getStatus());
+        assertEquals(Arrays.asList("google.com", "yahoo.com"), tunnel.getDirectDomains());
+        assertEquals(null, tunnel.getVmVersion());
+        assertEquals(1448859728000L, tunnel.getLastConnected().getTime());
+        assertEquals(null, tunnel.getShutdownTime());
+        assertEquals(443, tunnel.getSshPort());
+        assertEquals(1448859722000L, tunnel.getLaunchTime().getTime());
+        assertEquals(null, tunnel.getUserShutdown());
+        assertEquals(null, tunnel.getUseCachingProxy());
+        assertEquals(1448859714000L, tunnel.getCreationTime().getTime());
+        assertEquals(Arrays.asList("notgoogle.com", "notyahoo.com"), tunnel.getDomainNames());
+        assertEquals(false, tunnel.getSharedTunnel());
+        assertEquals("gavin-tunnel-id", tunnel.getTunnelIdentifier());
+        assertEquals("maki81017.miso.saucelabs.com", tunnel.getHost());
+        assertEquals(false, tunnel.getNoProxyCaching());
+        assertEquals("halkeye", tunnel.getOwner());
+        assertEquals(true, tunnel.getUseKgp());
+        assertEquals(null, tunnel.getNoSslBumpDomains());
+        assertEquals("0ec525b62b4e47a6a77e5185e9f40b2d", tunnel.getId());
 
+        assertEquals("odin", tunnel.getMetadata().getHostname());
+        assertEquals("abd6986", tunnel.getMetadata().getGitVersion());
+        assertEquals("Linux 3.10.0-229.14.1.el7.x86_64 #1 SMP Tue Sep 15 15:05:51 UTC 2015 x86_64", tunnel.getMetadata().getPlatform());
+        assertEquals("./bin/sc -u halkeye -k **** -D google.com,yahoo.com -t notgoogle.com,notyahoo.com -i gavin-tunnel-id", tunnel.getMetadata().getCommand());
+        assertEquals(1788, tunnel.getMetadata().getBuild());
+        assertEquals("4.3.12", tunnel.getMetadata().getRelease());
+        assertEquals(1024, tunnel.getMetadata().getNofileLimit());
     }
 
     public void testGetActivity() throws Exception {

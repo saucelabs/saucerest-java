@@ -31,9 +31,9 @@ public class Tunnel implements Serializable {
         public String getCommand() { return this.command; }
 
         @JsonProperty("build")
-        private String build;
+        private int build;
 
-        public String getBuild() { return this.build; }
+        public int getBuild() { return this.build; }
 
         @JsonProperty("release")
         private String release;
