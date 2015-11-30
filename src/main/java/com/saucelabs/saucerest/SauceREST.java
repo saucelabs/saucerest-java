@@ -2,6 +2,7 @@ package com.saucelabs.saucerest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.saucelabs.saucerest.objects.*;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
@@ -673,6 +674,10 @@ public class SauceREST {
         String json = retrieveResults(restEndpoint);
         try {
             return mapper.readValue(json, Tunnel.class);
+        } catch (UnrecognizedPropertyException e) {
+            if ("errors".equals(e.getPropertyName())) {
+                return null; // FIXME
+            }
         } catch (IOException e) {
             e.printStackTrace();
             // FIXME - this should be its own exception
@@ -806,6 +811,10 @@ public class SauceREST {
         String json = retrieveResults(restEndpoint);
         try {
             return mapper.readValue(json, User.class);
+        } catch (UnrecognizedPropertyException e) {
+            if ("errors".equals(e.getPropertyName())) {
+                return null; // FIXME
+            }
         } catch (IOException e) {
             e.printStackTrace();
             // FIXME - this should be its own exception
