@@ -601,17 +601,7 @@ public class SauceREST {
      * @return link to the job page with authorization token
      */
     public String getPublicJobLink(String jobId) {
-        try {
-            String key = username + ":" + accessKey;
-            String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
-            return "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
-        } catch (IllegalArgumentException ex) {
-            // someone messed up on the algorithm to hmacEncode
-            // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
-            // we only want to use 'HmacMD5'
-            logger.log(Level.WARNING, "Unable to create an authenticated public link to job:", ex);
-            return "";
-        }
+        return "https://saucelabs.com/jobs/" + jobId + "?auth=" + calcHMAC(username, accessKey, jobId);
     }
 
     /**
@@ -851,18 +841,8 @@ public class SauceREST {
      * @throws InvalidKeyException          thrown if an error occurs generating the key
      * @throws UnsupportedEncodingException thrown if an error occurs generating the key
      */
-    public String calcHMAC(String username, String accessKey, String jobId) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
-        Calendar calendar = Calendar.getInstance();
-
-        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String key = username + ":" + accessKey + ":" + format.format(calendar.getTime());
-        byte[] keyBytes = key.getBytes();
-        SecretKeySpec sks = new SecretKeySpec(keyBytes, HMAC_KEY);
-        Mac mac = Mac.getInstance(sks.getAlgorithm());
-        mac.init(sks);
-        byte[] hmacBytes = mac.doFinal(jobId.getBytes());
-        byte[] hexBytes = new Hex().encode(hmacBytes);
-        return new String(hexBytes, "ISO-8859-1");
+    public String calcHMAC(String username, String accessKey, String jobId) {
+        String key = username + ":" + accessKey;
+        return SecurityUtils.hmacEncode("HmacMD5", jobId, key);
     }
 }
