@@ -389,20 +389,6 @@ public class SauceRESTTest extends TestCase {
         assertEquals(0, jobs.size());
     }
 
-    //@Ignore("No idea what this done")
-    public void testGetJobsList() throws Exception {
-        urlConnection.setResponseCode(200);
-
-        sauceREST.getJobsList(new String[] {});
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
-        assertNull(this.urlConnection.getRealURL().getQuery());
-
-        sauceREST.getJobsList(new String[] {"hey=1"});
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
-        assertEquals(this.urlConnection.getRealURL().getQuery(), "hey=1");
-    }
-
-
     public void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
