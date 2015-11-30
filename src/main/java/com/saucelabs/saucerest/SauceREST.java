@@ -1,9 +1,7 @@
 package com.saucelabs.saucerest;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import com.saucelabs.saucerest.objects.*;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
@@ -31,6 +29,7 @@ import org.json.simple.JSONValue;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.io.File;
 import java.net.*;
@@ -43,7 +42,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API functionality is available from
@@ -54,6 +52,7 @@ import javax.xml.bind.DatatypeConverter;
 public class SauceREST {
     private static final String HMAC_KEY = "HMACMD5";
     private static final ObjectMapper mapper = new ObjectMapper();
+
     /**
      * Logger instance.
      */
@@ -672,14 +671,21 @@ public class SauceREST {
      *
      * @return String (in JSON format) representing the concurrency information
      */
-    public String getConcurrency() {
+    public Concurrency getConcurrency() {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(GET_CONCURRENCY_FORMAT, "users", username));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, Concurrency.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**

@@ -354,10 +354,24 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
 
-        String concurencyInfo = sauceREST.getConcurrency();
+        Concurrency concurencyInfo = sauceREST.getConcurrency();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "/concurrency");
         assertNull(this.urlConnection.getRealURL().getQuery());
-        assertEquals(concurencyInfo, "{\"timestamp\": 1447392030.111457, \"concurrency\": {\"halkeye\": {\"current\": {\"overall\": 0, \"mac\": 0, \"manual\": 0}, \"remaining\": {\"overall\": 100, \"mac\": 100, \"manual\": 5}}}}");
+        assertEquals(1448857070346L, concurencyInfo.getTimestamp().getTime());
+
+        assertEquals(0, concurencyInfo.getSubaccount("halkeye").getCurrent().getMac());
+        assertEquals(0, concurencyInfo.getSubaccount("halkeye").getCurrent().getManual());
+        assertEquals(0, concurencyInfo.getSubaccount("halkeye").getCurrent().getOverall());
+
+        assertEquals(100, concurencyInfo.getSubaccount("halkeye").getRemaining().getMac());
+        assertEquals(5, concurencyInfo.getSubaccount("halkeye").getRemaining().getManual());
+        assertEquals(100, concurencyInfo.getSubaccount("halkeye").getRemaining().getOverall());
+
+        assertEquals(1, concurencyInfo.getSubaccount("gavin_sauce_1").getRemaining().getOverall());
+
+        assertNull(concurencyInfo.getSubaccount("no real account"));
+
+        assertEquals(new HashSet<String>(Arrays.asList("halkeye", "gavin_sauce_1")), concurencyInfo.getSubaccounts());
     }
 
     /*
