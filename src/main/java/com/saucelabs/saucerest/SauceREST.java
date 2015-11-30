@@ -687,14 +687,21 @@ public class SauceREST {
      *
      * @return String (in JSON format) representing the activity information
      */
-    public String getActivity() {
+    public Activity getActivity() {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(GET_ACTIVITY_FORMAT, username));
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, Activity.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**

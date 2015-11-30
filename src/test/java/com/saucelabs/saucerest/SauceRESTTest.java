@@ -285,8 +285,23 @@ public class SauceRESTTest extends TestCase {
 
     public void testGetActivity() throws Exception {
         urlConnection.setResponseCode(200);
-        String userInfo = sauceREST.getActivity();
+        urlConnection.setInputStream(getClass().getResource("/activity.json").openStream());
+
+        Activity activity = sauceREST.getActivity();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals(0, activity.getTotals().getAll());
+        assertEquals(0, activity.getTotals().getInProgress());
+        assertEquals(0, activity.getTotals().getQueued());
+
+        assertEquals(0, activity.getSubaccount("halkeye").getAll());
+        assertEquals(0, activity.getSubaccount("halkeye").getInProgress());
+        assertEquals(0, activity.getSubaccount("halkeye").getQueued());
+
+        assertNull(activity.getSubaccount("no real account"));
+
+        assertEquals(new HashSet<String>(Arrays.asList("halkeye", "gavin_sauce_1")), activity.getSubaccounts());
+
     }
 
     public void testGetBuildJobs() throws Exception {

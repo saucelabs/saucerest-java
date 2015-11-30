@@ -1,0 +1,19 @@
+{
+  "subaccounts": {
+    "halkeye": {
+      "in progress": 0,
+      "all": 0,
+      "queued": 0
+    },
+    "gavin_sauce_1": {
+      "in progress": 0,
+      "all": 0,
+      "queued": 0
+    }
+  },
+  "totals": {
+    "in progress": 0,
+    "all": 0,
+    "queued": 0
+  }
+}
