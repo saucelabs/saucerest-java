@@ -730,32 +730,6 @@ public class SauceREST {
     }
 
     /**
-     * Invokes the Sauce REST API to retrieve a jobs info
-     *
-     * @param args array that is the request query parameters in "key=value" format
-     * @return String (in JSON format) representing the jobs list
-     */
-    public String getJobsList(String[] args) {
-        URL restEndpoint = null;
-        try {
-            URIBuilder ub = new URIBuilder(String.format(GET_JOBS_FORMAT, username));
-            if (args != null && args.length > 0) {
-                for(String arg : args)
-                {
-                    String[] parts = arg.split("=", 2);
-                    ub.addParameter(parts[0], parts[1]);
-                }
-            }
-            restEndpoint = new URL(ub.toString());
-        } catch (URISyntaxException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
-        return retrieveResults(restEndpoint);
-    }
-
-    /**
      * @param build Build Name
      * @param full Should just return full job information
      * @return API Results
