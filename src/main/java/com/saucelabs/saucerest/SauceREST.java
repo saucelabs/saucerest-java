@@ -169,6 +169,11 @@ public class SauceREST {
 
     public String doRESTPost(URL url, JSONObject body) throws SauceException
     {
+        return doREST("POST", url, body);
+    }
+
+    public String doREST(String method, URL url, JSONObject body) throws SauceException
+    {
         HttpURLConnection postBack = null;
         StringBuilder builder = new StringBuilder();
         BufferedReader reader = null;
@@ -182,7 +187,7 @@ public class SauceREST {
                 ((HttpsURLConnection) postBack).setSSLSocketFactory(factory);
             }
             postBack.setDoOutput(true);
-            postBack.setRequestMethod("POST");
+            postBack.setRequestMethod(method);
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
