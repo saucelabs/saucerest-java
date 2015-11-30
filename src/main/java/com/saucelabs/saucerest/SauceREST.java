@@ -650,9 +650,16 @@ public class SauceREST {
      *
      * @return String (in JSON format) representing the tunnel information
      */
-    public String getTunnels() {
+    public ArrayList<String> getTunnels() {
         URL restEndpoint = this.buildURL("v1/" + username + "/tunnels");
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, new TypeReference<ArrayList<String>>() {});
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**
@@ -661,9 +668,16 @@ public class SauceREST {
      * @param tunnelId the Sauce Tunnel id
      * @return String (in JSON format) representing the tunnel information
      */
-    public String getTunnelInformation(String tunnelId) {
+    public Tunnel getTunnelInformation(String tunnelId) {
         URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            return mapper.readValue(json, Tunnel.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**

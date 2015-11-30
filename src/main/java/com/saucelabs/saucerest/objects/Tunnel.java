@@ -1,181 +1,152 @@
 package com.saucelabs.saucerest.objects;
 
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.saucelabs.saucerest.deserializers.UnixtimeDeserializer;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Tunnel {
+public class Tunnel implements Serializable {
+    public static class Metadata implements Serializable {
+        @JsonProperty("hostname")
+        private String hostname;
+
+        public String getHostname() { return this.hostname; }
+
+        @JsonProperty("git_version")
+        private String git_version;
+
+        public String getGitVersion() { return this.git_version; }
+
+        @JsonProperty("platform")
+        private String platform;
+
+        public String getPlatform() { return this.platform; }
+
+        @JsonProperty("command")
+        private String command;
+
+        public String getCommand() { return this.command; }
+
+        @JsonProperty("build")
+        private String build;
+
+        public String getBuild() { return this.build; }
+
+        @JsonProperty("release")
+        private String release;
+
+        public String getRelease() { return this.release; }
+
+        @JsonProperty("nofile_limit")
+        private int nofile_limit;
+
+        public int getNofileLimit() { return this.nofile_limit; }
+    }
     @JsonProperty("status")
     private String status;
+
+    public String getStatus() { return this.status; }
+
     @JsonProperty("direct_domains")
-    private String directDomains;
+    private ArrayList<String> direct_domains;
+
+    public ArrayList<String> getDirectDomains() { return this.direct_domains; }
+
     @JsonProperty("vm_version")
-    private String vmVersion;
+    private String vm_version;
+
+    public String getVmVersion() { return this.vm_version; }
+
+    @JsonProperty("last_connected")
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
+    private Date last_connected;
+
+    public Date getLastConnected() { return this.last_connected; }
+
     @JsonProperty("shutdown_time")
-    private String shutdownTime;
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
+    private Date shutdown_time;
+
+    public Date getShutdownTime() { return this.shutdown_time; }
+
     @JsonProperty("ssh_port")
-    private String sshPort;
+    private int ssh_port;
+
+    public int getSshPort() { return this.ssh_port; }
+
+    @JsonProperty("launch_time")
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
+    private Date launch_time;
+
+    public Date getLaunchTime() { return this.launch_time; }
+
     @JsonProperty("user_shutdown")
-    private String userShutdown;
+    private Boolean user_shutdown;
+
+    public Boolean getUserShutdown() { return this.user_shutdown; }
+
     @JsonProperty("use_caching_proxy")
-    private String useCachingProxy;
+
+    private Boolean use_caching_proxy;
+
+    public Boolean getUseCachingProxy() { return this.use_caching_proxy; }
+
     @JsonProperty("creation_time")
-    private String creationTime;
+    @JsonDeserialize(using=UnixtimeDeserializer.class)
+    private Date creation_time;
+
+    public Date getCreationTime() { return this.creation_time; }
+
     @JsonProperty("domain_names")
-    private List<String> domainNames;
+    private ArrayList<String> domain_names;
+
+    public ArrayList<String> getDomainNames() { return this.domain_names; }
+
     @JsonProperty("shared_tunnel")
-    private String sharedTunnel;
+    private boolean shared_tunnel;
+
+    public boolean getSharedTunnel() { return this.shared_tunnel; }
+
     @JsonProperty("tunnel_identifier")
-    private String tunnelIdentifier;
+    private String tunnel_identifier;
+
+    public String getTunnelIdentifier() { return this.tunnel_identifier; }
+
     @JsonProperty("host")
     private String host;
+
+    public String getHost() { return this.host; }
+
+    @JsonProperty("no_proxy_caching")
+    private boolean no_proxy_caching;
+
+    public boolean getNoProxyCaching() { return this.no_proxy_caching; }
+
     @JsonProperty("owner")
     private String owner;
+
+    public String getOwner() { return this.owner; }
+
     @JsonProperty("use_kgp")
-    private String useKgp;
+    private boolean use_kgp;
+
+    public boolean getUseKgp() { return this.use_kgp; }
+
     @JsonProperty("no_ssl_bump_domains")
-    private String noSslBumpDomains;
+    private ArrayList<String> no_ssl_bump_domains; // FIXME - this can be null or a list
+
+    public ArrayList<String> getNoSslBumpDomains() { return this.no_ssl_bump_domains; }
+
     @JsonProperty("id")
     private String id;
+
+    public String getId() { return this.id; }
+
     @JsonProperty("metadata")
-    private Map<String, String> metadata;
+    private Metadata metadata;
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getDirectDomains() {
-        return directDomains;
-    }
-
-    public void setDirectDomains(String directDomains) {
-        this.directDomains = directDomains;
-    }
-
-    public String getVmVersion() {
-        return vmVersion;
-    }
-
-    public void setVmVersion(String vm_version) {
-        this.vmVersion = vm_version;
-    }
-
-    public String getShutdownTime() {
-        return shutdownTime;
-    }
-
-    public void setShutdownTime(String shutdownTime) {
-        this.shutdownTime = shutdownTime;
-    }
-
-    public String getSshPort() {
-        return sshPort;
-    }
-
-    public void setSshPort(String sshPort) {
-        this.sshPort = sshPort;
-    }
-
-    public String getUserShutdown() {
-        return userShutdown;
-    }
-
-    public void setUserShutdown(String userShutdown) {
-        this.userShutdown = userShutdown;
-    }
-
-    public String getUseCachingProxy() {
-        return useCachingProxy;
-    }
-
-    public void setUseCachingProxy(String useCachingProxy) {
-        this.useCachingProxy = useCachingProxy;
-    }
-
-    public String getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(String creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public List<String> getDomainNames() {
-        return domainNames;
-    }
-
-    public void setDomainNames(List<String> domainNames) {
-        this.domainNames = domainNames;
-    }
-
-    public String getSharedTunnel() {
-        return sharedTunnel;
-    }
-
-    public void setSharedTunnel(String sharedTunnel) {
-        this.sharedTunnel = sharedTunnel;
-    }
-
-    public String getTunnelIdentifier() {
-        return tunnelIdentifier;
-    }
-
-    public void setTunnelIdentifier(String tunnelIdentifier) {
-        this.tunnelIdentifier = tunnelIdentifier;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getUseKgp() {
-        return useKgp;
-    }
-
-    public void setUseKgp(String useKgp) {
-        this.useKgp = useKgp;
-    }
-
-    public String getNoSslBumpDomains() {
-        return noSslBumpDomains;
-    }
-
-    public void setNoSslBumpDomains(String noSslBumpDomains) {
-        this.noSslBumpDomains = noSslBumpDomains;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Map<String, String> getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Map<String, String> metadata) {
-        this.metadata = metadata;
-    }
+    public Metadata getMetadata() { return this.metadata; }
 }

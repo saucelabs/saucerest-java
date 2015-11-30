@@ -272,15 +272,42 @@ public class SauceRESTTest extends TestCase {
 
 
     public void testGetTunnels() throws Exception {
+        List<String> tunnels;
         urlConnection.setResponseCode(200);
-        String userInfo = sauceREST.getTunnels();
+
+        urlConnection.setInputStream(new ByteArrayInputStream("[]".getBytes("UTF-8")));
+        tunnels = sauceREST.getTunnels();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tunnels);
+        assertEquals(0, tunnels.size());
+
+        urlConnection.setInputStream(new ByteArrayInputStream("[\"0ec525b62b4e47a6a77e5185e9f40b2d\"]".getBytes("UTF-8")));
+        tunnels = sauceREST.getTunnels();
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tunnels);
+        assertEquals(1, tunnels.size());
+        assertEquals("0ec525b62b4e47a6a77e5185e9f40b2d", tunnels.get(0));
     }
 
     public void testGetTunnelInformation() throws Exception {
+        Tunnel tunnel = null;
+
         urlConnection.setResponseCode(200);
-        String userInfo = sauceREST.getTunnelInformation("1234-1234-1231-123-123");
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/1234-1234-1231-123-123");
+        urlConnection.setInputStream(new ByteArrayInputStream("{\"errors\": \"Tunnel not found\"}".getBytes("UTF-8")));
+        tunnel = sauceREST.getTunnelInformation("0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNull(tunnel);
+
+        urlConnection.setResponseCode(404);
+        urlConnection.setInputStream(getClass().getResource("/single_tunnel.json").openStream());
+        tunnel = sauceREST.getTunnelInformation("0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tunnel);
+
     }
 
     public void testGetActivity() throws Exception {
@@ -436,14 +463,6 @@ public class SauceRESTTest extends TestCase {
     }
 
     public void testDeleteTunnel() throws Exception {
-
-    }
-
-    public void testGetTunnels() throws Exception {
-
-    }
-
-    public void testGetTunnelInformation() throws Exception {
 
     }
     */

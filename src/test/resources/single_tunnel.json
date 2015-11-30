@@ -1,0 +1,36 @@
+{
+  "status": "running",
+  "direct_domains": [
+    "google.com",
+    "yahoo.com"
+  ],
+  "vm_version": null,
+  "last_connected": 1448859728,
+  "shutdown_time": null,
+  "ssh_port": 443,
+  "launch_time": 1448859722,
+  "user_shutdown": null,
+  "use_caching_proxy": null,
+  "creation_time": 1448859714,
+  "domain_names": [
+    "notgoogle.com",
+    "notyahoo.com"
+  ],
+  "shared_tunnel": false,
+  "tunnel_identifier": "gavin-tunnel-id",
+  "host": "maki81017.miso.saucelabs.com",
+  "no_proxy_caching": false,
+  "owner": "halkeye",
+  "use_kgp": true,
+  "no_ssl_bump_domains": null,
+  "id": "0ec525b62b4e47a6a77e5185e9f40b2d",
+  "metadata": {
+    "hostname": "odin",
+    "git_version": "abd6986",
+    "platform": "Linux 3.10.0-229.14.1.el7.x86_64 #1 SMP Tue Sep 15 15:05:51 UTC 2015 x86_64",
+    "command": "./bin/sc -u halkeye -k **** -D google.com,yahoo.com -t notgoogle.com,notyahoo.com -i gavin-tunnel-id",
+    "build": "1788",
+    "release": "4.3.12",
+    "nofile_limit": 1024
+  }
+}
