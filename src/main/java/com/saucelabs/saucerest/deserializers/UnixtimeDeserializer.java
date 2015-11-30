@@ -18,6 +18,7 @@ public class UnixtimeDeserializer extends StdDeserializer<Date> {
 
     @Override
     public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        return new Date(Long.parseLong(jsonParser.getValueAsString())*1000);
+        double val = Double.parseDouble(jsonParser.getValueAsString());
+        return new Date((long)(1000*val));
     }
 }

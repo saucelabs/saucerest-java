@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.saucelabs.saucerest.objects.Job;
-import com.saucelabs.saucerest.objects.JobList;
-import com.saucelabs.saucerest.objects.Platform;
-import com.saucelabs.saucerest.objects.User;
+import com.saucelabs.saucerest.objects.*;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
@@ -35,6 +32,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
+import java.io.File;
 import java.net.*;
 import java.rmi.UnexpectedException;
 import java.security.InvalidKeyException;
@@ -734,8 +732,8 @@ public class SauceREST {
         URL restEndpoint = this.buildURL("v1/" + this.getUsername() + "/build/" + build + "/jobs" + (full ? "?full=1" : ""));
         String json = retrieveResults(restEndpoint);
         try {
-            JobList jobs = mapper.readValue(json, JobList.class);
-            return jobs.getJobs();
+            RootObject root = mapper.readValue(json, RootObject.class);
+            return root.getJobs();
         } catch (IOException e) {
             e.printStackTrace();
             // FIXME - this should be its own exception
@@ -748,14 +746,22 @@ public class SauceREST {
      *
      * @return String (in JSON format) representing the stored files list
      */
-    public String getStoredFiles() {
+    public List<com.saucelabs.saucerest.objects.File> getStoredFiles() {
         URL restEndpoint = null;
         try {
             restEndpoint = new URL(String.format(RESTURL, "storage") + "/" + username);
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        return retrieveResults(restEndpoint);
+        String json = retrieveResults(restEndpoint);
+        try {
+            RootObject root = mapper.readValue(json, RootObject.class);
+            return root.getFiles();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
     }
 
     /**

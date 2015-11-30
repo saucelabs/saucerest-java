@@ -1,8 +1,6 @@
 package com.saucelabs.saucerest;
 
-import com.saucelabs.saucerest.objects.Job;
-import com.saucelabs.saucerest.objects.Platform;
-import com.saucelabs.saucerest.objects.User;
+import com.saucelabs.saucerest.objects.*;
 import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -235,12 +233,26 @@ public class SauceRESTTest extends TestCase {
 
     @Test
     public void testGetStoredFiles() throws Exception {
+        List<com.saucelabs.saucerest.objects.File> files;
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream(
-            "[]".getBytes("UTF-8")
-        ));
-        String userInfo = sauceREST.getStoredFiles();
+
+        urlConnection.setInputStream(getClass().getResource("/storage_empty.json").openStream());
+        files = sauceREST.getStoredFiles();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/" + this.sauceREST.getUsername() + "");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(files);
+        assertEquals(0, files.size());
+
+        urlConnection.setInputStream(getClass().getResource("/storage_files.json").openStream());
+        files = sauceREST.getStoredFiles();
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/" + this.sauceREST.getUsername() + "");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(files);
+        assertEquals(1, files.size());
+        assertEquals("cd6d9784b26d865cd1ede9610197e279", files.get(0).getMd5());
+        assertEquals("Garod-2.png", files.get(0).getName());
+        assertEquals(1448843959891L, files.get(0).getMtime().getTime());
+        assertEquals(80375, files.get(0).getSize());
     }
 
     @Test
