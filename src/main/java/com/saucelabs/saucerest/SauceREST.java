@@ -241,52 +241,6 @@ public class SauceREST {
     }
 
     /**
-     * @param restEndpoint the URL to perform a HTTP GET
-     * @return Returns the response from invoking a HTTP GET for the restEndpoint
-     */
-    public String retrieveResults(URL restEndpoint) {
-        BufferedReader reader = null;
-        StringBuilder builder = new StringBuilder();
-        try {
-
-            HttpURLConnection connection = openConnection(restEndpoint);
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
-
-            if (connection instanceof HttpsURLConnection) {
-                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
-                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
-            }
-
-            connection.setRequestProperty("charset", "utf-8");
-            connection.setDoOutput(true);
-            addAuthenticationProperty(connection);
-
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String inputLine;
-            while ((inputLine = reader.readLine()) != null) {
-                builder.append(inputLine);
-            }
-        } catch (SocketTimeoutException e) {
-            logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (KeyManagementException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        }
-        try {
-            if (reader != null) {
-                reader.close();
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error closing Sauce input stream", e);
-        }
-        return builder.toString();
-    }
-
-    /**
      * Stores the result of a HTTP GET to the value of the <code>restEndpoint</code> parameter,
      * saving the resulting file to the directory defined by the <code>location</code> parameter.
      *
