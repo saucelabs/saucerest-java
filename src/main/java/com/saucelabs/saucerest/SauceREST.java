@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.saucelabs.saucerest.objects.*;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.cookie.CookieSpec;
@@ -27,8 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
@@ -229,80 +225,6 @@ public class SauceREST {
             }
         }
         return builder.toString();
-    }
-
-
-
-    /**
-     * Marks a Sauce Job as 'passed'.
-     *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     */
-    public void jobPassed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
-        updates.put("passed", true);
-        updateJobInfo(jobId, updates);
-    }
-
-    /**
-     * Marks a Sauce Job as 'failed'.
-     *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     */
-    public void jobFailed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
-        updates.put("passed", false);
-        updateJobInfo(jobId, updates);
-    }
-
-    /**
-     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in
-     * a directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     */
-    public void downloadVideo(String jobId, String location) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(DOWNLOAD_VIDEO_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
-        downloadFile(jobId, location, restEndpoint);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
-     * a directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     */
-    public void downloadLog(String jobId, String location) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(DOWNLOAD_LOG_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
-        downloadFile(jobId, location, restEndpoint);
-    }
-
-    /**
-     * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/username/path.
-     *
-     * @param path path to append to the url
-     * @return HTTP response contents
-     */
-    public String retrieveResults(String path) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(USER_RESULT_FORMAT, username, path));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
-        return retrieveResults(restEndpoint);
     }
 
     /**
@@ -628,7 +550,6 @@ public class SauceREST {
      * @param tunnelId Identifier of the tunnel to delete
      */
     public void deleteTunnel(String tunnelId) {
-
         URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
         doREST("DELETE", restEndpoint, null);
     }
