@@ -15,6 +15,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class SauceRESTTest extends TestCase {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -131,6 +134,14 @@ public class SauceRESTTest extends TestCase {
                 return super.doREST(method, url, body);
             }
         };
+    }
+
+    @Test
+    public void testDoREST_GET() throws Exception {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey");
+        String ret = this.sauceREST.doREST("GET", new URL("https://saucelabs.com/test/guinea-pig"), null);
+        assertNotNull(ret);
+        assertThat(ret, containsString("<title>I am a page title - Sauce Labs</title>"));
     }
 
     @Test

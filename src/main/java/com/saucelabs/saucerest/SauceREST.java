@@ -230,7 +230,7 @@ public class SauceREST {
      */
     public Job getJobInfo(String jobId) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, Job.class);
         } catch (IOException e) {
@@ -344,7 +344,6 @@ public class SauceREST {
             String auth = encodeAuthentication();
             connection.setRequestProperty("Authorization", auth);
         }
-
     }
 
     /**
@@ -544,7 +543,7 @@ public class SauceREST {
      */
     public ArrayList<String> getTunnels() {
         URL restEndpoint = this.buildURL("v1/" + username + "/tunnels");
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, new TypeReference<ArrayList<String>>() {});
         } catch (IOException e) {
@@ -562,7 +561,7 @@ public class SauceREST {
      */
     public Tunnel getTunnelInformation(String tunnelId) {
         URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, Tunnel.class);
         } catch (UnrecognizedPropertyException e) {
@@ -588,7 +587,7 @@ public class SauceREST {
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, Concurrency.class);
         } catch (IOException e) {
@@ -610,7 +609,7 @@ public class SauceREST {
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, Activity.class);
         } catch (IOException e) {
@@ -627,7 +626,7 @@ public class SauceREST {
      */
     public List<Job> getBuildJobs(String build, boolean full) throws SauceException {
         URL restEndpoint = this.buildURL("v1/" + this.getUsername() + "/build/" + build + "/jobs" + (full ? "?full=1" : ""));
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             RootObject root = mapper.readValue(json, RootObject.class);
             return root.getJobs();
@@ -650,7 +649,7 @@ public class SauceREST {
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             RootObject root = mapper.readValue(json, RootObject.class);
             return root.getFiles();
@@ -673,7 +672,7 @@ public class SauceREST {
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
         }
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, User.class);
         } catch (UnrecognizedPropertyException e) {
@@ -696,7 +695,7 @@ public class SauceREST {
      */
     public List<Platform> getSupportedPlatforms(String automationApi) {
         URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
-        String json = retrieveResults(restEndpoint);
+        String json = doREST("GET", restEndpoint, null);
         try {
             return mapper.readValue(json, new TypeReference<ArrayList<Platform>>() {});
         } catch (IOException e) {
