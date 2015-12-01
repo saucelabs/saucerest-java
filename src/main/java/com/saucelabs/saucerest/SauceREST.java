@@ -163,11 +163,6 @@ public class SauceREST {
         return "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
     }
 
-    public String doRESTPost(URL url, JSONObject body) throws SauceException
-    {
-        return doREST("POST", url, body);
-    }
-
     public String doREST(String method, URL url, JSONObject body) throws SauceException
     {
         HttpURLConnection postBack = null;
@@ -745,7 +740,7 @@ public class SauceREST {
         }
 
         try {
-            doRESTPost(restEndpoint, obj);
+            doREST("POST", restEndpoint, obj);
         } catch (SauceException e) {
             return false;
         }
