@@ -659,6 +659,20 @@ public class SauceREST {
         return null;
     }
 
+    public SauceStatus getStatus() {
+        URL restEndpoint = this.buildURL("v1/info/status");
+        String json = doREST("GET", restEndpoint, null);
+        try {
+            return mapper.readValue(json, SauceStatus.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
+        }
+        return null;
+    }
+
+
+
     /**
      * Record CI Usage to Sauce Labs
      *

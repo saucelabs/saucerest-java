@@ -474,4 +474,17 @@ public class SauceRESTTest extends TestCase {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertEquals("PUT", this.urlConnection.getRealMethod());
     }
+
+    @Test
+    public void testGetStatus() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/status.json").openStream());
+
+        SauceStatus status = sauceREST.getStatus();
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/info/status");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals(true, status.getServiceOperational());
+        assertEquals("Basic service status checks passed.", status.getStatusMessage());
+        assertEquals(2.487502764875028, status.getWaitTime());
+    }
 }
