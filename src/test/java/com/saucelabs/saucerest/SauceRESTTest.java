@@ -297,6 +297,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
     }
 
+    @Test
     public void testGetJobInfo() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/job_info.json").openStream());
@@ -307,6 +308,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals("Sauce Sample Test", job.getName());
     }
 
+    @Test
     public void testGetTunnels() throws Exception {
         List<String> tunnels;
         urlConnection.setResponseCode(200);
@@ -327,6 +329,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals("0ec525b62b4e47a6a77e5185e9f40b2d", tunnels.get(0));
     }
 
+    @Test
     public void testDeleteTunnel() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("".getBytes("UTF-8")));
@@ -340,6 +343,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals("DELETE", this.urlConnection.getRealMethod());
     }
 
+    @Test
     public void testGetTunnelInformation() throws Exception {
         Tunnel tunnel = null;
 
@@ -385,6 +389,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals(1024, tunnel.getMetadata().getNofileLimit());
     }
 
+    @Test
     public void testGetActivity() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/activity.json").openStream());
@@ -406,6 +411,7 @@ public class SauceRESTTest extends TestCase {
 
     }
 
+    @Test
     public void testGetBuildJobs() throws Exception {
         urlConnection.setResponseCode(200);
         List<Job> jobs;
@@ -438,6 +444,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals(0, jobs.size());
     }
 
+    @Test
     public void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
@@ -462,6 +469,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals(new HashSet<String>(Arrays.asList("halkeye", "gavin_sauce_1")), concurencyInfo.getSubaccounts());
     }
 
+    @Test
     public void testStopJob() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("".getBytes("UTF-8")));
