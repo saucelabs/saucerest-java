@@ -15,8 +15,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
 public class SauceRESTTest extends TestCase {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -42,6 +40,7 @@ public class SauceRESTTest extends TestCase {
         private URL realURL;
         private InputStream mockInputStream;
         private OutputStream mockOutputStream;
+        private String realMethod;
 
         /**
          * Constructor for the HttpURLConnection.
@@ -105,6 +104,14 @@ public class SauceRESTTest extends TestCase {
         public int getResponseCode() throws IOException {
             return this.responseCode;
         }
+
+        public void setRealMethod(String realMethod) {
+            this.realMethod = realMethod;
+        }
+
+        public String getRealMethod() {
+            return realMethod;
+        }
     }
 
 
@@ -116,6 +123,12 @@ public class SauceRESTTest extends TestCase {
             public HttpURLConnection openConnection(URL url) throws IOException {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
                 return SauceRESTTest.this.urlConnection;
+            }
+
+            @Override
+            public String doREST(String method, URL url, JSONObject body) throws SauceException {
+                SauceRESTTest.this.urlConnection.setRealMethod(method);
+                return super.doREST(method, url, body);
             }
         };
     }
@@ -289,6 +302,19 @@ public class SauceRESTTest extends TestCase {
         assertNotNull(tunnels);
         assertEquals(1, tunnels.size());
         assertEquals("0ec525b62b4e47a6a77e5185e9f40b2d", tunnels.get(0));
+    }
+
+    public void testDeleteTunnel() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("".getBytes("UTF-8")));
+
+        sauceREST.deleteTunnel("0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/0ec525b62b4e47a6a77e5185e9f40b2d",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals("DELETE", this.urlConnection.getRealMethod());
     }
 
     public void testGetTunnelInformation() throws Exception {
@@ -471,10 +497,6 @@ public class SauceRESTTest extends TestCase {
     }
 
     public void testEncodeAuthentication() throws Exception {
-
-    }
-
-    public void testDeleteTunnel() throws Exception {
 
     }
     */

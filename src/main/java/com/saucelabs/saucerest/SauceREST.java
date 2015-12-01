@@ -191,8 +191,12 @@ public class SauceREST {
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
-            String jsonText = JSONValue.toJSONString(body);
-            postBack.getOutputStream().write(jsonText.getBytes());
+            if (body != null) {
+                String jsonText = JSONValue.toJSONString(body);
+                postBack.getOutputStream().write(jsonText.getBytes());
+            } else {
+                postBack.getOutputStream().write("".getBytes());
+            }
 
             reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
 
@@ -625,20 +629,13 @@ public class SauceREST {
      */
     public void deleteTunnel(String tunnelId) {
 
-        HttpURLConnection connection = null;
         try {
             URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
-            connection = openConnection(restEndpoint);
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
-            connection.setDoOutput(true);
-            connection.setRequestMethod("DELETE");
-            addAuthenticationProperty(connection);
-            connection.getOutputStream().write("".getBytes());
+            doREST("DELETE", restEndpoint, null);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
         }
 
-        closeInputStream(connection);
     }
 
     /**
