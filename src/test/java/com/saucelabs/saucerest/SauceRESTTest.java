@@ -172,12 +172,12 @@ public class SauceRESTTest extends TestCase {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(platforms);
         assertEquals(86, platforms.size());
-        assertEquals("iPad", platforms.get(0).longName);
+        assertEquals("iPad", platforms.get(0).getLongName());
         assertEquals(
             Arrays.asList("1.0.0", "1.1.0", "1.2.0", "1.2.4", "1.3.3", "1.3.4", "1.3.6", "1.4.3", "1.4.7", "1.4.10"),
-            platforms.get(0).deprecatedBackendVersions
+            platforms.get(0).getDeprecatedBackendVersions()
         );
-        assertEquals("iPhone", platforms.get(3).longName);
+        assertEquals("iPhone", platforms.get(3).getLongName());
 
         urlConnection.setInputStream(getClass().getResource("/webdriver.json").openStream());
         platforms = sauceREST.getSupportedPlatforms("webdriver");
@@ -185,9 +185,9 @@ public class SauceRESTTest extends TestCase {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(platforms);
         assertEquals(686, platforms.size());
-        assertEquals("iPad", platforms.get(0).longName);
-        assertNull(platforms.get(0).deprecatedBackendVersions);
-        assertEquals("Firefox", platforms.get(3).longName);
+        assertEquals("iPad", platforms.get(0).getLongName());
+        assertNull(platforms.get(0).getDeprecatedBackendVersions());
+        assertEquals("Firefox", platforms.get(3).getLongName());
     }
 
     @Test
