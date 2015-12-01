@@ -233,14 +233,16 @@ public class SauceREST {
      * @param jobId the Sauce Job id to retrieve
      * @return String (in JSON format) representing the details for a Sauce job
      */
-    public String getJobInfo(String jobId) {
-        URL restEndpoint = null;
+    public Job getJobInfo(String jobId) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+        String json = retrieveResults(restEndpoint);
         try {
-            restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+            return mapper.readValue(json, Job.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // FIXME - this should be its own exception
         }
-        return retrieveResults(restEndpoint);
+        return null;
     }
 
     /**

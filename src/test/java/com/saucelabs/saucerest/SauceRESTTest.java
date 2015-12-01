@@ -274,15 +274,27 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setInputStream(new ByteArrayInputStream(
             "[]".getBytes("UTF-8")
         ));
+
         HashMap<String, Object> updates = new HashMap<String, Object>();
         updates.put("public", "shared");
         sauceREST.updateJobInfo("12345", updates);
+
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/12345");
+        assertNull(this.urlConnection.getRealURL().getQuery());
 
         String output = this.urlConnection.getOutputStream().toString();
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
     }
 
+    public void testGetJobInfo() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/job_info.json").openStream());
+        Job job = this.sauceREST.getJobInfo("1234");
+        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234");
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(job);
+        assertEquals("Sauce Sample Test", job.getName());
+    }
 
     public void testGetTunnels() throws Exception {
         List<String> tunnels;
@@ -457,10 +469,6 @@ public class SauceRESTTest extends TestCase {
     }
 
     public void testRetrieveResults() throws Exception {
-
-    }
-
-    public void testGetJobInfo() throws Exception {
 
     }
 
