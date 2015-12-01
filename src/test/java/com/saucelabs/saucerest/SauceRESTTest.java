@@ -139,15 +139,15 @@ public class SauceRESTTest extends TestCase {
             "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes("UTF-8")
         ));
         urlConnection.setResponseCode(201);
-        this.sauceREST.doRESTPost(new URL("http://example.org/blah"), new JSONObject());
+        this.sauceREST.doREST("POST", new URL("http://example.org/blah"), new JSONObject());
     }
 
-    @Test(expected=SauceException.NotAuthorized.class)
+    @Test(expected = SauceException.NotAuthorized.class)
     public void testDoJSONPOST_NotAuthorized() throws Exception {
         urlConnection.setResponseCode(401);
 
         thrown.expect(SauceException.NotAuthorized.class);
-        this.sauceREST.doRESTPost(new URL("http://example.org/blah"), new JSONObject());
+        this.sauceREST.doREST("POST", new URL("http://example.org/blah"), new JSONObject());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class SauceRESTTest extends TestCase {
         assertEquals("test@test.com", userInfo.getEmail());
         assertEquals("individual", userInfo.getEntityType());
 
-        assertEquals(new Date((long)1265155800 * 1000), userInfo.getCreationTime());
+        assertEquals(new Date((long) 1265155800 * 1000), userInfo.getCreationTime());
         assertEquals("free", userInfo.getUserType());
 
         assertEquals(2, userInfo.getConcurrencyLimit().getMac());
@@ -451,61 +451,16 @@ public class SauceRESTTest extends TestCase {
         assertEquals(new HashSet<String>(Arrays.asList("halkeye", "gavin_sauce_1")), concurencyInfo.getSubaccounts());
     }
 
-    /*
-    public void testJobPassed() throws Exception {
-
-    }
-
-    public void testJobFailed() throws Exception {
-
-    }
-
-    public void testDownloadVideo() throws Exception {
-
-    }
-
-    public void testDownloadLog() throws Exception {
-
-    }
-
-    public void testRetrieveResults() throws Exception {
-
-    }
-
-    public void testRetrieveResults1() throws Exception {
-
-    }
-
-    public void testAddAuthenticationProperty() throws Exception {
-
-    }
-
     public void testStopJob() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("".getBytes("UTF-8")));
 
+        sauceREST.stopJob("0ec525b62b4e47a6a77e5185e9f40b2d");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/0ec525b62b4e47a6a77e5185e9f40b2d/stop",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertEquals("PUT", this.urlConnection.getRealMethod());
     }
-
-    public void testOpenConnection() throws Exception {
-
-    }
-
-    public void testUploadFile() throws Exception {
-
-    }
-
-    public void testUploadFile1() throws Exception {
-
-    }
-
-    public void testUploadFile2() throws Exception {
-
-    }
-
-    public void testGetPublicJobLink() throws Exception {
-
-    }
-
-    public void testEncodeAuthentication() throws Exception {
-
-    }
-    */
 }

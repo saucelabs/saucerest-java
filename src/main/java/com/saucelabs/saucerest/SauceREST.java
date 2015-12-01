@@ -379,22 +379,8 @@ public class SauceREST {
      * @param jobId the Sauce Job id
      */
     public void stopJob(String jobId) {
-        HttpURLConnection postBack = null;
-
-        try {
-            URL restEndpoint = new URL(String.format(STOP_JOB_FORMAT, username, jobId));
-            postBack = openConnection(restEndpoint);
-            postBack.setRequestProperty("User-Agent", this.getUserAgent());
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("PUT");
-            addAuthenticationProperty(postBack);
-            postBack.getOutputStream().write("".getBytes());
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
-        }
-
-        closeInputStream(postBack);
-
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/stop");
+        doREST("PUT", restEndpoint, null);
     }
 
     private void closeInputStream(HttpURLConnection connection) {
@@ -458,7 +444,7 @@ public class SauceREST {
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
-         */
+     */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
 
         CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
