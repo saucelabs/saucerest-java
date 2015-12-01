@@ -629,13 +629,8 @@ public class SauceREST {
      */
     public void deleteTunnel(String tunnelId) {
 
-        try {
-            URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
-            doREST("DELETE", restEndpoint, null);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
-        }
-
+        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
+        doREST("DELETE", restEndpoint, null);
     }
 
     /**
