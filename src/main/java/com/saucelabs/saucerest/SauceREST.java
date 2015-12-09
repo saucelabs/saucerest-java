@@ -400,6 +400,8 @@ public class SauceREST {
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
 
+        String sourceFileMD5 = this.calcMD5(file);
+
         CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
             public CookieSpec create(HttpContext context) {
                 return new BrowserCompatSpec(new String[]{DateUtils.PATTERN_RFC1123,
@@ -451,7 +453,14 @@ public class SauceREST {
                 throw new UnexpectedException("Failed to upload to sauce-storage: "
                         + sauceUploadResponse.getString("error"));
             }
-            return sauceUploadResponse.getString("md5");
+            String destinationFileMD5 = sauceUploadResponse.getString("md5");
+            if(!destinationFileMD5.contentEquals(sourceFileMD5)){
+                throw new UnexpectedException(
+                    String.format("Failed to upload to sauce-storage: md5 expected: %s, received: %s",
+                        sourceFileMD5,
+                        destinationFileMD5));
+            }
+            return destinationFileMD5;
         } catch (JSONException j) {
             throw new UnexpectedException("Failed to parse json response.", j);
         }
@@ -712,5 +721,15 @@ public class SauceREST {
     public String calcHMAC(String username, String accessKey, String jobId) {
         String key = username + ":" + accessKey;
         return SecurityUtils.hmacEncode("HmacMD5", jobId, key);
+    }
+
+    public String calcMD5(File file) throws IOException{
+        if (file == null || !file.exists()){
+            throw new FileNotFoundException(String.format("File does not exist!"));
+        }
+        FileInputStream fis = new FileInputStream(file);
+        String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(fis);
+        fis.close();
+        return md5;
     }
 }
