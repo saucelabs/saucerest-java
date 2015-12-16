@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +46,7 @@ import javax.xml.bind.DatatypeConverter;
  *
  * @author Ross Rowe
  */
-public class SauceREST {
+public class SauceREST implements Serializable {
 
     /**
      * Logger instance.
@@ -784,5 +785,17 @@ public class SauceREST {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SauceREST)) {
+            return super.equals(obj);
+        }
+        SauceREST sauceobj = (SauceREST) obj;
+        return Objects.equals(sauceobj.username, this.username) &&
+            Objects.equals(sauceobj.accessKey, this.accessKey) &&
+            Objects.equals(sauceobj.server, this.server) &&
+            Objects.equals(sauceobj.BASE_URL, this.BASE_URL);
     }
 }

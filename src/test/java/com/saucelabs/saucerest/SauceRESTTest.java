@@ -4,10 +4,10 @@ import junit.framework.TestCase;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.apache.commons.lang.SerializationUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -116,6 +116,13 @@ public class SauceRESTTest extends TestCase {
                 return SauceRESTTest.this.urlConnection;
             }
         };
+    }
+
+    @Test
+    public void testConfirmSerializable() throws Exception {
+        SauceREST original = new SauceREST(null, null);
+        SauceREST copy = (SauceREST) SerializationUtils.clone(original);
+        assertEquals(original, copy);
     }
 
     @Test
