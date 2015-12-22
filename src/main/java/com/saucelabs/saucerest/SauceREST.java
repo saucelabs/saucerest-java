@@ -20,6 +20,7 @@ import org.apache.http.protocol.HttpContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
+import sun.misc.IOUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -526,61 +527,58 @@ public class SauceREST implements Serializable {
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
          */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
-
-        CookieSpecProvider customSpecProvider = new CookieSpecProvider() {
-            public CookieSpec create(HttpContext context) {
-                return new BrowserCompatSpec(new String[]{DateUtils.PATTERN_RFC1123,
-                    DateUtils.PATTERN_RFC1036,
-                    DateUtils.PATTERN_ASCTIME,
-                    "\"EEE, dd-MMM-yyyy HH:mm:ss z\""});
-            }
-
-        };
-        Registry<CookieSpecProvider> r = RegistryBuilder.<CookieSpecProvider>create()
-                .register(CookieSpecs.BEST_MATCH,
-                        new BestMatchSpecFactory())
-                .register("custom", customSpecProvider)
-                .build();
-
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setCookieSpec("custom")
-                .build();
-
-        CloseableHttpClient client = HttpClients.custom()
-                .setDefaultCookieSpecRegistry(r)
-                .setDefaultRequestConfig(requestConfig)
-                .build();
-
-        HttpClientContext context = HttpClientContext.create();
-        context.setCookieSpecRegistry(r);
-
-        HttpPost post = new HttpPost(String.format(RESTURL, "storage/")
+        try {
+            URL restEndpoint = new URL(String.format(RESTURL, "storage/")
                 + username + "/" + fileName + "?overwrite=" + overwrite.toString());
 
-        FileEntity entity = new FileEntity(file);
-        entity.setContentType(new BasicHeader("Content-Type",
-                "application/octet-stream"));
-        post.setEntity(entity);
+            HttpURLConnection connection = openConnection(restEndpoint);
 
-        post.setHeader("Content-Type", "application/octet-stream");
-        post.setHeader("Authorization", encodeAuthentication());
-        HttpResponse response = client.execute(post, context);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        String line;
-        StringBuilder builder = new StringBuilder();
-        while ((line = rd.readLine()) != null) {
-            builder.append(line);
-        }
+            if (connection instanceof HttpsURLConnection) {
+                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
+                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
+            }
 
-        try {
+            connection.setRequestProperty("User-Agent", this.getUserAgent());
+            addAuthenticationProperty(connection);
+            connection.setUseCaches(false);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("Cache-Control", "no-cache");
+            connection.setRequestProperty("Content-Type", "application/octet-stream");
+
+            InputStream is = new FileInputStream(file);
+            DataOutputStream oos = new DataOutputStream(connection.getOutputStream());
+
+            int c = 0;
+            byte[] buf = new byte[8192];
+
+            while ((c = is.read(buf, 0, buf.length)) > 0) {
+                oos.write(buf, 0, c);
+                oos.flush();
+            }
+            oos.close();
+            is.close();
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder builder = new StringBuilder();
+            while ((line = rd.readLine()) != null) {
+                builder.append(line);
+            }
+
             JSONObject sauceUploadResponse = new JSONObject(builder.toString());
             if (sauceUploadResponse.has("error")) {
                 throw new UnexpectedException("Failed to upload to sauce-storage: "
                         + sauceUploadResponse.getString("error"));
             }
             return sauceUploadResponse.getString("md5");
-        } catch (JSONException j) {
-            throw new UnexpectedException("Failed to parse json response.", j);
+        } catch (JSONException e) {
+            throw new UnexpectedException("Failed to parse json response.", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnexpectedException("Failed to get algorithm.", e);
+        } catch (KeyManagementException e) {
+            throw new UnexpectedException("Failed to get key management.", e);
         }
 
     }
