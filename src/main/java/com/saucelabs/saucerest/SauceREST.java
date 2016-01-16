@@ -119,6 +119,8 @@ public class SauceREST implements Serializable {
      */
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
 
+    private static String extraUserAgent = "";
+
     private String server;
     private static final String BASE_URL = System.getenv("SAUCE_REST_ENDPOINT") != null ? System.getenv("SAUCE_REST_ENDPOINT") : "https://saucelabs.com/";
 
@@ -132,6 +134,14 @@ public class SauceREST implements Serializable {
         this.username = username;
         this.accessKey = accessKey;
         this.server = BASE_URL;
+    }
+
+    public static String getExtraUserAgent() {
+        return extraUserAgent;
+    }
+
+    public static void setExtraUserAgent(String extraUserAgent) {
+        SauceREST.extraUserAgent = extraUserAgent;
     }
 
     /**
@@ -159,7 +169,11 @@ public class SauceREST implements Serializable {
     }
 
     protected String getUserAgent() {
-        return "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
+        String userAgent = "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
+        if (!"".equals(getExtraUserAgent())) {
+            userAgent = userAgent + " " + getExtraUserAgent();
+        }
+        return userAgent;
     }
 
     public String doJSONPOST(URL url, JSONObject body) throws SauceException
