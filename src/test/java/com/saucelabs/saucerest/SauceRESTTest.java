@@ -216,20 +216,6 @@ public class SauceRESTTest extends TestCase {
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");
     }
 
-    //@Ignore("No idea what this done")
-    public void testGetJobsList() throws Exception {
-        urlConnection.setResponseCode(200);
-
-        sauceREST.getJobsList(new String[] {});
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
-        assertNull(this.urlConnection.getRealURL().getQuery());
-
-        sauceREST.getJobsList(new String[] {"hey=1"});
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs");
-        assertEquals(this.urlConnection.getRealURL().getQuery(), "hey=1");
-    }
-
-
     public void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
@@ -240,56 +226,121 @@ public class SauceRESTTest extends TestCase {
         assertEquals(concurencyInfo, "{\"timestamp\": 1447392030.111457, \"concurrency\": {\"halkeye\": {\"current\": {\"overall\": 0, \"mac\": 0, \"manual\": 0}, \"remaining\": {\"overall\": 100, \"mac\": 100, \"manual\": 5}}}}");
     }
 
-    /*
-    public void testJobPassed() throws Exception {
+    @Test
+    public void testUploadFile() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ \"md5\": \"abc123445213242\" }".getBytes("UTF-8")));
 
+        sauceREST.uploadFile(
+            new ByteArrayInputStream("".getBytes("UTF-8")),
+            "gavin.txt",
+            true
+        );
+        assertEquals(
+            "/rest/v1/storage/" + this.sauceREST.getUsername() + "/gavin.txt",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "overwrite=true",
+            this.urlConnection.getRealURL().getQuery()
+        );
     }
 
-    public void testJobFailed() throws Exception {
+    @Test
+    public void testStopJob() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
+        sauceREST.stopJob("123");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/123/stop",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
-    public void testDownloadVideo() throws Exception {
-
-    }
-
-    public void testDownloadLog() throws Exception {
-
-    }
-
-    public void testRetrieveResults() throws Exception {
-
-    }
-
+    @Test
     public void testGetJobInfo() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
+        sauceREST.getJobInfo("123");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/123",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
-    public void testRetrieveResults1() throws Exception {
+    @Test
+    public void testRetrieveResults() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
+        sauceREST.retrieveResults("fakePath");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/fakePath",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
+    @Test
+    public void testDownload() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.downloadLog("1234", "location");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.downloadVideo("1234", "location");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.flv",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testJobFailed() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.jobFailed("1234");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"passed\":false}"));
+    }
+
+    @Test
+    public void testJobPassed() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.jobPassed("1234");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"passed\":true}"));
+    }
+
+    /*
     public void testAddAuthenticationProperty() throws Exception {
 
     }
 
-    public void testStopJob() throws Exception {
-
-    }
-
     public void testOpenConnection() throws Exception {
-
-    }
-
-    public void testUploadFile() throws Exception {
-
-    }
-
-    public void testUploadFile1() throws Exception {
-
-    }
-
-    public void testUploadFile2() throws Exception {
 
     }
 
