@@ -1,26 +1,8 @@
 package com.saucelabs.saucerest;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.DateUtils;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.cookie.CookieSpec;
-import org.apache.http.cookie.CookieSpecProvider;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.cookie.BestMatchSpecFactory;
-import org.apache.http.impl.cookie.BrowserCompatSpec;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HttpContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
-import sun.misc.IOUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;

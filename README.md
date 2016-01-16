@@ -32,6 +32,3 @@ Maven
   </dependency>
 </dependencies
 ```
-
-* [sauce-rest-api](http://repository-saucelabs.forge.cloudbees.com/release/com/saucelabs/sauce-rest-api/)
-* [the repository](http://repository-saucelabs.forge.cloudbees.com/release/com/saucelabs/saucerest/)
