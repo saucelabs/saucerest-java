@@ -53,50 +53,6 @@ public class SauceREST implements Serializable {
     protected String accessKey;
 
     /**
-     * The initial component of the Sauce REST API URL.
-     */
-    public static final String RESTURL = "https://saucelabs.com/rest/v1/%1$s";
-    /**
-     * The String format used to retrieve Sauce Job results for a specific user from the Sauce REST API.
-     */
-    private static final String USER_RESULT_FORMAT = RESTURL + "/%2$s";
-    /**
-     * The String format used to retrieve the jobs information via the Sauce REST API.
-     */
-    private static final String GET_JOBS_FORMAT = RESTURL + "/jobs";
-    /**
-     * The String format used to retrieve Sauce Job results from the Sauce REST API.
-     */
-    private static final String JOB_RESULT_FORMAT = GET_JOBS_FORMAT + "/%2$s";
-    /**
-     * The String format used to stop a running job via the Sauce REST API.
-     */
-    private static final String STOP_JOB_FORMAT = JOB_RESULT_FORMAT + "/stop";
-    /**
-     * The String format used to download a video for a Sauce job via the Sauce REST API.
-     */
-    private static final String DOWNLOAD_VIDEO_FORMAT = JOB_RESULT_FORMAT + "/assets/video.flv";
-    /**
-     * The String format used to download a log for a Sauce job via the Sauce REST API.
-     */
-    private static final String DOWNLOAD_LOG_FORMAT = JOB_RESULT_FORMAT + "/assets/selenium-server.log";
-    /**
-     * The String format used to retrieve the tunnel information via the Sauce REST API.
-     */
-    private static final String GET_TUNNELS_FORMAT = RESTURL + "/tunnels";
-    /**
-     * The String format used to retrieve the user activity information via the Sauce REST API.
-     */
-    private static final String GET_ACTIVITY_FORMAT = RESTURL + "/activity";
-    /**
-     * The String format used to delete a tunnel via the Sauce REST API.
-     */
-    private static final String GET_TUNNEL_FORMAT = GET_TUNNELS_FORMAT + "/%2$s";
-    /**
-     * The String format used to retrieve the user concurrency information via the Sauce REST API.
-     */
-    private static final String GET_CONCURRENCY_FORMAT = USER_RESULT_FORMAT + "/concurrency";
-    /**
      * Date format used as part of the file name for downloaded files.
      */
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
@@ -104,7 +60,15 @@ public class SauceREST implements Serializable {
     private static String extraUserAgent = "";
 
     private String server;
-    private static final String BASE_URL = System.getenv("SAUCE_REST_ENDPOINT") != null ? System.getenv("SAUCE_REST_ENDPOINT") : "https://saucelabs.com/";
+
+    private static final String BASE_URL;
+    static {
+        if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
+            BASE_URL = System.getenv("SAUCE_REST_ENDPOINT");
+        } else {
+            BASE_URL = System.getProperty("saucerest-java.base_url", "https://saucelabs.com/");
+        }
+    }
 
     /**
      * Constructs a new instance of the SauceREST class.
@@ -245,12 +209,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadVideo(String jobId, String location) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(DOWNLOAD_VIDEO_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
         downloadFile(jobId, location, restEndpoint);
     }
 
@@ -262,12 +221,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadLog(String jobId, String location) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(DOWNLOAD_LOG_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
         downloadFile(jobId, location, restEndpoint);
     }
 
@@ -278,12 +232,7 @@ public class SauceREST implements Serializable {
      * @return HTTP response contents
      */
     public String retrieveResults(String path) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(USER_RESULT_FORMAT, username, path));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/" + path);
         return retrieveResults(restEndpoint);
     }
 
@@ -294,12 +243,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getJobInfo(String jobId) {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
         return retrieveResults(restEndpoint);
     }
 
@@ -420,7 +364,7 @@ public class SauceREST implements Serializable {
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
         try {
-            URL restEndpoint = new URL(String.format(JOB_RESULT_FORMAT, username, jobId));
+            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
@@ -445,7 +389,8 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
 
         try {
-            URL restEndpoint = new URL(String.format(STOP_JOB_FORMAT, username, jobId));
+            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/stop");
+
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
@@ -513,6 +458,18 @@ public class SauceREST implements Serializable {
         return uploadFile(file, fileName, true);
     }
 
+    public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
+        FileInputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            return uploadFile(is, fileName, true);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
+    }
+
     /**
      * Uploads a file to Sauce storage.
      *
@@ -522,10 +479,9 @@ public class SauceREST implements Serializable {
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
          */
-    public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
+    public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
         try {
-            URL restEndpoint = new URL(String.format(RESTURL, "storage/")
-                + username + "/" + fileName + "?overwrite=" + overwrite.toString());
+            URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite.toString());
 
             HttpURLConnection connection = openConnection(restEndpoint);
 
@@ -543,7 +499,6 @@ public class SauceREST implements Serializable {
             connection.setRequestProperty("Cache-Control", "no-cache");
             connection.setRequestProperty("Content-Type", "application/octet-stream");
 
-            InputStream is = new FileInputStream(file);
             DataOutputStream oos = new DataOutputStream(connection.getOutputStream());
 
             int c = 0;
@@ -554,7 +509,6 @@ public class SauceREST implements Serializable {
                 oos.flush();
             }
             oos.close();
-            is.close();
 
             BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
@@ -620,7 +574,7 @@ public class SauceREST implements Serializable {
 
         HttpURLConnection connection = null;
         try {
-            URL restEndpoint = new URL(String.format(GET_TUNNEL_FORMAT, username, tunnelId));
+            URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
             connection = openConnection(restEndpoint);
             connection.setRequestProperty("User-Agent", this.getUserAgent());
             connection.setDoOutput(true);
@@ -661,12 +615,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(GET_CONCURRENCY_FORMAT, "users", username));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/users/" + username + "/concurrency");
         return retrieveResults(restEndpoint);
     }
 
@@ -676,39 +625,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the activity information
      */
     public String getActivity() {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(GET_ACTIVITY_FORMAT, username));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
-        return retrieveResults(restEndpoint);
-    }
-
-    /**
-     * Invokes the Sauce REST API to retrieve a jobs info
-     *
-     * @param args array that is the request query parameters in "key=value" format
-     * @return String (in JSON format) representing the jobs list
-     */
-    public String getJobsList(String[] args) {
-        URL restEndpoint = null;
-        try {
-            StringBuilder url = new StringBuilder(String.format(GET_JOBS_FORMAT, username));
-            if (args != null && args.length > 0) {
-                int len = args.length;
-                url.append("?");
-                for (int i = 0; i < len; i++) {
-                    url.append(args[i]);
-                    if ((len > 1) && (i != len - 1)) {
-                        url.append("&");
-                    }
-                }
-            }
-            restEndpoint = new URL(url.toString());
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/" + username + "/activity");
         return retrieveResults(restEndpoint);
     }
 
@@ -718,12 +635,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the stored files list
      */
     public String getStoredFiles() {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(RESTURL, "storage") + "/" + username);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/storage/" + username);
         return retrieveResults(restEndpoint);
     }
 
@@ -733,12 +645,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the basic account information
      */
     public String getUser() {
-        URL restEndpoint = null;
-        try {
-            restEndpoint = new URL(String.format(USER_RESULT_FORMAT, "users", username));
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-        }
+        URL restEndpoint = this.buildURL("v1/users/" + username);
         return retrieveResults(restEndpoint);
     }
 
