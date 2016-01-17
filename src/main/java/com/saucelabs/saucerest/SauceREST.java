@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,11 +73,19 @@ public class SauceREST implements Serializable {
     private String server;
 
     private static final String BASE_URL;
+
+    private static Properties prop = new Properties();
     static {
         if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
             BASE_URL = System.getenv("SAUCE_REST_ENDPOINT");
         } else {
             BASE_URL = System.getProperty("saucerest-java.base_url", "https://saucelabs.com/");
+        }
+
+        try {
+            prop.load(SauceREST.class.getClassLoader().getResourceAsStream(".properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -125,7 +134,7 @@ public class SauceREST implements Serializable {
     }
 
     protected String getUserAgent() {
-        String userAgent = "SauceREST/" + SauceREST.class.getPackage().getImplementationVersion();
+        String userAgent = "SauceREST/" + prop.get("saucerest.version");
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
         }
