@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest;
 
 import junit.framework.TestCase;
+import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
@@ -14,6 +15,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 
 public class SauceRESTTest extends TestCase {
     @Rule
@@ -116,6 +120,13 @@ public class SauceRESTTest extends TestCase {
                 return SauceRESTTest.this.urlConnection;
             }
         };
+    }
+
+    @Test
+    public void testUserAgent() throws Exception {
+        String agent = this.sauceREST.getUserAgent();
+        assertNotNull(agent);
+        assertThat(agent, not(CoreMatchers.containsString("/null")));
     }
 
     @Test
