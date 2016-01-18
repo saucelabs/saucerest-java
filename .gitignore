@@ -9,3 +9,4 @@ target
 
 saucerest.iml
 atlassian-ide-plugin.xml
+src/main/java/com/saucelabs/saucerest/BuildUtils.java

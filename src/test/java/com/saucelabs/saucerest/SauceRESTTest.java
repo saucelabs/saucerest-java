@@ -290,7 +290,7 @@ public class SauceRESTTest extends TestCase {
 
         sauceREST.retrieveResults("fakePath");
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/fakePath",
+            "/rest/v1/fakePath",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
@@ -344,6 +344,39 @@ public class SauceRESTTest extends TestCase {
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"passed\":true}"));
+    }
+
+    @Test
+    public void testGetFullJobs() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getFullJobs();
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("full=true&limit=20", this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getFullJobs(50);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("full=true&limit=50", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testBuildFullJobs() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getBuildFullJobs("fakePath");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/build/fakePath/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("full=1", this.urlConnection.getRealURL().getQuery());
     }
 
     /*

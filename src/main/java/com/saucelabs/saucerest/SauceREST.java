@@ -238,13 +238,13 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/username/path.
+     * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/path.
      *
      * @param path path to append to the url
      * @return HTTP response contents
      */
     public String retrieveResults(String path) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/" + path);
+        URL restEndpoint = this.buildURL("v1/" + path);
         return retrieveResults(restEndpoint);
     }
 
@@ -256,6 +256,19 @@ public class SauceREST implements Serializable {
      */
     public String getJobInfo(String jobId) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+        return retrieveResults(restEndpoint);
+    }
+
+    public String getFullJobs() {
+        return getFullJobs(20);
+    }
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @return String (in JSON format) representing the details for a Sauce job
+     */
+    public String getFullJobs(int limit) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?full=true&limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 
@@ -670,6 +683,16 @@ public class SauceREST implements Serializable {
      */
     public String getSupportedPlatforms(String automationApi) {
         URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve jobs associated with a build
+     * @param build Build Id
+     * @return String (in JSON format) representing jobs associated with a build
+     */
+    public String getBuildFullJobs(String build) {
+        URL restEndpoint = this.buildURL("v1/" + this.username + "/build/" + build + "/jobs?full=1");
         return retrieveResults(restEndpoint);
     }
 
