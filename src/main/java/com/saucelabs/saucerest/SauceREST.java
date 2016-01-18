@@ -74,18 +74,11 @@ public class SauceREST implements Serializable {
 
     private static final String BASE_URL;
 
-    private static Properties prop = new Properties();
     static {
         if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
             BASE_URL = System.getenv("SAUCE_REST_ENDPOINT");
         } else {
             BASE_URL = System.getProperty("saucerest-java.base_url", "https://saucelabs.com/");
-        }
-
-        try {
-            prop.load(SauceREST.class.getClassLoader().getResourceAsStream(".properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
