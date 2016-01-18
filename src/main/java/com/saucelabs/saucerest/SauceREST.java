@@ -134,7 +134,7 @@ public class SauceREST implements Serializable {
     }
 
     protected String getUserAgent() {
-        String userAgent = "SauceREST/" + prop.get("saucerest.version");
+        String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
         }
