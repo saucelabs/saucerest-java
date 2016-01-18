@@ -259,12 +259,18 @@ public class SauceREST implements Serializable {
         return retrieveResults(restEndpoint);
     }
 
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @return String (in JSON format) representing the details for a Sauce job
+     */
     public String getFullJobs() {
         return getFullJobs(20);
     }
     /**
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
+     * @param limit Number of jobs to return
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getFullJobs(int limit) {
@@ -483,6 +489,15 @@ public class SauceREST implements Serializable {
         return uploadFile(file, fileName, true);
     }
 
+    /**
+     * Uploads a file to Sauce storage.
+     *
+     * @param file      the file to upload
+     * @param fileName  name of the file in sauce storage
+     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
+     */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
         FileInputStream is = null;
         try {
@@ -498,12 +513,12 @@ public class SauceREST implements Serializable {
     /**
      * Uploads a file to Sauce storage.
      *
-     * @param file      the file to upload
+     * @param is      Input stream of the file to be uploaded
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
-         */
+     */
     public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
         try {
             URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite.toString());
