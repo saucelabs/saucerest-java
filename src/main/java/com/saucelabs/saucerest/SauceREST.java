@@ -704,12 +704,21 @@ public class SauceREST implements Serializable {
     /**
      * Retrieve jobs associated with a build
      * @param build Build Id
+     * @param limit Max jobs to return
      * @return String (in JSON format) representing jobs associated with a build
      */
-    public String getBuildFullJobs(String build) {
-        URL restEndpoint = this.buildURL("v1/" + this.username + "/build/" + build + "/jobs?full=1");
+    public String getBuildFullJobs(String build, int limit) {
+        URL restEndpoint = this.buildURL(
+            "v1/" + this.username + "/build/" + build + "/jobs?full=1" +
+                (limit == 0 ? "" : "&limit=" + limit)
+        );
         return retrieveResults(restEndpoint);
     }
+
+    public String getBuildFullJobs(String build) {
+        return getBuildFullJobs(build, 0);
+    }
+
 
     /**
      * Record CI Usage to Sauce Labs
