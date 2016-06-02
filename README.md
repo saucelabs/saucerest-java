@@ -30,5 +30,5 @@ Maven
     <version>1.0.27</version>
     <scope>test</scope>
   </dependency>
-</dependencies
+</dependencies>
 ```
