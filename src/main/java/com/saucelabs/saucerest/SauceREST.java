@@ -281,10 +281,21 @@ public class SauceREST implements Serializable {
     /**
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
+     * @return String (in JSON format) representing the jobID for a sauce Job
+     */
+    public String getJobs() {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs");
+        return retrieveResults(restEndpoint);
+    }
+
+
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
      * @param limit Number of jobs to return(max of 500)
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
-    public String getJobsLimit(int limit) {
+    public String getJobs(int limit) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit);
         return retrieveResults(restEndpoint);
     }
@@ -297,7 +308,7 @@ public class SauceREST implements Serializable {
      * @param from value in Epoch time format denoting the time to start the search
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
-    public String getJobsLimit(int limit, long to, int from) {
+    public String getJobs(int limit, long to, int from) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
         return retrieveResults(restEndpoint);
     }

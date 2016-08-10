@@ -371,18 +371,31 @@ public class SauceRESTTest extends TestCase {
     }
 
     @Test
+    public void testGetJobs() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobs();
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(null, this.urlConnection.getRealURL().getQuery());
+
+    }
+    @Test
     public void testGetJobsLimit() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.getJobsLimit(100);
+        sauceREST.getJobs(100);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
         );
         assertEquals("limit=100", this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.getJobsLimit(500);
+        sauceREST.getJobs(500);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
@@ -395,14 +408,14 @@ public class SauceRESTTest extends TestCase {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.getJobsLimit(100,1470689339, 1470862161);
+        sauceREST.getJobs(100,1470689339, 1470862161);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
         );
         assertEquals("limit=100&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.getJobsLimit(500,1470689339, 1470862161);
+        sauceREST.getJobs(500,1470689339, 1470862161);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
