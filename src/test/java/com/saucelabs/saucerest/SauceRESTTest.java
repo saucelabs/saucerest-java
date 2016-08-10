@@ -367,6 +367,47 @@ public class SauceRESTTest extends TestCase {
     }
 
     @Test
+    public void testGetJobsLimit() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobsLimit(100);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=100", this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getJobsLimit(500);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=500", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testGetJobsSkipLimit() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobsSkipLimit(100,1470689339, 1470862161);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=100&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getJobsSkipLimit(500,1470689339, 1470862161);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=500&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
+
+    }
+
+    @Test
     public void testBuildFullJobs() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
