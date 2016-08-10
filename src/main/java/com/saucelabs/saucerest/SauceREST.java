@@ -297,7 +297,7 @@ public class SauceREST implements Serializable {
      * @param from value in Epoch time format denoting the time to start the search
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
-    public String getJobsSkipLimit(int limit, long to, int from) {
+    public String getJobsLimit(int limit, long to, int from) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
         return retrieveResults(restEndpoint);
     }
