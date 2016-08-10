@@ -27,7 +27,7 @@ Maven
   <dependency>
     <groupId>com.saucelabs</groupId>
     <artifactId>saucerest</artifactId>
-    <version>1.0.27</version>
+    <version>1.0.33</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
