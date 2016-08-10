@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest;
 
 import junit.framework.TestCase;
+import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
@@ -8,9 +9,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.apache.commons.lang.SerializationUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -364,6 +368,60 @@ public class SauceRESTTest extends TestCase {
             this.urlConnection.getRealURL().getPath()
         );
         assertEquals("full=true&limit=50", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testGetJobs() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobs();
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(null, this.urlConnection.getRealURL().getQuery());
+
+    }
+    @Test
+    public void testGetJobsLimit() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobs(100);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=100", this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getJobs(500);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=500", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testGetJobsSkipLimit() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getJobs(100,1470689339, 1470862161);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=100&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
+
+        sauceREST.getJobs(500,1470689339, 1470862161);
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals("limit=500&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
+
     }
 
     @Test

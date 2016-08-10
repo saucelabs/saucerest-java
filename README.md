@@ -27,8 +27,11 @@ Maven
   <dependency>
     <groupId>com.saucelabs</groupId>
     <artifactId>saucerest</artifactId>
-    <version>1.0.33</version>
+    <version>LATEST VERSION</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
 ```
+
+For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22
+

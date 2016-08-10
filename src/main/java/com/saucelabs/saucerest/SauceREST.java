@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -267,6 +266,7 @@ public class SauceREST implements Serializable {
     public String getFullJobs() {
         return getFullJobs(20);
     }
+
     /**
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
@@ -277,6 +277,42 @@ public class SauceREST implements Serializable {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs?full=true&limit=" + limit);
         return retrieveResults(restEndpoint);
     }
+
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @return String (in JSON format) representing the jobID for a sauce Job
+     */
+    public String getJobs() {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs");
+        return retrieveResults(restEndpoint);
+    }
+
+
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @param limit Number of jobs to return(max of 500)
+     * @return String (in JSON format) representing the jobID for a sauce Job
+     */
+    public String getJobs(int limit) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit);
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the details for a Sauce job.
+     *
+     * @param limit Number of jobs to return(max of 500)
+     * @param to value in Epoch time format denoting the time to end the job list searh
+     * @param from value in Epoch time format denoting the time to start the search
+     * @return String (in JSON format) representing the jobID for a sauce Job
+     */
+    public String getJobs(int limit, long to, int from) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
+        return retrieveResults(restEndpoint);
+    }
+
 
     /**
      * @param restEndpoint the URL to perform a HTTP GET
