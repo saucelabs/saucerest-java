@@ -472,6 +472,31 @@ public class SauceREST implements Serializable {
 
     }
 
+    /**
+     * Invokes the Sauce REST API to delete a completed job from Sauce.
+     *
+     * @param jobId the Sauce Job id
+     */
+    public void deleteJob(String jobId) {
+        HttpURLConnection postBack = null;
+
+        try {
+            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+
+            postBack = openConnection(restEndpoint);
+            postBack.setRequestProperty("User-Agent", this.getUserAgent());
+            postBack.setDoOutput(true);
+            postBack.setRequestMethod("DELETE");
+            addAuthenticationProperty(postBack);
+            postBack.getOutputStream().write("".getBytes());
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
+        }
+
+        closeInputStream(postBack);
+
+    }
+
     private void closeInputStream(HttpURLConnection connection) {
         try {
             if (connection != null) {
@@ -750,6 +775,7 @@ public class SauceREST implements Serializable {
         );
         return retrieveResults(restEndpoint);
     }
+
 
     public String getBuildFullJobs(String build) {
         return getBuildFullJobs(build, 0);
