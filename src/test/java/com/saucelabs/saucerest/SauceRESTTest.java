@@ -275,6 +275,19 @@ public class SauceRESTTest extends TestCase {
     }
 
     @Test
+    public void testDeleteJob() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.deleteJob("123");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/123",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
     public void testGetJobInfo() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
