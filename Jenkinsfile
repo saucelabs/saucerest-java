@@ -19,7 +19,7 @@ node {
   mvn "clean install -B -V -U -e -Dsurefire.useFile=false -Dmaven.test.failure.ignore=true -Dgpg.skip=true"
 
   stage 'Archive Results'
-  step([$class: 'ArtifactArchiver', artifacts: 'target/*.hpi,target/*.jpi'])
+  step([$class: 'ArtifactArchiver', artifacts: 'target/*.jar'])
 
   stage 'Publish Results'
   step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
