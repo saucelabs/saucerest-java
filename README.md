@@ -12,6 +12,14 @@ Using this client you can update Job info, including pass/fail status and other 
 
 Usage
 -----
+Mark a job passed or failed:
+```java
+SauceREST r = new SauceREST("username", "access-key");
+r.jobPassed(job_id);
+r.jobFailed(job_id);
+```
+
+Get all tunnels:
 
 ```java
 SauceREST r = new SauceREST("username", "access-key");
