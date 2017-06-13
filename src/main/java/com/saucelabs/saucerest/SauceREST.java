@@ -506,6 +506,16 @@ public class SauceREST implements Serializable {
             logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error closing result stream", e);
+            try {
+                int responseCode = connection.getResponseCode();
+                if (responseCode == 401) {
+                    throw new SauceException.NotAuthorized();
+                } else if (responseCode == 429) {
+                    throw new SauceException.TooManyRequestsException();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "Error determining response code", e);
+            }
         }
 
     }
