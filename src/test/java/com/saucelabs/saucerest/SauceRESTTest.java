@@ -260,7 +260,7 @@ public class SauceRESTTest {
     public void testUpdateJobInfo_TooManyRequests() throws Exception {
         setConnectionThrowIOExceptionOnClose();
         urlConnection.setResponseCode(429);
-        thrown.expect(SauceException.TooManyRequestsException.class);
+        thrown.expect(SauceException.TooManyRequests.class);
 
         HashMap<String, Object> updates = new HashMap<String, Object>();
         updates.put("passed", true);

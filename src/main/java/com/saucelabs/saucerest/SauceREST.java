@@ -511,7 +511,7 @@ public class SauceREST implements Serializable {
                 if (responseCode == 401) {
                     throw new SauceException.NotAuthorized();
                 } else if (responseCode == 429) {
-                    throw new SauceException.TooManyRequestsException();
+                    throw new SauceException.TooManyRequests();
                 }
             } catch (IOException ex) {
                 logger.log(Level.WARNING, "Error determining response code", e);
