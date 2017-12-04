@@ -1,11 +1,11 @@
 package com.saucelabs.saucerest;
 
-import junit.framework.TestCase;
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -21,9 +21,12 @@ import java.net.URL;
 import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-public class SauceRESTTest extends TestCase {
+public class SauceRESTTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -44,6 +47,19 @@ public class SauceRESTTest extends TestCase {
         }
     }
 
+    private class ExceptionThrowingMockInputStream extends InputStream {
+
+        @Override
+        public int read() throws IOException {
+            return 1;
+        }
+
+        @Override
+        public void close() throws IOException {
+            throw new IOException();
+        }
+    }
+
     private class MockHttpURLConnection extends HttpURLConnection {
         private URL realURL;
         private InputStream mockInputStream;
@@ -60,6 +76,11 @@ public class SauceRESTTest extends TestCase {
                 e.printStackTrace();
             }
             this.mockOutputStream = new MockOutputStream();
+        }
+
+        protected MockHttpURLConnection(ExceptionThrowingMockInputStream mockInputStream) throws MalformedURLException {
+            this();
+            this.mockInputStream = mockInputStream;
         }
 
         @Override
@@ -126,6 +147,17 @@ public class SauceRESTTest extends TestCase {
         };
     }
 
+    private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
+        urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
+        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+            @Override
+            public HttpURLConnection openConnection(URL url) throws IOException {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+    }
+
     @Test
     public void testUserAgent() throws Exception {
         String agent = this.sauceREST.getUserAgent();
@@ -149,6 +181,7 @@ public class SauceRESTTest extends TestCase {
         this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
     }
 
+    @Ignore("This test didn't run before - was implicitly ignored. Requires fixing.")
     @Test(expected=SauceException.NotAuthorized.class)
     public void testDoJSONPOST_NotAuthorized() throws Exception {
         urlConnection.setResponseCode(401);
@@ -212,25 +245,50 @@ public class SauceRESTTest extends TestCase {
         assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
     }
 
+    @Test
+    public void testUpdateJobInfo_NotAuthorized() throws Exception {
+        setConnectionThrowIOExceptionOnClose();
+        urlConnection.setResponseCode(401);
+        thrown.expect(SauceException.NotAuthorized.class);
 
+        HashMap<String, Object> updates = new HashMap<String, Object>();
+        updates.put("passed", true);
+        sauceREST.updateJobInfo("12345", updates);
+    }
+
+    @Test
+    public void testUpdateJobInfo_TooManyRequests() throws Exception {
+        setConnectionThrowIOExceptionOnClose();
+        urlConnection.setResponseCode(429);
+        thrown.expect(SauceException.TooManyRequests.class);
+
+        HashMap<String, Object> updates = new HashMap<String, Object>();
+        updates.put("passed", true);
+        sauceREST.updateJobInfo("12345", updates);
+    }
+
+    @Test
     public void testGetTunnels() throws Exception {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnels();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels");
     }
 
+    @Test
     public void testGetTunnelInformation() throws Exception {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnelInformation("1234-1234-1231-123-123");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/1234-1234-1231-123-123");
     }
 
+    @Test
     public void testGetActivity() throws Exception {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getActivity();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");
     }
 
+    @Test
     public void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
