@@ -1,11 +1,11 @@
 package com.saucelabs.saucerest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONValue;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -672,7 +672,7 @@ public class SauceREST implements Serializable {
      */
     protected String encodeAuthentication() {
         String auth = username + ":" + accessKey;
-        auth = "Basic " + DatatypeConverter.printBase64Binary(auth.getBytes());
+        auth = "Basic " + Base64.encodeBase64String(auth.getBytes());
         return auth;
     }
 
