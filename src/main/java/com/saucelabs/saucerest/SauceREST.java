@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.rmi.UnexpectedException;
@@ -528,7 +530,17 @@ public class SauceREST implements Serializable {
      * @throws IOException when a bad url is provided
      */
     public HttpURLConnection openConnection(URL url) throws IOException {
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        HttpURLConnection con;
+        if ("true".equals(System.getenv("USE_PROXY"))) {
+            logger.log(Level.SEVERE, "Using proxy: " + System.getenv("http.proxyHost")
+                + System.getenv("http.proxyPort"));
+
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(System.getenv("http.proxyHost"),
+                Integer.parseInt(System.getenv("http.proxyPort"))));
+            con = (HttpURLConnection) url.openConnection(proxy);
+        } else {
+            con = (HttpURLConnection) url.openConnection();
+        }
         con.setReadTimeout((int) HTTP_READ_TIMEOUT_SECONDS);
         con.setConnectTimeout((int) HTTP_CONNECT_TIMEOUT_SECONDS);
         return con;
