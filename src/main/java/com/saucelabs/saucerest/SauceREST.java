@@ -582,7 +582,7 @@ public class SauceREST implements Serializable {
         FileInputStream is = null;
         try {
             is = new FileInputStream(file);
-            return uploadFile(is, fileName, true);
+            return uploadFile(is, fileName, overwrite);
         } finally {
             if (is != null) {
                 is.close();
