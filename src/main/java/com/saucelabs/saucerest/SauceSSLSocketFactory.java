@@ -140,7 +140,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
             }
         }
 
-        List<String> aa = new ArrayList<String>();
+        List<String> aa = new ArrayList<>();
         for (int i = 0; i < preferredProtocols.length; i++) {
             int idx = Arrays.binarySearch(availableProtocols, preferredProtocols[i]);
             if (idx >= 0)
@@ -222,7 +222,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
             };
         }
 
-        List<String> aa = new ArrayList<String>();
+        List<String> aa = new ArrayList<>();
         for (int i = 0; i < preferredCiphers.length; i++) {
             int idx = Arrays.binarySearch(availableCiphers, preferredCiphers[i]);
             if (idx >= 0)

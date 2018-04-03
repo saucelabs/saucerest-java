@@ -196,7 +196,7 @@ public class SauceREST implements Serializable {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobPassed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
+        Map<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         updateJobInfo(jobId, updates);
     }
@@ -207,7 +207,7 @@ public class SauceREST implements Serializable {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobFailed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
+        Map<String, Object> updates = new HashMap<>();
         updates.put("passed", false);
         updateJobInfo(jobId, updates);
     }
