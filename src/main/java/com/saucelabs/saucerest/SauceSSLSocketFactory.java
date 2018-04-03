@@ -29,7 +29,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         initSSLSocketFactoryEx(km, tm, random);
     }
 
-    public SauceSSLSocketFactory(SSLContext ctx) throws NoSuchAlgorithmException, KeyManagementException {
+    public SauceSSLSocketFactory(SSLContext ctx) {
         initSSLSocketFactoryEx(ctx);
     }
 
@@ -108,8 +108,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         m_ciphers = GetCipherList();
     }
 
-    private void initSSLSocketFactoryEx(SSLContext ctx)
-            throws NoSuchAlgorithmException, KeyManagementException {
+    private void initSSLSocketFactoryEx(SSLContext ctx) {
         m_ctx = ctx;
 
         m_protocols = GetProtocolList();
