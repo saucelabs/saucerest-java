@@ -601,7 +601,7 @@ public class SauceREST implements Serializable {
 
             DataOutputStream oos = new DataOutputStream(connection.getOutputStream());
 
-            int c = 0;
+            int c;
             byte[] buf = new byte[8192];
 
             while ((c = is.read(buf, 0, buf.length)) > 0) {
