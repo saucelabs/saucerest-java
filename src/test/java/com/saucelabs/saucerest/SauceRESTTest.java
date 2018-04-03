@@ -236,7 +236,7 @@ public class SauceRESTTest {
         urlConnection.setInputStream(new ByteArrayInputStream(
             "[]".getBytes("UTF-8")
         ));
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("public", "shared");
         sauceREST.updateJobInfo("12345", updates);
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/12345");
@@ -251,7 +251,7 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(401);
         thrown.expect(SauceException.NotAuthorized.class);
 
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         sauceREST.updateJobInfo("12345", updates);
     }
@@ -262,7 +262,7 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(429);
         thrown.expect(SauceException.TooManyRequests.class);
 
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         sauceREST.updateJobInfo("12345", updates);
     }
