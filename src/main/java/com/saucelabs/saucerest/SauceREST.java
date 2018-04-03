@@ -171,9 +171,7 @@ public class SauceREST implements Serializable {
             }
 
             logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
         } finally {
             closeInputStream(postBack);
@@ -343,11 +341,7 @@ public class SauceREST implements Serializable {
             }
         } catch (SocketTimeoutException e) {
             logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (KeyManagementException e) {
+        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
             logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
         }
         try {
