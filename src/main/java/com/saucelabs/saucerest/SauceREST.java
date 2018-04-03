@@ -363,7 +363,6 @@ public class SauceREST implements Serializable {
      * @param restEndpoint the URL to perform a HTTP GET
      */
     private void downloadFile(String jobId, String location, URL restEndpoint) {
-        BufferedOutputStream out = null;
         try {
             HttpURLConnection connection = openConnection(restEndpoint);
             connection.setRequestProperty("User-Agent", this.getUserAgent());
@@ -382,24 +381,17 @@ public class SauceREST implements Serializable {
                 saveName = saveName + ".log";
             }
             FileOutputStream file = new FileOutputStream(new File(location, saveName));
-            out = new BufferedOutputStream(file);
-            int i;
-            while ((i = in.read()) != -1) {
-                out.write(i);
+            try (BufferedOutputStream out = new BufferedOutputStream(file)) {
+                int i;
+                while ((i = in.read()) != -1)
+                {
+                    out.write(i);
+                }
+                out.flush();
             }
-            out.flush();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results");
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    //ignore
-                }
-            }
         }
-
     }
 
     /**
@@ -573,14 +565,8 @@ public class SauceREST implements Serializable {
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(file);
+        try (FileInputStream is = new FileInputStream(file)) {
             return uploadFile(is, fileName, true);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
         }
     }
 
