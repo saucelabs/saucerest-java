@@ -3,7 +3,6 @@ package com.saucelabs.saucerest;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.JSONValue;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
@@ -154,8 +153,7 @@ public class SauceREST implements Serializable {
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
-            String jsonText = JSONValue.toJSONString(body);
-            postBack.getOutputStream().write(jsonText.getBytes());
+            postBack.getOutputStream().write(body.toString().getBytes());
 
             reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
 
@@ -439,8 +437,7 @@ public class SauceREST implements Serializable {
             postBack.setDoOutput(true);
             postBack.setRequestMethod("PUT");
             addAuthenticationProperty(postBack);
-            String jsonText = JSONValue.toJSONString(updates);
-            postBack.getOutputStream().write(jsonText.getBytes());
+            postBack.getOutputStream().write(new JSONObject(updates).toString().getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error updating Sauce Results", e);
         }

@@ -3,7 +3,6 @@ package com.saucelabs.saucerest;
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
-import org.json.simple.JSONValue;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -208,7 +207,8 @@ public class SauceRESTTest {
         sauceREST.recordCI("jenkins", "1.1");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/stats/ci");
         String output = this.urlConnection.getOutputStream().toString();
-        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}"));
+        assertEquals(new JSONObject(output).toString(),
+            new JSONObject("{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}").toString());
     }
 
 
@@ -242,7 +242,7 @@ public class SauceRESTTest {
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/12345");
 
         String output = this.urlConnection.getOutputStream().toString();
-        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"public\":\"shared\"}"));
+        assertEquals(output, "{\"public\":\"shared\"}");
     }
 
     @Test
@@ -403,7 +403,7 @@ public class SauceRESTTest {
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
-        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"passed\":false}"));
+        assertEquals(output, "{\"passed\":false}");
     }
 
     @Test
@@ -418,7 +418,7 @@ public class SauceRESTTest {
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
-        assertEquals(JSONValue.parse(output), JSONValue.parse("{\"passed\":true}"));
+        assertEquals(output, "{\"passed\":true}");
     }
 
     @Test
