@@ -117,7 +117,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
 
     protected String[] GetProtocolList() {
         String[] preferredProtocols = {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
-        String[] availableProtocols = null;
+        String[] availableProtocols;
 
         try {
             SSLSocketFactory factory = m_ctx.getSocketFactory();
@@ -191,7 +191,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
                 "TLS_RSA_WITH_AES_128_CBC_SHA"
         };
 
-        String[] availableCiphers = null;
+        String[] availableCiphers;
 
         try {
             SSLSocketFactory factory = m_ctx.getSocketFactory();
