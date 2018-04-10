@@ -508,6 +508,19 @@ public class SauceRESTTest {
         assertEquals("full=1", this.urlConnection.getRealURL().getQuery());
     }
 
+    @Test
+    public void testGetBuild() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.getBuild("fakePath");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/builds/fakePath",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(null, this.urlConnection.getRealURL().getQuery());
+    }
+
     /*
     public void testAddAuthenticationProperty() throws Exception {
 

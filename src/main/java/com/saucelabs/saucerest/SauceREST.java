@@ -795,11 +795,20 @@ public class SauceREST implements Serializable {
         return retrieveResults(restEndpoint);
     }
 
-
     public String getBuildFullJobs(String build) {
         return getBuildFullJobs(build, 0);
     }
 
+    /**
+     * Retrieve build info
+     * @param build Build name
+     * @return String (in JSON format) representing the build
+     */
+    public String getBuild(String build) {
+        URL restEndpoint = this.buildURL(
+            "v1/" + this.username + "/builds/" + build); // yes, this goes to builds instead of build like the above
+        return retrieveResults(restEndpoint);
+    }
 
     /**
      * Record CI Usage to Sauce Labs
