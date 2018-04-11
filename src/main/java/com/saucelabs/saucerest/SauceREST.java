@@ -566,7 +566,7 @@ public class SauceREST implements Serializable {
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
         try (FileInputStream is = new FileInputStream(file)) {
-            return uploadFile(is, fileName, true);
+            return uploadFile(is, fileName, overwrite);
         }
     }
 
