@@ -29,7 +29,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         initSSLSocketFactoryEx(km, tm, random);
     }
 
-    public SauceSSLSocketFactory(SSLContext ctx) throws NoSuchAlgorithmException, KeyManagementException {
+    public SauceSSLSocketFactory(SSLContext ctx) {
         initSSLSocketFactoryEx(ctx);
     }
 
@@ -108,8 +108,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         m_ciphers = GetCipherList();
     }
 
-    private void initSSLSocketFactoryEx(SSLContext ctx)
-            throws NoSuchAlgorithmException, KeyManagementException {
+    private void initSSLSocketFactoryEx(SSLContext ctx) {
         m_ctx = ctx;
 
         m_protocols = GetProtocolList();
@@ -118,29 +117,19 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
 
     protected String[] GetProtocolList() {
         String[] preferredProtocols = {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
-        String[] availableProtocols = null;
-
-        SSLSocket socket = null;
+        String[] availableProtocols;
 
         try {
             SSLSocketFactory factory = m_ctx.getSocketFactory();
-            socket = (SSLSocket) factory.createSocket();
-
-            availableProtocols = socket.getSupportedProtocols();
-            Arrays.sort(availableProtocols);
-        } catch (Exception e) {
-            return new String[]{"TLSv1"};
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    //ignore
-                }
+            try (SSLSocket socket = (SSLSocket) factory.createSocket()) {
+                availableProtocols = socket.getSupportedProtocols();
+                Arrays.sort(availableProtocols);
             }
+        } catch (Exception e) {
+            return new String[] { "TLSv1" };
         }
 
-        List<String> aa = new ArrayList<String>();
+        List<String> aa = new ArrayList<>();
         for (int i = 0; i < preferredProtocols.length; i++) {
             int idx = Arrays.binarySearch(availableProtocols, preferredProtocols[i]);
             if (idx >= 0)
@@ -202,7 +191,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
                 "TLS_RSA_WITH_AES_128_CBC_SHA"
         };
 
-        String[] availableCiphers = null;
+        String[] availableCiphers;
 
         try {
             SSLSocketFactory factory = m_ctx.getSocketFactory();
@@ -222,7 +211,7 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
             };
         }
 
-        List<String> aa = new ArrayList<String>();
+        List<String> aa = new ArrayList<>();
         for (int i = 0; i < preferredCiphers.length; i++) {
             int idx = Arrays.binarySearch(availableCiphers, preferredCiphers[i]);
             if (idx >= 0)

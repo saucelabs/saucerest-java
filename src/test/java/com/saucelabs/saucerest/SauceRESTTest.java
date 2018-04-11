@@ -36,7 +36,7 @@ public class SauceRESTTest {
         public StringBuffer output = new StringBuffer();
 
         @Override
-        public void write(int b) throws IOException {
+        public void write(int b) {
             output.append((char) b);
         }
 
@@ -49,7 +49,7 @@ public class SauceRESTTest {
     private class ExceptionThrowingMockInputStream extends InputStream {
 
         @Override
-        public int read() throws IOException {
+        public int read() {
             return 1;
         }
 
@@ -93,12 +93,12 @@ public class SauceRESTTest {
         }
 
         @Override
-        public void connect() throws IOException {
+        public void connect() {
 
         }
 
         @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             return mockInputStream;
         }
 
@@ -107,7 +107,7 @@ public class SauceRESTTest {
         }
 
         @Override
-        public OutputStream getOutputStream() throws IOException {
+        public OutputStream getOutputStream() {
             return mockOutputStream;
         }
 
@@ -128,7 +128,7 @@ public class SauceRESTTest {
         }
 
         @Override
-        public int getResponseCode() throws IOException {
+        public int getResponseCode() {
             return this.responseCode;
         }
     }
@@ -139,7 +139,7 @@ public class SauceRESTTest {
         urlConnection = new MockHttpURLConnection();
         this.sauceREST = new SauceREST("fakeuser", "fakekey") {
             @Override
-            public HttpURLConnection openConnection(URL url) throws IOException {
+            public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
                 return SauceRESTTest.this.urlConnection;
             }
@@ -150,7 +150,7 @@ public class SauceRESTTest {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
         this.sauceREST = new SauceREST("fakeuser", "fakekey") {
             @Override
-            public HttpURLConnection openConnection(URL url) throws IOException {
+            public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
                 return SauceRESTTest.this.urlConnection;
             }
@@ -158,14 +158,14 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testUserAgent() throws Exception {
+    public void testUserAgent() {
         String agent = this.sauceREST.getUserAgent();
         assertNotNull(agent);
         assertThat(agent, not(CoreMatchers.containsString("/null")));
     }
 
     @Test
-    public void testConfirmSerializable() throws Exception {
+    public void testConfirmSerializable() {
         SauceREST original = new SauceREST(null, null);
         SauceREST copy = (SauceREST) SerializationUtils.clone(original);
         assertEquals(original, copy);
@@ -236,7 +236,7 @@ public class SauceRESTTest {
         urlConnection.setInputStream(new ByteArrayInputStream(
             "[]".getBytes("UTF-8")
         ));
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("public", "shared");
         sauceREST.updateJobInfo("12345", updates);
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/12345");
@@ -251,7 +251,7 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(401);
         thrown.expect(SauceException.NotAuthorized.class);
 
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         sauceREST.updateJobInfo("12345", updates);
     }
@@ -262,27 +262,27 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(429);
         thrown.expect(SauceException.TooManyRequests.class);
 
-        HashMap<String, Object> updates = new HashMap<String, Object>();
+        HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         sauceREST.updateJobInfo("12345", updates);
     }
 
     @Test
-    public void testGetTunnels() throws Exception {
+    public void testGetTunnels() {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnels();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels");
     }
 
     @Test
-    public void testGetTunnelInformation() throws Exception {
+    public void testGetTunnelInformation() {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getTunnelInformation("1234-1234-1231-123-123");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/tunnels/1234-1234-1231-123-123");
     }
 
     @Test
-    public void testGetActivity() throws Exception {
+    public void testGetActivity() {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getActivity();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/" + this.sauceREST.getUsername() + "/activity");

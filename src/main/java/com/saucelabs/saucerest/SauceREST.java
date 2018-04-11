@@ -171,9 +171,7 @@ public class SauceREST implements Serializable {
             }
 
             logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
         } finally {
             closeInputStream(postBack);
@@ -196,7 +194,7 @@ public class SauceREST implements Serializable {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobPassed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
+        Map<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
         updateJobInfo(jobId, updates);
     }
@@ -207,7 +205,7 @@ public class SauceREST implements Serializable {
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobFailed(String jobId) {
-        Map<String, Object> updates = new HashMap<String, Object>();
+        Map<String, Object> updates = new HashMap<>();
         updates.put("passed", false);
         updateJobInfo(jobId, updates);
     }
@@ -343,11 +341,7 @@ public class SauceREST implements Serializable {
             }
         } catch (SocketTimeoutException e) {
             logger.log(Level.SEVERE, "Received a SocketTimeoutException when invoking Sauce REST API, check status.saucelabs.com for network outages", e);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (NoSuchAlgorithmException e) {
-            logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
-        } catch (KeyManagementException e) {
+        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
             logger.log(Level.SEVERE, "Error retrieving Sauce Results", e);
         }
         try {
@@ -369,7 +363,6 @@ public class SauceREST implements Serializable {
      * @param restEndpoint the URL to perform a HTTP GET
      */
     private void downloadFile(String jobId, String location, URL restEndpoint) {
-        BufferedOutputStream out = null;
         try {
             HttpURLConnection connection = openConnection(restEndpoint);
             connection.setRequestProperty("User-Agent", this.getUserAgent());
@@ -388,24 +381,17 @@ public class SauceREST implements Serializable {
                 saveName = saveName + ".log";
             }
             FileOutputStream file = new FileOutputStream(new File(location, saveName));
-            out = new BufferedOutputStream(file);
-            int i;
-            while ((i = in.read()) != -1) {
-                out.write(i);
+            try (BufferedOutputStream out = new BufferedOutputStream(file)) {
+                int i;
+                while ((i = in.read()) != -1)
+                {
+                    out.write(i);
+                }
+                out.flush();
             }
-            out.flush();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results");
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    //ignore
-                }
-            }
         }
-
     }
 
     /**
@@ -579,14 +565,8 @@ public class SauceREST implements Serializable {
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the 200 range)
      */
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(file);
+        try (FileInputStream is = new FileInputStream(file)) {
             return uploadFile(is, fileName, overwrite);
-        } finally {
-            if (is != null) {
-                is.close();
-            }
         }
     }
 
@@ -621,7 +601,7 @@ public class SauceREST implements Serializable {
 
             DataOutputStream oos = new DataOutputStream(connection.getOutputStream());
 
-            int c = 0;
+            int c;
             byte[] buf = new byte[8192];
 
             while ((c = is.read(buf, 0, buf.length)) > 0) {
