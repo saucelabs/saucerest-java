@@ -26,6 +26,19 @@ SauceREST r = new SauceREST("username", "access-key");
 String tunnels = r.getTunnels();
 ```
 
+Save the Selenium server log to your filesystem:
+
+```java
+SauceREST r = new SauceREST("username", "access-key");
+r.downloadLog("job_id", "/var/tmp/selenium.log");
+```
+
+Save the HAR File from a test using extended debugging:
+
+```java
+SauceREST r = new SauceREST("username" "access-key");
+r.downloadHAR("job_id", "/var/tmp/HAR.log");
+```
 
 Maven
 -----
