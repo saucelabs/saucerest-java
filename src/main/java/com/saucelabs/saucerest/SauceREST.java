@@ -305,7 +305,7 @@ public class SauceREST implements Serializable {
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @return         A JSONTokener containing the HAR data, tokenized
      * @throws         IOException if there is a problem fetching the HAR file
-     * @throws         JsonException if encoding can't be determined or there's an IO problem
+     * @throws         JSONException if encoding can't be determined or there's an IO problem
      */
     public JSONTokener getHARData(String jobId) throws IOException, JSONException {
         logger.log(Level.FINEST, "getHARData for " + jobId);
