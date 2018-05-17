@@ -132,6 +132,7 @@ public class SauceREST implements Serializable {
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
         }
+        logger.log(Level.FINEST, "userAgent is set to " + userAgent);
         return userAgent;
     }
 
@@ -154,17 +155,23 @@ public class SauceREST implements Serializable {
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
+            logger.log(Level.FINE, "POSTing to " + url.toString());
+            logger.log(Level.FINE, body.toString(2));   // PrettyPrint JSON with an indent of 2
+
             postBack.getOutputStream().write(body.toString().getBytes());
 
             reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
 
             String inputLine;
+            logger.log(Level.FINEST, "Building string from response.");
             while ((inputLine = reader.readLine()) != null) {
+                logger.log(Level.FINEST, "  " + inputLine);
                 builder.append(inputLine);
             }
         } catch (IOException e) {
             try {
                 if (postBack.getResponseCode() == 401) {
+                    logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ": Unauthorized (401)");
                     throw new SauceException.NotAuthorized();
                 }
             } catch (IOException e1) {
@@ -497,6 +504,7 @@ public class SauceREST implements Serializable {
     protected void addAuthenticationProperty(HttpURLConnection connection) {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
+            logger.log(Level.FINE, "Encoded Authorization: " + auth);
             connection.setRequestProperty("Authorization", auth);
         }
 
