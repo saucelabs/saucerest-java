@@ -235,6 +235,21 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * This will only work for jobs which support Extended Debugging, which were
+     * started with the 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the HAR file should be downloaded to
+     */
+    public void downloadHAR(String jobId, String location) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        downloadFile(jobId, location, restEndpoint);
+    }
+
+    /**
      * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/path.
      *
      * @param path path to append to the url
