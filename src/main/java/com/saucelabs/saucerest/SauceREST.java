@@ -3,6 +3,7 @@ package com.saucelabs.saucerest;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
@@ -273,7 +274,45 @@ public class SauceREST implements Serializable {
      */
     public void downloadHAR(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
-        downloadFile(jobId, location, restEndpoint);
+        saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the HAR file for a Sauce Job.
+     *
+     * This will only work for jobs which support Extended Debugging, which were
+     * started with the 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         A BufferedInputStream containing the HAR data, unparsed
+     * @throws         IOException if there is a problem fetching the HAR file
+     */
+    public BufferedInputStream getHARDataStream(String jobId) throws IOException {
+        logger.log(Level.FINEST, "getHARDataStream for " + jobId);
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
+     * 
+     * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The
+     * stream will be read as soon as a JSONObject is created.
+     *
+     * This will only work for jobs which support Extended Debugging, which were
+     * started with the 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         A JSONTokener containing the HAR data, tokenized
+     * @throws         IOException if there is a problem fetching the HAR file
+     * @throws         JSONException if encoding can't be determined or there's an IO problem
+     */
+    public JSONTokener getHARData(String jobId) throws IOException, JSONException {
+        logger.log(Level.FINEST, "getHARData for " + jobId);
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+
+        BufferedInputStream har_stream = downloadFileData(jobId, restEndpoint);
+        return new JSONTokener(har_stream);
     }
 
     /**
