@@ -3,6 +3,7 @@ package com.saucelabs.saucerest;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
@@ -219,7 +220,22 @@ public class SauceREST implements Serializable {
      */
     public void downloadVideo(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
-        downloadFile(jobId, location, restEndpoint);
+        saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the video for a Sauce Job and returns it.
+     *
+     * Will probably eat your memory.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         A BufferedInputStream containing the video info
+     * @throws         IOException if there is a problem fetching the datt
+     */
+
+    public BufferedInputStream downloadVideo(String jobId) throws IOException{
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
+        return downloadFileData(jobId, restEndpoint);
     }
 
     /**
@@ -231,7 +247,19 @@ public class SauceREST implements Serializable {
      */
     public void downloadLog(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        downloadFile(jobId, location, restEndpoint);
+        saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         a BufferedInputStream containing the logfile
+     * @throws         IOException if there is a problem fetching the file
+     */
+    public BufferedInputStream downloadLog(String jobId) throws IOException {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return downloadFileData(jobId, restEndpoint);
     }
 
     /**
@@ -246,7 +274,45 @@ public class SauceREST implements Serializable {
      */
     public void downloadHAR(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
-        downloadFile(jobId, location, restEndpoint);
+        saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the HAR file for a Sauce Job.
+     *
+     * This will only work for jobs which support Extended Debugging, which were
+     * started with the 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         A BufferedInputStream containing the HAR data, unparsed
+     * @throws         IOException if there is a problem fetching the HAR file
+     */
+    public BufferedInputStream getHARDataStream(String jobId) throws IOException {
+        logger.log(Level.FINEST, "getHARDataStream for " + jobId);
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
+     * 
+     * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The
+     * stream will be read as soon as a JSONObject is created.
+     *
+     * This will only work for jobs which support Extended Debugging, which were
+     * started with the 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return         A JSONTokener containing the HAR data, tokenized
+     * @throws         IOException if there is a problem fetching the HAR file
+     * @throws         JSONException if encoding can't be determined or there's an IO problem
+     */
+    public JSONTokener getHARData(String jobId) throws IOException, JSONException {
+        logger.log(Level.FINEST, "getHARData for " + jobId);
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+
+        BufferedInputStream har_stream = downloadFileData(jobId, restEndpoint);
+        return new JSONTokener(har_stream);
     }
 
     /**
@@ -370,6 +436,28 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Returns the result of a HTTP get to the value of the <code>restEndpoint</code> parameter,
+     * as a BufferedInputStream suitable for consumption or saving to file.
+     *
+     * @param jobId        the Sauce Job id
+     * @param restEndpoint the URL to perform a HTTP GET
+     * @throws IOException when something goes wrong fetching the data
+     */
+    // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
+    private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws IOException{
+        HttpURLConnection connection = openConnection(restEndpoint);
+        connection.setRequestProperty("User-Agent", this.getUserAgent());
+
+        connection.setDoOutput(true);
+        connection.setRequestMethod("GET");
+        addAuthenticationProperty(connection);
+
+        InputStream stream = connection.getInputStream();
+        BufferedInputStream in = new BufferedInputStream(stream);
+        return in;
+    }
+
+    /**
      * Stores the result of a HTTP GET to the value of the <code>restEndpoint</code> parameter,
      * saving the resulting file to the directory defined by the <code>location</code> parameter.
      *
@@ -377,17 +465,9 @@ public class SauceREST implements Serializable {
      * @param location     represents the location that the result file should be stored in
      * @param restEndpoint the URL to perform a HTTP GET
      */
-    private void downloadFile(String jobId, String location, URL restEndpoint) {
+    private void saveFile(String jobId, String location, URL restEndpoint) {
         try {
-            HttpURLConnection connection = openConnection(restEndpoint);
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("GET");
-            addAuthenticationProperty(connection);
-
-            InputStream stream = connection.getInputStream();
-            BufferedInputStream in = new BufferedInputStream(stream);
+            BufferedInputStream in = downloadFileData(jobId, restEndpoint);
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
             String saveName = jobId + format.format(new Date());
             if (restEndpoint.getPath().endsWith(".flv")) {
