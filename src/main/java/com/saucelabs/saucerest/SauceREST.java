@@ -452,6 +452,8 @@ public class SauceREST implements Serializable {
      */
     // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws IOException{
+        logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
+        logger.log(Level.FINEST, "Opening connection for Job " + jobId);
         HttpURLConnection connection = openConnection(restEndpoint);
         connection.setRequestProperty("User-Agent", this.getUserAgent());
 
@@ -459,6 +461,7 @@ public class SauceREST implements Serializable {
         connection.setRequestMethod("GET");
         addAuthenticationProperty(connection);
 
+        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
         BufferedInputStream in = new BufferedInputStream(stream);
         return in;
@@ -473,6 +476,9 @@ public class SauceREST implements Serializable {
      * @param restEndpoint the URL to perform a HTTP GET
      */
     private void saveFile(String jobId, String location, URL restEndpoint) {
+        String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
+        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+        
         try {
             BufferedInputStream in = downloadFileData(jobId, restEndpoint);
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
@@ -482,6 +488,8 @@ public class SauceREST implements Serializable {
             } else {
                 saveName = saveName + ".log";
             }
+
+            logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + saveName);
             FileOutputStream file = new FileOutputStream(new File(location, saveName));
             try (BufferedOutputStream out = new BufferedOutputStream(file)) {
                 int i;
