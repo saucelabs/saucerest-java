@@ -72,14 +72,24 @@ public class SauceREST implements Serializable {
     private static String extraUserAgent = "";
 
     private String server;
+    private String edsServer;
 
     private static final String BASE_URL;
+    private static final String BASE_EDS_URL;
 
     static {
         if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
             BASE_URL = System.getenv("SAUCE_REST_ENDPOINT");
         } else {
             BASE_URL = System.getProperty("saucerest-java.base_url", "https://saucelabs.com/");
+        }
+    }
+
+    static {
+        if (System.getenv("SAUCE_REST_EDS_ENDPOINT") != null) {
+            BASE_EDS_URL = System.getenv("SAUCE_REST_EDS_ENDPOINT");
+        } else {
+            BASE_EDS_URL = System.getProperty("saucerest-java.base_eds_url", "https://eds.saucelabs.com/");
         }
     }
 
@@ -93,6 +103,7 @@ public class SauceREST implements Serializable {
         this.username = username;
         this.accessKey = accessKey;
         this.server = BASE_URL;
+        this.edsServer = BASE_EDS_URL;
     }
 
     public static String getExtraUserAgent() {
@@ -127,11 +138,27 @@ public class SauceREST implements Serializable {
         }
     }
 
+    /**
+    * Build URLs for the EDS server
+    *
+    * @param endpoint
+    * @return URL to use in direct fetch functions
+    */
+    protected URL buildEDSURL(String endpoint) {
+        try {
+            return new URL(new URL(this.edsServer), endpoint);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce EDS URL", e);
+            return null;
+        }
+    }
+
     protected String getUserAgent() {
         String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
         }
+        logger.log(Level.FINEST, "userAgent is set to " + userAgent);
         return userAgent;
     }
 
@@ -154,17 +181,23 @@ public class SauceREST implements Serializable {
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
+            logger.log(Level.FINE, "POSTing to " + url.toString());
+            logger.log(Level.FINE, body.toString(2));   // PrettyPrint JSON with an indent of 2
+
             postBack.getOutputStream().write(body.toString().getBytes());
 
             reader = new BufferedReader(new InputStreamReader(postBack.getInputStream()));
 
             String inputLine;
+            logger.log(Level.FINEST, "Building string from response.");
             while ((inputLine = reader.readLine()) != null) {
+                logger.log(Level.FINEST, "  " + inputLine);
                 builder.append(inputLine);
             }
         } catch (IOException e) {
             try {
                 if (postBack.getResponseCode() == 401) {
+                    logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ": Unauthorized (401)");
                     throw new SauceException.NotAuthorized();
                 }
             } catch (IOException e1) {
@@ -273,7 +306,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the HAR file should be downloaded to
      */
     public void downloadHAR(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
         saveFile(jobId, location, restEndpoint);
     }
 
@@ -445,6 +478,8 @@ public class SauceREST implements Serializable {
      */
     // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws IOException{
+        logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
+        logger.log(Level.FINEST, "Opening connection for Job " + jobId);
         HttpURLConnection connection = openConnection(restEndpoint);
         connection.setRequestProperty("User-Agent", this.getUserAgent());
 
@@ -452,6 +487,7 @@ public class SauceREST implements Serializable {
         connection.setRequestMethod("GET");
         addAuthenticationProperty(connection);
 
+        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
         BufferedInputStream in = new BufferedInputStream(stream);
         return in;
@@ -466,6 +502,9 @@ public class SauceREST implements Serializable {
      * @param restEndpoint the URL to perform a HTTP GET
      */
     private void saveFile(String jobId, String location, URL restEndpoint) {
+        String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
+        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+        
         try {
             BufferedInputStream in = downloadFileData(jobId, restEndpoint);
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
@@ -475,6 +514,8 @@ public class SauceREST implements Serializable {
             } else {
                 saveName = saveName + ".log";
             }
+
+            logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + saveName);
             FileOutputStream file = new FileOutputStream(new File(location, saveName));
             try (BufferedOutputStream out = new BufferedOutputStream(file)) {
                 int i;
@@ -485,7 +526,7 @@ public class SauceREST implements Serializable {
                 out.flush();
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error downloading Sauce Results");
+            logger.log(Level.WARNING, "Error downloading Sauce Results", e);
         }
     }
 
@@ -497,6 +538,7 @@ public class SauceREST implements Serializable {
     protected void addAuthenticationProperty(HttpURLConnection connection) {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
+            logger.log(Level.FINE, "Encoded Authorization: " + auth);
             connection.setRequestProperty("Authorization", auth);
         }
 
