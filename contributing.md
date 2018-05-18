@@ -27,3 +27,26 @@ We appreciate contributions from the community, helping to make this library bet
 2. Visit your repo on Github and click then `Pull Request` button
 3. If required, fill in a PR request.  Treat it like a commit message; A short title describing what changed, as well as a longer message summarising changes with any context required.  If fixing a lodged issue, include this in the title
 4. Send the Pull Request
+
+# Using a locally build version for Development or to resolve a bug
+We highly encourage users to send PRs and updates that the community might find useful.  However, you might want to use a personal release if you're waiting for fixes to be built into a release, to test complicated behaviour, or for company-specific changes.
+
+One way of doing this is to take a copy of the source and install it locally by doing
+`mvn install`
+from the repository root.
+
+You can then update the pom file for your target project so that you're checking out your build version:
+
+```
+<dependencies>
+        <dependency>
+            <groupId>com.saucelabs</groupId>
+            <artifactId>saucerest</artifactId>
+            <version>1.0.38-SNAPSHOT</version>
+        </dependency>
+</dependencies>
+```
+
+Get the value of the VERSION from the version key in the saucerest-java pom file.  ATM it's on line 6: `<version>1.0.38-SNAPSHOT</version>`.
+
+You may need to give it a custom version.
