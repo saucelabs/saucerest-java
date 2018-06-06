@@ -252,7 +252,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadVideo(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
         saveFile(jobId, location, restEndpoint);
     }
 
@@ -267,7 +267,7 @@ public class SauceREST implements Serializable {
      */
 
     public BufferedInputStream downloadVideo(String jobId) throws IOException{
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -328,7 +328,7 @@ public class SauceREST implements Serializable {
 
     /**
      * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
-     * 
+     *
      * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The
      * stream will be read as soon as a JSONObject is created.
      *
@@ -504,13 +504,13 @@ public class SauceREST implements Serializable {
     private void saveFile(String jobId, String location, URL restEndpoint) {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
         logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
-        
+
         try {
             BufferedInputStream in = downloadFileData(jobId, restEndpoint);
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
             String saveName = jobId + format.format(new Date());
-            if (restEndpoint.getPath().endsWith(".flv")) {
-                saveName = saveName + ".flv";
+            if (restEndpoint.getPath().endsWith(".mp4")) {
+                saveName = saveName + ".mp4";
             } else {
                 saveName = saveName + ".log";
             }
