@@ -385,7 +385,7 @@ public class SauceRESTTest {
 
         sauceREST.downloadVideo("1234", "location");
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.flv",
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
@@ -398,7 +398,7 @@ public class SauceRESTTest {
 
         sauceREST.downloadHAR("1234", "location");
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/network.har",
+            "/1234/network.har",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());

@@ -72,14 +72,24 @@ public class SauceREST implements Serializable {
     private static String extraUserAgent = "";
 
     private String server;
+    private String edsServer;
 
     private static final String BASE_URL;
+    private static final String BASE_EDS_URL;
 
     static {
         if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
             BASE_URL = System.getenv("SAUCE_REST_ENDPOINT");
         } else {
             BASE_URL = System.getProperty("saucerest-java.base_url", "https://saucelabs.com/");
+        }
+    }
+
+    static {
+        if (System.getenv("SAUCE_REST_EDS_ENDPOINT") != null) {
+            BASE_EDS_URL = System.getenv("SAUCE_REST_EDS_ENDPOINT");
+        } else {
+            BASE_EDS_URL = System.getProperty("saucerest-java.base_eds_url", "https://eds.saucelabs.com/");
         }
     }
 
@@ -93,6 +103,7 @@ public class SauceREST implements Serializable {
         this.username = username;
         this.accessKey = accessKey;
         this.server = BASE_URL;
+        this.edsServer = BASE_EDS_URL;
     }
 
     public static String getExtraUserAgent() {
@@ -123,6 +134,21 @@ public class SauceREST implements Serializable {
             return new URL(new URL(this.server), "/rest/" + endpoint);
         } catch (MalformedURLException e) {
             logger.log(Level.WARNING, "Error constructing Sauce URL", e);
+            return null;
+        }
+    }
+
+    /**
+    * Build URLs for the EDS server
+    *
+    * @param endpoint
+    * @return URL to use in direct fetch functions
+    */
+    protected URL buildEDSURL(String endpoint) {
+        try {
+            return new URL(new URL(this.edsServer), endpoint);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "Error constructing Sauce EDS URL", e);
             return null;
         }
     }
@@ -226,7 +252,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the video should be downloaded to
      */
     public void downloadVideo(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
         saveFile(jobId, location, restEndpoint);
     }
 
@@ -241,7 +267,7 @@ public class SauceREST implements Serializable {
      */
 
     public BufferedInputStream downloadVideo(String jobId) throws IOException{
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.flv");
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -280,7 +306,7 @@ public class SauceREST implements Serializable {
      * @param location represents the base directory where the HAR file should be downloaded to
      */
     public void downloadHAR(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
         saveFile(jobId, location, restEndpoint);
     }
 
@@ -302,7 +328,7 @@ public class SauceREST implements Serializable {
 
     /**
      * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
-     * 
+     *
      * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The
      * stream will be read as soon as a JSONObject is created.
      *
@@ -478,13 +504,13 @@ public class SauceREST implements Serializable {
     private void saveFile(String jobId, String location, URL restEndpoint) {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
         logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
-        
+
         try {
             BufferedInputStream in = downloadFileData(jobId, restEndpoint);
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
             String saveName = jobId + format.format(new Date());
-            if (restEndpoint.getPath().endsWith(".flv")) {
-                saveName = saveName + ".flv";
+            if (restEndpoint.getPath().endsWith(".mp4")) {
+                saveName = saveName + ".mp4";
             } else {
                 saveName = saveName + ".log";
             }
@@ -500,7 +526,7 @@ public class SauceREST implements Serializable {
                 out.flush();
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error downloading Sauce Results");
+            logger.log(Level.WARNING, "Error downloading Sauce Results", e);
         }
     }
 
