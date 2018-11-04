@@ -3,9 +3,9 @@
 [![codecov.io](https://codecov.io/github/saucelabs/saucerest-java/coverage.svg?branch=master)](https://codecov.io/github/saucelabs/saucerest-java?branch=master)
 [![Build Status](https://travis-ci.org/saucelabs/saucerest-java.svg?branch=master)](https://travis-ci.org/saucelabs/saucerest-java)
 
-A java client for Sauce OnDemand’s REST API. This supercedes the old [sauce-rest-api].
+A Java client for Sauce Labs’s REST API. This supercedes the old [sauce-rest-api].
 
-Using this client you can update Job info, including pass/fail status and other information supported.
+Using this client you can update Job info, including pass/fail status and other information supported.  Only the Sauce Labs Virtual Device Cloud is supported.  For Real Devices, please see [the docs](https://api.testobject.com/).
 
 If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md)
 
