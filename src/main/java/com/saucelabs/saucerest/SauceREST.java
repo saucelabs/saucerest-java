@@ -349,6 +349,29 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * A generic method to download any job's asset file
+     * 
+     * @param jobId		The Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location	The base directory where the file should be download to
+     * @param fileName	The file name of the asset you want to retrieve
+     */
+    public void getJobAssetFile(String jobId, String location, String fileName) {
+    	URL restEndpoint = this.buildURL("v1" + username + "/jobs/" + jobId + "/assets/" + fileName);
+    	saveFile(jobId, location, restEndpoint);
+    }
+    
+    /**
+     * Get details about the static assets collected for a specific job
+     * 
+     * @param jobId		the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return 			String (in JSON format) containing key/value pairs of the different saved assets
+     */
+    public String getJobAssetNames(String jobId) {
+    	URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets");
+    	return retrieveResults(restEndpoint);
+    }
+    
+    /**
      * Returns the HTTP response for invoking https://saucelabs.com/rest/v1/path.
      *
      * @param path path to append to the url
