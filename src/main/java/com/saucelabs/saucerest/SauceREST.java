@@ -356,7 +356,7 @@ public class SauceREST implements Serializable {
      * @param fileName	The file name of the asset you want to retrieve
      */
     public void getJobAssetFile(String jobId, String location, String fileName) {
-    	URL restEndpoint = this.buildURL("v1" + username + "/jobs/" + jobId + "/assets/" + fileName);
+    	URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/" + fileName);
     	saveFile(jobId, location, restEndpoint);
     }
     
@@ -469,7 +469,7 @@ public class SauceREST implements Serializable {
             connection.setRequestProperty("charset", "utf-8");
             connection.setDoOutput(true);
             addAuthenticationProperty(connection);
-
+            
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
