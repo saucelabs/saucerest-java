@@ -50,7 +50,7 @@ public class SauceREST implements Serializable {
     /**
      * 10 seconds in milliseconds.
      */
-    private static final long HTTP_READ_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+    private static final long HTTP_READ_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(System.getenv("SAUCE_HTTP_READ_TIMEOUT_SECONDS") != null ? System.getenv("SAUCE_HTTP_READ_TIMEOUT_SECONDS") : 10);
     /**
      * 10 seconds in milliseconds.
      */
