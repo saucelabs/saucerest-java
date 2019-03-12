@@ -1,5 +1,12 @@
 package com.saucelabs.saucerest;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
@@ -18,12 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 public class SauceRESTTest {
     @Rule
@@ -181,7 +182,7 @@ public class SauceRESTTest {
     }
 
     @Ignore("This test didn't run before - was implicitly ignored. Requires fixing.")
-    @Test(expected=SauceException.NotAuthorized.class)
+    @Test(expected = SauceException.NotAuthorized.class)
     public void testDoJSONPOST_NotAuthorized() throws Exception {
         urlConnection.setResponseCode(401);
 
@@ -467,6 +468,7 @@ public class SauceRESTTest {
         assertEquals(null, this.urlConnection.getRealURL().getQuery());
 
     }
+
     @Test
     public void testGetJobsLimit() throws Exception {
         urlConnection.setResponseCode(200);
@@ -492,14 +494,14 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.getJobs(100,1470689339, 1470862161);
+        sauceREST.getJobs(100, 1470689339, 1470862161);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
         );
         assertEquals("limit=100&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.getJobs(500,1470689339, 1470862161);
+        sauceREST.getJobs(500, 1470689339, 1470862161);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
             this.urlConnection.getRealURL().getPath()
@@ -532,6 +534,38 @@ public class SauceRESTTest {
             this.urlConnection.getRealURL().getPath()
         );
         assertEquals(null, this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void should_get_public_job_from_eu() {
+        //GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU) {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        //WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        //THEN
+        assertThat(publicJobLink, containsString("eu-central-1"));
+    }
+
+    @Test
+    public void should_get_public_job_from_us() {
+        //GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        //WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        //THEN
+        assertThat(publicJobLink, not(containsString("eu-central-1")));
     }
 
     /*
