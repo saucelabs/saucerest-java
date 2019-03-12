@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest;
 
+import static com.saucelabs.saucerest.DataCenter.US;
+
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,6 +75,7 @@ public class SauceREST implements Serializable {
 
     private String server;
     private String edsServer;
+    private DataCenter dataCenter;
 
     private static final String BASE_URL;
     private static final String BASE_EDS_URL;
@@ -104,6 +107,22 @@ public class SauceREST implements Serializable {
         this.accessKey = accessKey;
         this.server = BASE_URL;
         this.edsServer = BASE_EDS_URL;
+        this.dataCenter = US;
+    }
+
+    /**
+     * Constructs a new instance of the SauceREST class.
+     *
+     * @param username The username to use when performing HTTP requests to the Sauce REST API
+     * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     * @param dataCenter the datacenter to use
+     */
+    public SauceREST(String username, String accessKey, DataCenter dataCenter) {
+        this.username = username;
+        this.accessKey = accessKey;
+        this.server = BASE_URL;
+        this.edsServer = BASE_EDS_URL;
+        this.dataCenter = dataCenter;
     }
 
     public static String getExtraUserAgent() {
@@ -783,6 +802,9 @@ public class SauceREST implements Serializable {
         try {
             String key = username + ":" + accessKey;
             String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
+            if(DataCenter.EU.equals(dataCenter)){
+                return "https://eu-central-1.saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
+            }
             return "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
         } catch (IllegalArgumentException ex) {
             // someone messed up on the algorithm to hmacEncode
