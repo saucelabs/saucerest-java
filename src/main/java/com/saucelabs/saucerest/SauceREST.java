@@ -77,30 +77,28 @@ public class SauceREST implements Serializable {
 
     private String server;
     private String edsServer;
+    private String appServer;
     private DataCenter dataCenter;
 
-    private static final String BASE_EDS_URL;
-
-    static {
-        if (System.getenv("SAUCE_REST_EDS_ENDPOINT") != null) {
-            BASE_EDS_URL = System.getenv("SAUCE_REST_EDS_ENDPOINT");
-        } else {
-            BASE_EDS_URL = System.getProperty("saucerest-java.base_eds_url", "https://eds.saucelabs.com/");
-        }
-    }
-
     /**
-     * Constructs a new instance of the SauceREST class.
+     * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
      * @param username  The username to use when performing HTTP requests to the Sauce REST API
      * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
      */
     public SauceREST(String username, String accessKey) {
-        this.username = username;
-        this.accessKey = accessKey;
-        this.edsServer = BASE_EDS_URL;
-        this.dataCenter = US;
-        this.server = buildBaseUrl();
+        this(username, accessKey, US);
+    }
+
+    /**
+     * Constructs a new instance of the SauceREST class, matching the datacenter string to datacenter object
+     *
+     * @param username  The username to use when performing HTTP requests to the Sauce REST API
+     * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     * @param dataCenter the data center to use
+     */
+    public SauceREST(String username, String accessKey, String dataCenter) {
+        this(username, accessKey, DataCenter.fromString(dataCenter));
     }
 
     /**
@@ -113,9 +111,10 @@ public class SauceREST implements Serializable {
     public SauceREST(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
-        this.edsServer = BASE_EDS_URL;
         this.dataCenter = dataCenter;
         this.server = buildBaseUrl();
+        this.edsServer = buildEdsUrl();
+        this.appServer = dataCenter.appServer;
     }
 
     /**
@@ -125,16 +124,28 @@ public class SauceREST implements Serializable {
      */
     private String buildBaseUrl() {
         String defaultBaseUrl;
-        if (DataCenter.EU.equals(dataCenter)) {
-            defaultBaseUrl = "https://eu-central-1.saucelabs.com/";
-        } else {
-            defaultBaseUrl = "https://saucelabs.com/";
-        }
+        defaultBaseUrl = dataCenter.server;
 
         if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
             return System.getenv("SAUCE_REST_ENDPOINT");
         } else {
             return System.getProperty("saucerest-java.base_url", defaultBaseUrl);
+        }
+    }
+
+    /**
+     * Build base URL with property or default base url.
+     *
+     * @return baseUrl to use
+     */
+    private String buildEdsUrl() {
+        String defaultEdsUrl;
+        defaultEdsUrl = dataCenter.edsServer;
+
+        if (System.getenv("SAUCE_REST_EDS_ENDPOINT") != null) {
+            return System.getenv("SAUCE_REST_EDS_ENDPOINT");
+        } else {
+            return System.getProperty("saucerest-java.base_eds_url", defaultEdsUrl);
         }
     }
 
@@ -153,6 +164,33 @@ public class SauceREST implements Serializable {
      */
     public String getUsername() {
         return this.username;
+    }
+
+    /**
+     * Returns server assigned to this interface
+     *
+     * @return Returns server assigned to this interface
+     */
+    public String getServer() {
+        return this.server;
+    }
+
+    /**
+     * Returns eds server assigned to this interface
+     *
+     * @return Reurns eds server assigned to this interface
+     */
+    public String getEdsServer() {
+        return this.edsServer;
+    }
+
+    /**
+     * Returns app server assigned to this interface
+     *
+     * @return Returns app server assigned to this interface
+     */
+    public String getAppServer() {
+        return this.appServer;
     }
 
     /**
@@ -812,10 +850,7 @@ public class SauceREST implements Serializable {
         try {
             String key = username + ":" + accessKey;
             String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
-            if (DataCenter.EU.equals(dataCenter)) {
-                return "https://eu-central-1.saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
-            }
-            return "https://saucelabs.com/jobs/" + jobId + "?auth=" + auth_token;
+            return server + "jobs/" + jobId + "?auth=" + auth_token;
         } catch (IllegalArgumentException ex) {
             // someone messed up on the algorithm to hmacEncode
             // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
