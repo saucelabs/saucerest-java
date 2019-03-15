@@ -538,7 +538,7 @@ public class SauceRESTTest {
 
     @Test
     public void should_get_public_job_from_eu() {
-        //GIVEN
+        // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU) {
             @Override
             public HttpURLConnection openConnection(URL url) {
@@ -546,15 +546,15 @@ public class SauceRESTTest {
                 return SauceRESTTest.this.urlConnection;
             }
         };
-        //WHEN
+        // WHEN
         String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
-        //THEN
+        // THEN
         assertThat(publicJobLink, containsString("eu-central-1"));
     }
 
     @Test
     public void should_get_public_job_from_us() {
-        //GIVEN
+        // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
@@ -562,9 +562,57 @@ public class SauceRESTTest {
                 return SauceRESTTest.this.urlConnection;
             }
         };
-        //WHEN
+        // WHEN
         String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
-        //THEN
+        // THEN
+        assertThat(publicJobLink, not(containsString("eu-central-1")));
+    }
+
+    @Test
+    public void should_get_public_job_from_us_by_default() {
+        // GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        // WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        // THEN
+        assertThat(publicJobLink, not(containsString("eu-central-1")));
+    }
+
+    @Test
+    public void should_get_public_job_from_eu_with_string() {
+        // GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", "EU") {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        // WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        // THEN
+        assertThat(publicJobLink, containsString("eu-central-1"));
+    }
+
+    @Test
+    public void should_get_public_job_from_us_with_invalid_string() {
+        // GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        // WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        // THEN
         assertThat(publicJobLink, not(containsString("eu-central-1")));
     }
 
