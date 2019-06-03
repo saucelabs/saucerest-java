@@ -2,6 +2,7 @@ package com.saucelabs.saucerest;
 
 public enum DataCenter {
     US ("https://saucelabs.com/", "https://eds.saucelabs.com/", "https://app.saucelabs.com/"),
+    USEast ("https://us-east-1.saucelabs.com/"),
     EU ("https://eu-central-1.saucelabs.com/", "https://eds.eu-central-1.saucelabs.com/", "https://app.eu-central-1.saucelabs.com/");
 
     public final String server;
