@@ -600,7 +600,7 @@ public class SauceRESTTest {
         assertThat(publicJobLink, containsString("eu-central-1"));
     }
 
-    @TEST
+    @Test
     public void should_get_public_job_from_us_east_with_string() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "USEAST") {
