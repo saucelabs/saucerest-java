@@ -601,6 +601,22 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void should_get_public_job_from_us_east_with_string() {
+        // GIVEN
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", "US_EAST") {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+        // WHEN
+        String publicJobLink = sauceREST.getPublicJobLink("fakeJobId");
+        // THEN
+        assertThat(publicJobLink, containsString("us-east-1"));
+    }
+
+    @Test
     public void should_get_public_job_from_us_with_invalid_string() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
