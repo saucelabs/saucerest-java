@@ -20,14 +20,14 @@
     </organization>
     <developers>
         <developer>
-            <name>Gavin Mogan</name>
-            <email>gavin@saucelabs.com</email>
+            <name>Yeh Fang</name>
+            <email>yeh.fang@saucelabs.com</email>
             <organization>Sauce Labs</organization>
             <organizationUrl>http://www.saucelabs.com/</organizationUrl>
         </developer>
         <developer>
-            <name>Ross Rowe</name>
-            <email>piaross@gmail.com</email>
+            <name>Sean Enright</name>
+            <email>sean@saucelabs.com</email>
             <organization>Sauce Labs</organization>
             <organizationUrl>http://www.saucelabs.com/</organizationUrl>
         </developer>
@@ -36,7 +36,7 @@
         <connection>scm:git:git://github.com/saucelabs/saucerest-java.git</connection>
         <developerConnection>scm:git:git@github.com:saucelabs/saucerest-java.git</developerConnection>
         <url>git@github.com:saucelabs/saucerest-java.git</url>
-      <tag>saucerest-1.0.41</tag>
+      <tag>HEAD</tag>
   </scm>
     <properties>
         <junit.version>4.12</junit.version>
