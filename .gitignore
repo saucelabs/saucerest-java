@@ -7,6 +7,10 @@ target
 
 .DS_Store
 
+.settings
+.classpath
+.project
+
 saucerest.iml
 atlassian-ide-plugin.xml
 src/main/java/com/saucelabs/saucerest/BuildUtils.java
