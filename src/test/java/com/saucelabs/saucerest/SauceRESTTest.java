@@ -24,7 +24,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SauceRESTTest {
     @Rule
@@ -433,6 +435,39 @@ public class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
         assertEquals(output, "{\"passed\":true}");
+    }
+
+    @Test
+    public void testAddTagsEmpty() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        sauceREST.addTags("1234", new ArrayList<String>());
+        assertEquals(
+                "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+                this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(output, "{\"tags\":[]}");
+    }
+
+    @Test
+    public void testAddTags() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        List<String> tags = new ArrayList<>();
+        tags.add("tag1");
+        tags.add("tag2");
+        sauceREST.addTags("1234", tags);
+        assertEquals(
+                "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+                this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        String output = this.urlConnection.getOutputStream().toString();
+        assertEquals(output, "{\"tags\":[\"tag1\",\"tag2\"]}");
     }
 
     @Test
