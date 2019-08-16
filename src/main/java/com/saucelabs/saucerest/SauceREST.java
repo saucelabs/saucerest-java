@@ -28,10 +28,7 @@ import java.rmi.UnexpectedException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -308,6 +305,18 @@ public class SauceREST implements Serializable {
     public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("passed", false);
+        updateJobInfo(jobId, updates);
+    }
+
+    /**
+     * Adds the provided tags to the Sauce Job
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param tags  the tags to be added to the job, provided as a list of strings
+     */
+    public void addTags(String jobId, List<String> tags) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("tags", tags);
         updateJobInfo(jobId, updates);
     }
 
