@@ -20,6 +20,15 @@ OR
 ```java
 SauceREST sauce = new SauceREST("username", "access-key", Datacenter.US);
 ```
+Paramaters: 
+
+| Name        | Type              | Details       |
+| ----------- | ----------------- | ------------- |
+| username    | String (required) | your sauce labs username  |
+| access-key  | String (required) | your sauce labs accesskey  |
+| dataCenter  | String (optional) | one of US, US_EAST, EU (Default US)  |
+
+
 
 Users generally only have access to their own jobs and resources.  Parent accounts may have access to their children's jobs.  Check out the Sauce Labs documentation for more information.
 
