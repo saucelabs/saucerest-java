@@ -14,7 +14,7 @@ If a function you're after isn't supported, we suggest either shelling out and u
 # Usage
 ## Create an instance of the client
 ```java
-SauceREST sauce = new SauceREST("username", "access-key");
+SauceREST sauce = new SauceREST("username", "access-key", "data_center");
 ```
 OR
 ```java
@@ -26,7 +26,7 @@ Paramaters:
 | ----------- | ----------------- | ------------- |
 | username    | String (required) | your sauce labs username  |
 | access-key  | String (required) | your sauce labs accesskey  |
-| dataCenter  | String (optional) | one of US, US_EAST, EU (Default US)  |
+| data_center  | String (optional) | one of US, US_EAST, EU (Default US)  |
 
 
 
