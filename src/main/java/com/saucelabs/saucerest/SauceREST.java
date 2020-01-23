@@ -398,7 +398,7 @@ public class SauceREST implements Serializable {
      */
     public BufferedInputStream getHARDataStream(String jobId) throws IOException {
         logger.log(Level.FINEST, "getHARDataStream for " + jobId);
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -418,7 +418,7 @@ public class SauceREST implements Serializable {
      */
     public JSONTokener getHARData(String jobId) throws IOException, JSONException {
         logger.log(Level.FINEST, "getHARData for " + jobId);
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/network.har");
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
 
         BufferedInputStream har_stream = downloadFileData(jobId, restEndpoint);
         return new JSONTokener(har_stream);
