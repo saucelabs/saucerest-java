@@ -401,7 +401,7 @@ public class SauceRESTTest {
 
         sauceREST.downloadHAR("1234", "location");
         assertEquals(
-            "/1234/network.har",
+            "/v1/eds/1234/network.har",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
