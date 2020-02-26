@@ -587,6 +587,8 @@ public class SauceREST implements Serializable {
             String saveName = jobId + format.format(new Date());
             if (restEndpoint.getPath().endsWith(".mp4")) {
                 saveName = saveName + ".mp4";
+            } else if (restEndpoint.getPath().endsWith(".har")) {
+                saveName = saveName + ".har";
             } else {
                 saveName = saveName + ".log";
             }

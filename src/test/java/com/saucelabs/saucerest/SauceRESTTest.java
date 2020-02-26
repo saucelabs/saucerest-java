@@ -15,6 +15,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +32,9 @@ import java.util.List;
 public class SauceRESTTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     private SauceREST sauceREST;
     private MockHttpURLConnection urlConnection;
@@ -379,14 +383,14 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.downloadLog("1234", "location");
+        sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.downloadVideo("1234", "location");
+        sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
             this.urlConnection.getRealURL().getPath()
@@ -399,7 +403,7 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.downloadHAR("1234", "location");
+        sauceREST.downloadHAR("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/v1/eds/1234/network.har",
             this.urlConnection.getRealURL().getPath()
