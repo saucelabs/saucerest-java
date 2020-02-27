@@ -46,13 +46,17 @@ String tunnels = sauce.getTunnels();
 ```
 
 ## Download Assets
-Assets are downloaded by providing a job ID and the location to save the asset too.
+Assets are downloaded by providing a job ID and the location to save the asset to.
+
+Filenames are set automatically to `job_idyyyyMMdd_HHmmSS.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
 
 ### Selenium log
 
 ```java
 sauce.downloadLog("job_id", "/var/tmp/");
 ```
+
+Extension: `.log`
 
 ### HAR File
 HAR files are only available for jobs using [Extended Debugging](https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943).
@@ -61,8 +65,16 @@ HAR files are only available for jobs using [Extended Debugging](https://wiki.sa
 sauce.downloadHAR("job_id", "/var/tmp/");
 ```
 
+Extension: `.har`
+
 ### Video
 Video is only available for jobs which have not [disabled video recording](https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options#TestConfigurationOptions-Disablevideorecording).
+
+```java
+sauce.downloadVideo("job_id", "/var/tmp");
+```
+
+Extension: `.mp4`
 
 ## Get Information
 ### About a particular job
