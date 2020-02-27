@@ -2,10 +2,7 @@ package com.saucelabs.saucerest;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
@@ -390,12 +387,13 @@ public class SauceRESTTest {
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
+        boolean downloaded = sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
     }
 
     @Test
@@ -431,12 +429,13 @@ public class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.downloadHAR("1234", folder.getRoot().getAbsolutePath());
+        boolean downloaded = sauceREST.downloadHAR("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/v1/eds/1234/network.har",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
     }
 
     @Test
