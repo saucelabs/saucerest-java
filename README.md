@@ -33,7 +33,7 @@ Paramaters:
 Users generally only have access to their own jobs and resources.  Parent accounts may have access to their children's jobs.  Check out the Sauce Labs documentation for more information.
 
 ## Change a job's metadata
-###Mark a job passed or failed:
+### Mark a job passed or failed:
 ```java
 sauce.jobPassed(job_id);
 sauce.jobFailed(job_id);
