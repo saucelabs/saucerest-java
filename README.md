@@ -50,10 +50,19 @@ Assets are downloaded by providing a job ID and the location to save the asset t
 
 Filenames are set automatically to `job_idyyyyMMdd_HHmmSS.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
 
+Each of these methods comes in two flavours; the `downloadX` methods which ignore exceptions, and the `downloadXOrThrow` methods which throw:
+ * SauceException.NotAuthorized if credentials are missing or wrong
+ * FileNotFound if resources are missing or don't exist
+ * IOException if any of the many networking horrors which can occur, do
+
 ### Selenium log
 
 ```java
+// Download the log; Ignore exceptions
 sauce.downloadLog("job_id", "/var/tmp/");
+
+// Download the log; Raise SauceException.NotAuthorized, FileNotFound, IOException
+sauce.downloadLogOrThrow("job_id", "/var.tmp");
 ```
 
 Extension: `.log`
@@ -62,7 +71,11 @@ Extension: `.log`
 HAR files are only available for jobs using [Extended Debugging](https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943).
 
 ```java
+// Download the HAR file; Ignore exceptions
 sauce.downloadHAR("job_id", "/var/tmp/");
+
+// Download the HAR file; Raise SauceException.NotAuthorized, FileNotFound, IOException
+sauce.downloadHAROrThrow("job_id", "/var.tmp");
 ```
 
 Extension: `.har`
@@ -71,7 +84,11 @@ Extension: `.har`
 Video is only available for jobs which have not [disabled video recording](https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options#TestConfigurationOptions-Disablevideorecording).
 
 ```java
+// Download the Log; Ignore exceptions
 sauce.downloadVideo("job_id", "/var/tmp");
+
+// Download the Log; Raise SauceException.NotAuthorized, FileNotFound, IOException
+sauce.downloadVideoOrThrow("job_id", "/var/tmp");
 ```
 
 Extension: `.mp4`
