@@ -411,6 +411,20 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void testVideoDownload() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+
+        boolean downloaded = sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
+        assertEquals(
+            "/rest/v1/fakeuser/jobs/1234/assets/video.mp4",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
     public void testDownloadVideoWithFileNotFoundThrowsException() throws Exception {
         urlConnection.setResponseCode(404);
         thrown.expect(java.io.FileNotFoundException.class);
