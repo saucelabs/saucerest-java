@@ -51,14 +51,14 @@ Assets are downloaded by providing a job ID and the location to save the asset t
 ### Selenium log
 
 ```java
-sauce.downloadLog("job_id", "/var/tmp/selenium.log");
+sauce.downloadLog("job_id", "/var/tmp/");
 ```
 
 ### HAR File
 HAR files are only available for jobs using [Extended Debugging](https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943).
 
 ```java
-sauce.downloadHAR("job_id", "/var/tmp/HAR.log");
+sauce.downloadHAR("job_id", "/var/tmp/");
 ```
 
 ### Video
