@@ -399,6 +399,34 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void testDownloadWithFileNotFoundThrowsException() throws Exception {
+        urlConnection.setResponseCode(404);
+        thrown.expect(java.io.FileNotFoundException.class);
+        sauceREST.downloadLogOrThrow("1234", folder.getRoot().getAbsolutePath());
+    }
+
+    @Test
+    public void testDownloadLogWithWrongCredentialsThrowsException() throws Exception {
+        urlConnection.setResponseCode(401);
+        thrown.expect(SauceException.NotAuthorized.class);
+        sauceREST.downloadLogOrThrow("1234", folder.getRoot().getAbsolutePath());
+    }
+
+    @Test
+    public void testDownloadVideoWithFileNotFoundThrowsException() throws Exception {
+        urlConnection.setResponseCode(404);
+        thrown.expect(java.io.FileNotFoundException.class);
+        sauceREST.downloadVideoOrThrow("1234", folder.getRoot().getAbsolutePath());
+    }
+
+    @Test
+    public void testDownloadVideoWithWrongCredentialsThrowsException() throws Exception {
+        urlConnection.setResponseCode(401);
+        thrown.expect(SauceException.NotAuthorized.class);
+        sauceREST.downloadVideoOrThrow("1234", folder.getRoot().getAbsolutePath());
+    }
+
+    @Test
     public void testHARDownload() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
@@ -409,6 +437,20 @@ public class SauceRESTTest {
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    public void testDownloadHARWithFileNotFoundThrowsException() throws Exception {
+        urlConnection.setResponseCode(404);
+        thrown.expect(java.io.FileNotFoundException.class);
+        sauceREST.downloadHAROrThrow("1234", folder.getRoot().getAbsolutePath());
+    }
+
+    @Test
+    public void testDownloadHARWithWrongCredentialsThrowsException() throws Exception {
+        urlConnection.setResponseCode(401);
+        thrown.expect(SauceException.NotAuthorized.class);
+        sauceREST.downloadHAROrThrow("1234", folder.getRoot().getAbsolutePath());
     }
 
     @Test
