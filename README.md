@@ -62,7 +62,7 @@ Each of these methods comes in two flavours; the `downloadX` methods which ignor
 sauce.downloadLog("job_id", "/var/tmp/");
 
 // Download the log; Raise SauceException.NotAuthorized, FileNotFound, IOException
-sauce.downloadLogOrThrow("job_id", "/var.tmp");
+sauce.downloadLogOrThrow("job_id", "/var/tmp");
 ```
 
 Extension: `.log`
@@ -75,7 +75,7 @@ HAR files are only available for jobs using [Extended Debugging](https://wiki.sa
 sauce.downloadHAR("job_id", "/var/tmp/");
 
 // Download the HAR file; Raise SauceException.NotAuthorized, FileNotFound, IOException
-sauce.downloadHAROrThrow("job_id", "/var.tmp");
+sauce.downloadHAROrThrow("job_id", "/var/tmp");
 ```
 
 Extension: `.har`
