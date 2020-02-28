@@ -379,18 +379,18 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testDownload() throws Exception {
+    public void testAttemptDownload() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath());
+        sauceREST.attemptLogDownload("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
 
-        sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
+        sauceREST.attemptVideoDownload("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
             this.urlConnection.getRealURL().getPath()
@@ -427,11 +427,11 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testHARDownload() throws Exception {
+    public void testAttemptHARDownload() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
 
-        sauceREST.downloadHAR("1234", folder.getRoot().getAbsolutePath());
+        sauceREST.attemptHARDownload("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/v1/eds/1234/network.har",
             this.urlConnection.getRealURL().getPath()

@@ -322,9 +322,27 @@ public class SauceREST implements Serializable {
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      */
-    public void downloadVideo(String jobId, String location) {
+    public void attemptVideoDownload(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
         saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     *
+     * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
+     * is not set to false.
+     *
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @deprecated  This method's behaviour will change in a future release to no longer swallow exceptions. To continue using the exception-swallowing version, please switch to {@link #attemptVideoDownload(String, String)}.
+     * @see https://github.com/DylanLacey/saucerest-java/wiki/Asset-Fetching
+     */
+    public void downloadVideo(String jobId, String location) {
+        downloadVideo(jobId, location);
     }
 
     /**
@@ -362,7 +380,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @// TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
      * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
@@ -371,9 +388,25 @@ public class SauceREST implements Serializable {
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      */
-    public void downloadLog(String jobId, String location) {
+    public void attemptLogDownload(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
         saveFile(jobId, location, restEndpoint);
+    }
+
+
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     *
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @deprecated  This method's behaviour will change in a future release to no longer swallow exceptions. To continue using the exception-swallowing version, please switch to {@link #attemptLogDownload(String, String)}.
+     * @see https://github.com/DylanLacey/saucerest-java/wiki/Asset-Fetching
+     */
+    public void downloadLog(String jobId, String location) {
+        downloadLog(jobId, location);
     }
 
     /**
@@ -406,7 +439,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @// TODO: 27/2/20 I think this should be renamed "attemptHARDownload" - Dylan
      * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
@@ -418,9 +450,28 @@ public class SauceREST implements Serializable {
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the HAR file should be downloaded to
      */
-    public void downloadHAR(String jobId, String location) {
+    public void attemptHARDownload(String jobId, String location){
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
         saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * This will only work for jobs which support Extended Debugging, which were started with the
+     * 'extendedDebugging' capability set to true.
+     *
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadHAROrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the HAR file should be downloaded to
+     *
+     * @deprecated  This method's behaviour will change in a future release to no longer swallow exceptions. To continue using the exception-swallowing version, please switch to {@link #attemptHARDownload(String, String)}.
+     * @see https://github.com/DylanLacey/saucerest-java/wiki/Asset-Fetching
+     */
+    public void downloadHAR(String jobId, String location) {
+        downloadHAR(jobId, location);
     }
 
     /**

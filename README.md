@@ -55,11 +55,13 @@ Each of these methods comes in two flavours; the `downloadX` methods which ignor
  * FileNotFound if resources are missing or don't exist
  * IOException if any of the many networking horrors which can occur, do
 
+See (Asset Fetching)[https://github.com/DylanLacey/saucerest-java/wiki/Asset-Fetching] for more details.
+
 ### Selenium log
 
 ```java
 // Download the log; Ignore exceptions
-sauce.downloadLog("job_id", "/var/tmp/");
+sauce.attemptLogDownload("job_id", "/var/tmp/");
 
 // Download the log; Raise SauceException.NotAuthorized, FileNotFound, IOException
 sauce.downloadLogOrThrow("job_id", "/var/tmp");
@@ -72,7 +74,7 @@ HAR files are only available for jobs using [Extended Debugging](https://wiki.sa
 
 ```java
 // Download the HAR file; Ignore exceptions
-sauce.downloadHAR("job_id", "/var/tmp/");
+sauce.attemptHARDownload("job_id", "/var/tmp/");
 
 // Download the HAR file; Raise SauceException.NotAuthorized, FileNotFound, IOException
 sauce.downloadHAROrThrow("job_id", "/var/tmp");
@@ -85,7 +87,7 @@ Video is only available for jobs which have not [disabled video recording](https
 
 ```java
 // Download the Log; Ignore exceptions
-sauce.downloadVideo("job_id", "/var/tmp");
+sauce.attemptVideoDownload("job_id", "/var/tmp");
 
 // Download the Log; Raise SauceException.NotAuthorized, FileNotFound, IOException
 sauce.downloadVideoOrThrow("job_id", "/var/tmp");
