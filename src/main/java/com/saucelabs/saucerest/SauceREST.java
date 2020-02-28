@@ -319,12 +319,13 @@ public class SauceREST implements Serializable {
      *
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
+     * @param jobId     the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location  represents the base directory where the video should be downloaded to
+     * @return          True if the video was downloaded successfully; Otherwise false
      */
-    public void downloadVideo(String jobId, String location) {
+    public boolean downloadVideo(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
-        saveFile(jobId, location, restEndpoint);
+        return saveFile(jobId, location, restEndpoint);
     }
 
     /**
@@ -368,12 +369,13 @@ public class SauceREST implements Serializable {
      *
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
+     * @param jobId     the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location  represents the base directory where the video should be downloaded to
+     * @return          True if the Log file downloads successfully; Otherwise false.
      */
-    public void downloadLog(String jobId, String location) {
+    public boolean downloadLog(String jobId, String location) {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        saveFile(jobId, location, restEndpoint);
+        return saveFile(jobId, location, restEndpoint);
     }
 
     /**
@@ -415,12 +417,13 @@ public class SauceREST implements Serializable {
      *
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadHAROrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the HAR file should be downloaded to
+     * @param jobId     the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location  represents the base directory where the HAR file should be downloaded to
+     * @return          True if the HAR file downloads successfully, otherwise false
      */
-    public void downloadHAR(String jobId, String location) {
+    public boolean downloadHAR(String jobId, String location) {
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
-        saveFile(jobId, location, restEndpoint);
+        return saveFile(jobId, location, restEndpoint);
     }
 
     /**
@@ -670,15 +673,18 @@ public class SauceREST implements Serializable {
      * If an IOException is thrown during this process, this method will fail _silently_ (although it will record the error
      * at Level.WARNING.  Use {@link #saveFileOrThrowException(String, String, URL)} to fail with an exception.
      *
-     * @param jobId        the Sauce Job id
-     * @param location     represents the location that the result file should be stored in
-     * @param restEndpoint the URL to perform a HTTP GET
+     * @param jobId         the Sauce Job id
+     * @param location      represents the location that the result file should be stored in
+     * @param restEndpoint  the URL to perform a HTTP GET
+     * @return              Whether the request successfully fetched a resource or not
      */
-    private void saveFile(String jobId, String location, URL restEndpoint) {
+    private boolean saveFile(String jobId, String location, URL restEndpoint) {
         try {
             saveFileOrThrowException(jobId, location, restEndpoint);
+            return true;
         } catch(IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results", e);
+            return false;
         }
     }
 
