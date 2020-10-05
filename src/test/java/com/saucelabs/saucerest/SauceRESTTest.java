@@ -59,7 +59,7 @@ public class SauceRESTTest {
 
         @Override
         public void close() throws IOException {
-            throw new IOException();
+            throw new IOException("Expected IO Exception");
         }
     }
 
