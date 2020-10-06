@@ -5,7 +5,7 @@ package com.saucelabs.saucerest;
  */
 class ErrorExplainers {
 
-    static String missingCreds(){
+    static String missingCreds() {
         return String.join(System.getProperty("line.separator"),
             "If using System Properties/Environment Variables (ENVars), this can happen because:",
             " * You are using a toolchain which does not automatically propagate ENVars between tools",
@@ -14,18 +14,18 @@ class ErrorExplainers {
         );
     }
 
-    static String incorrectCreds(String username, String accessKey){
+    static String incorrectCreds(String username, String accessKey) {
         String endOfKey = accessKey.substring(accessKey.length() - 3);
 
         return String.join(System.getProperty("line.separator"),
             "Not Authorized.  Possible Reasons:",
-            " * The provided Username (" + username +") is incorrect",
+            " * The provided Username (" + username + ") is incorrect",
             " * This account does not have permissions to access this job",
             " * The provided Access Key ending with '" + endOfKey + "' is incorrect"
         );
     }
 
-    static String resourceMissing(){
+    static String resourceMissing() {
         return String.join(System.getProperty("line.separator"),
             "Resource Not Found.   Possible reasons:",
             " * This job does not exist",
@@ -33,14 +33,14 @@ class ErrorExplainers {
         );
     }
 
-    static String videoMissing(){
+    static String videoMissing() {
         return String.join(System.getProperty("line.separator"),
             " * You disabled video recording by setting the `recordVideo` capability to false",
             " * This test was not able to complete video encoding due to an error or early termination"
         );
     }
 
-    public static String HARMissing(){
+    public static String HARMissing() {
         return String.join(System.getProperty("line.separator"),
             " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
             " * This test was not able to complete HAR file recording due to an error or early termination"
