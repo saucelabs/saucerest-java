@@ -1,14 +1,14 @@
 package com.saucelabs.saucerest;
-/** @// TODO: 27/2/20 Lets have all these take a message, yeah?
- * @// TODO: 27/2/20 And also, we should make these IOExceptions, not Runtime.
+/** @// TODO: 2020-02-27 Lets have all these take a message, yeah?
+ * @// TODO: 2020-02-27 And also, we should make these IOExceptions, not Runtime.
  */
 
 /**
- * Created by gavinmogan on 11/2/15.
+ * Created by gavinmogan on 2015-02-11.
  */
 public class SauceException extends RuntimeException {
     /**
-     * Created by gavinmogan on 11/2/15.
+     * Created by gavinmogan on 2015-02-11.
      */
     public SauceException(String message) {
         super(message);
