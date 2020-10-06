@@ -65,7 +65,6 @@ public class SauceREST implements Serializable {
     private String server;
     private String edsServer;
     private String appServer;
-    private DataCenter dataCenter;
 
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
@@ -98,42 +97,22 @@ public class SauceREST implements Serializable {
     public SauceREST(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
-        this.dataCenter = dataCenter;
-        this.server = buildBaseUrl();
-        this.edsServer = buildEdsUrl();
-        this.appServer = dataCenter.appServer;
+        this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
+        this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
+        this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
     }
 
     /**
-     * Build base URL with property or default base url.
+     * Build URL with environment variable, or system property, or default URL.
      *
-     * @return baseUrl to use
+     * @param defaultUrl default URL if no URL is found in environment variables and system properties
+     * @param envVarName the name of the environment variable that may contain URL
+     * @param systemPropertyName the name of the system property that may contain URL
+     * @return URL to use
      */
-    private String buildBaseUrl() {
-        String defaultBaseUrl;
-        defaultBaseUrl = dataCenter.server;
-
-        if (System.getenv("SAUCE_REST_ENDPOINT") != null) {
-            return System.getenv("SAUCE_REST_ENDPOINT");
-        } else {
-            return System.getProperty("saucerest-java.base_url", defaultBaseUrl);
-        }
-    }
-
-    /**
-     * Build base URL with property or default base url.
-     *
-     * @return baseUrl to use
-     */
-    private String buildEdsUrl() {
-        String defaultEdsUrl;
-        defaultEdsUrl = dataCenter.edsServer;
-
-        if (System.getenv("SAUCE_REST_EDS_ENDPOINT") != null) {
-            return System.getenv("SAUCE_REST_EDS_ENDPOINT");
-        } else {
-            return System.getProperty("saucerest-java.base_eds_url", defaultEdsUrl);
-        }
+    private String buildUrl(String defaultUrl, String envVarName, String systemPropertyName) {
+        String envVar = System.getenv(envVarName);
+        return envVar != null ? envVar : System.getProperty(systemPropertyName, defaultUrl);
     }
 
     public static String getExtraUserAgent() {
@@ -165,7 +144,7 @@ public class SauceREST implements Serializable {
     /**
      * Returns eds server assigned to this interface
      *
-     * @return Reurns eds server assigned to this interface
+     * @return Returns eds server assigned to this interface
      */
     public String getEdsServer() {
         return this.edsServer;
