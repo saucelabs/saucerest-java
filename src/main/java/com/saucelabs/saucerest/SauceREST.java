@@ -849,6 +849,8 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * @deprecated use {@link #uploadFile(File, String, boolean)}.
+     *
      * Uploads a file to Sauce storage.
      *
      * @param file      the file to upload
@@ -858,10 +860,41 @@ public class SauceREST implements Serializable {
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the
      *                     200 range)
      */
+    @Deprecated
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
+        return uploadFile(file, fileName, overwrite.booleanValue());
+    }
+
+    /**
+     * Uploads a file to Sauce storage.
+     *
+     * @param file      the file to upload
+     * @param fileName  name of the file in sauce storage
+     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
+     *                     200 range)
+     */
+    public String uploadFile(File file, String fileName, boolean overwrite) throws IOException {
         try (FileInputStream is = new FileInputStream(file)) {
             return uploadFile(is, fileName, overwrite);
         }
+    }
+
+    /**
+     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
+     * Uploads a file to Sauce storage.
+     *
+     * @param is        Input stream of the file to be uploaded
+     * @param fileName  name of the file in sauce storage
+     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
+     * @return the md5 hash returned by sauce of the file
+     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
+     *                     200 range)
+     */
+    @Deprecated
+    public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
+        return uploadFile(is, fileName, overwrite.booleanValue());
     }
 
     /**
@@ -874,9 +907,9 @@ public class SauceREST implements Serializable {
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the
      *                     200 range)
      */
-    public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
+    public String uploadFile(InputStream is, String fileName, boolean overwrite) throws IOException {
         try {
-            URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite.toString());
+            URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
 
             HttpURLConnection connection = openConnection(restEndpoint);
 
