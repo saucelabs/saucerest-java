@@ -7,10 +7,7 @@ import static org.junit.Assert.*;
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
@@ -63,6 +60,14 @@ public class SauceRESTTest {
         }
     }
 
+    private class ExceptionThrowingMockOutputStream extends OutputStream {
+
+        @Override
+        public void write(int b) throws IOException {
+            throw new IOException("Expected IO Exception");
+        }
+    }
+
     private class MockHttpURLConnection extends HttpURLConnection {
         private URL realURL;
         private InputStream mockInputStream;
@@ -84,6 +89,11 @@ public class SauceRESTTest {
         protected MockHttpURLConnection(ExceptionThrowingMockInputStream mockInputStream) throws MalformedURLException {
             this();
             this.mockInputStream = mockInputStream;
+        }
+
+        protected MockHttpURLConnection(ExceptionThrowingMockOutputStream mockOutputStream) throws  MalformedURLException {
+            this();
+            this.mockOutputStream = mockOutputStream;
         }
 
         @Override
@@ -137,6 +147,10 @@ public class SauceRESTTest {
         }
     }
 
+    @BeforeClass
+    public static void setUpLogger() {
+        System.setProperty("java.util.logging.config.file", ClassLoader.getSystemResource("logging.properties").getPath());
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -152,6 +166,17 @@ public class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
+        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+            @Override
+            public HttpURLConnection openConnection(URL url) {
+                SauceRESTTest.this.urlConnection.setRealURL(url);
+                return SauceRESTTest.this.urlConnection;
+            }
+        };
+    }
+
+    private void setConnectionThrowIOExceptionOnWrite() throws MalformedURLException {
+        urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockOutputStream());
         this.sauceREST = new SauceREST("fakeuser", "fakekey") {
             @Override
             public HttpURLConnection openConnection(URL url) {
@@ -184,9 +209,9 @@ public class SauceRESTTest {
         this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
     }
 
-    @Ignore("This test didn't run before - was implicitly ignored. Requires fixing.")
-    @Test(expected = SauceException.NotAuthorized.class)
+    @Test
     public void testDoJSONPOST_NotAuthorized() throws Exception {
+        setConnectionThrowIOExceptionOnWrite();
         urlConnection.setResponseCode(401);
 
         thrown.expect(SauceException.NotAuthorized.class);
@@ -503,8 +528,8 @@ public class SauceRESTTest {
 
         sauceREST.addTags("1234", new ArrayList<String>());
         assertEquals(
-                "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
-                this.urlConnection.getRealURL().getPath()
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+            this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
@@ -521,8 +546,8 @@ public class SauceRESTTest {
         tags.add("tag2");
         sauceREST.addTags("1234", tags);
         assertEquals(
-                "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
-                this.urlConnection.getRealURL().getPath()
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234",
+            this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
         String output = this.urlConnection.getOutputStream().toString();
