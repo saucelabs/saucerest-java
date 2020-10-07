@@ -1,29 +1,44 @@
 package com.saucelabs.saucerest;
 
-import static com.saucelabs.saucerest.DataCenter.US;
-
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.*;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
+import static com.saucelabs.saucerest.DataCenter.US;
 
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API
@@ -105,8 +120,8 @@ public class SauceREST implements Serializable {
     /**
      * Build URL with environment variable, or system property, or default URL.
      *
-     * @param defaultUrl default URL if no URL is found in environment variables and system properties
-     * @param envVarName the name of the environment variable that may contain URL
+     * @param defaultUrl         default URL if no URL is found in environment variables and system properties
+     * @param envVarName         the name of the environment variable that may contain URL
      * @param systemPropertyName the name of the system property that may contain URL
      * @return URL to use
      */
@@ -381,6 +396,31 @@ public class SauceREST implements Serializable {
      * @return a BufferedInputStream containing the logfile
      * @throws IOException if there is a problem fetching the file
      */
+    public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/log.json");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadJsonLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return a BufferedInputStream containing the logfile
+     * @throws IOException if there is a problem fetching the file
+     */
     public BufferedInputStream downloadLog(String jobId) throws IOException {
         URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
         return downloadFileData(jobId, restEndpoint);
@@ -441,16 +481,16 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
+     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a {@link JSONTokener}.
      * <p>
-     * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The stream will be read as
-     * soon as a JSONObject is created.
+     * Pass this {@link JSONTokener} to a {@link JSONObject} when you wish to read JSON.  The stream will be read as
+     * soon as a {@link JSONObject} is created.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return A JSONTokener containing the HAR data, tokenized
+     * @return A {@link JSONTokener} containing the HAR data, tokenized
      * @throws IOException   if there is a problem fetching the HAR file
      * @throws JSONException if encoding can't be determined or there's an IO problem
      */
@@ -639,8 +679,7 @@ public class SauceREST implements Serializable {
 
         logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
-        BufferedInputStream in = new BufferedInputStream(stream);
-        return in;
+        return new BufferedInputStream(stream);
     }
 
     /**
@@ -676,6 +715,8 @@ public class SauceREST implements Serializable {
             saveName = saveName + ".mp4";
         } else if (restEndpoint.getPath().endsWith(".har")) {
             saveName = saveName + ".har";
+        } else if (restEndpoint.getPath().endsWith(".json")) {
+            saveName = saveName + ".json";
         } else {
             saveName = saveName + ".log";
         }
@@ -849,10 +890,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @deprecated use {@link #uploadFile(File, String, boolean)}.
-     *
-     * Uploads a file to Sauce storage.
-     *
      * @param file      the file to upload
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
@@ -882,9 +919,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
-     * Uploads a file to Sauce storage.
-     *
      * @param is        Input stream of the file to be uploaded
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists

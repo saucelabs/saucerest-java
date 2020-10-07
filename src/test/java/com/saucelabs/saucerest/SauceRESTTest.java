@@ -11,6 +11,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +81,7 @@ public class SauceRESTTest {
         protected MockHttpURLConnection() throws MalformedURLException {
             super(new URL("http://fake.site/"));
             try {
-                this.mockInputStream = new ByteArrayInputStream("".getBytes("UTF-8"));
+                this.mockInputStream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8.name()));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -91,7 +93,7 @@ public class SauceRESTTest {
             this.mockInputStream = mockInputStream;
         }
 
-        protected MockHttpURLConnection(ExceptionThrowingMockOutputStream mockOutputStream) throws  MalformedURLException {
+        protected MockHttpURLConnection(ExceptionThrowingMockOutputStream mockOutputStream) throws MalformedURLException {
             this();
             this.mockOutputStream = mockOutputStream;
         }
@@ -203,7 +205,7 @@ public class SauceRESTTest {
     @Test
     public void testDoJSONPOST_Created() throws Exception {
         urlConnection.setInputStream(new ByteArrayInputStream(
-            "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes("UTF-8")
+            "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes(StandardCharsets.UTF_8.name())
         ));
         urlConnection.setResponseCode(201);
         this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
@@ -231,7 +233,7 @@ public class SauceRESTTest {
     public void testRecordCI() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
-            "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes("UTF-8")
+            "{\"id\": \"29cee6f11f5e4ec6b8b62e98f79bba6f\"}".getBytes(StandardCharsets.UTF_8.name())
         ));
         sauceREST.recordCI("jenkins", "1.1");
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/stats/ci");
@@ -253,7 +255,7 @@ public class SauceRESTTest {
     public void testGetStoredFiles() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
-            "[]".getBytes("UTF-8")
+            "[]".getBytes(StandardCharsets.UTF_8.name())
         ));
         String userInfo = sauceREST.getStoredFiles();
         assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/" + this.sauceREST.getUsername() + "");
@@ -263,7 +265,7 @@ public class SauceRESTTest {
     public void testUpdateJobInfo() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
-            "[]".getBytes("UTF-8")
+            "[]".getBytes(StandardCharsets.UTF_8.name())
         ));
         HashMap<String, Object> updates = new HashMap<>();
         updates.put("public", "shared");
@@ -331,10 +333,10 @@ public class SauceRESTTest {
     @Test
     public void testUploadFile() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ \"md5\": \"abc123445213242\" }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ \"md5\": \"abc123445213242\" }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.uploadFile(
-            new ByteArrayInputStream("".getBytes("UTF-8")),
+            new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8.name())),
             "gavin.txt",
             true
         );
@@ -351,7 +353,7 @@ public class SauceRESTTest {
     @Test
     public void testStopJob() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.stopJob("123");
         assertEquals(
@@ -364,7 +366,7 @@ public class SauceRESTTest {
     @Test
     public void testDeleteJob() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.deleteJob("123");
         assertEquals(
@@ -377,7 +379,7 @@ public class SauceRESTTest {
     @Test
     public void testGetJobInfo() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getJobInfo("123");
         assertEquals(
@@ -390,35 +392,80 @@ public class SauceRESTTest {
     @Test
     public void testRetrieveResults() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
-
-        sauceREST.retrieveResults("fakePath");
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        String results = sauceREST.retrieveResults("fakePath");
         assertEquals(
             "/rest/v1/fakePath",
             this.urlConnection.getRealURL().getPath()
         );
+        assertNotNull(results);
         assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
     @Test
-    public void testDownload() throws Exception {
+    public void testDownloadServerLog() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
-
-        sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath());
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        boolean downloaded = sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().endsWith(".log"));
+        assertTrue(downloaded);
+    }
 
+    @Test
+    public void testDownloadVideo() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
         boolean downloaded = sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().endsWith(".mp4"));
         assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadJsonLog() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        boolean downloaded = sauceREST.downloadJsonLog("1234", folder.getRoot().getAbsolutePath());
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().endsWith(".json"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadJsonLogStream() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        BufferedInputStream stream = sauceREST.downloadJsonLog("1234");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
+            this.urlConnection.getRealURL().getPath()
+        );
+
+        byte[] targetArray = new byte[stream.available()];
+        stream.read(targetArray);
+        assertTrue(new String(targetArray).length() > 0);
+        assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
     @Test
@@ -438,7 +485,7 @@ public class SauceRESTTest {
     @Test
     public void testVideoDownload() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         boolean downloaded = sauceREST.downloadVideo("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
@@ -466,7 +513,7 @@ public class SauceRESTTest {
     @Test
     public void testHARDownload() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         boolean downloaded = sauceREST.downloadHAR("1234", folder.getRoot().getAbsolutePath());
         assertEquals(
@@ -494,7 +541,7 @@ public class SauceRESTTest {
     @Test
     public void testJobFailed() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.jobFailed("1234");
         assertEquals(
@@ -509,7 +556,7 @@ public class SauceRESTTest {
     @Test
     public void testJobPassed() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.jobPassed("1234");
         assertEquals(
@@ -524,7 +571,7 @@ public class SauceRESTTest {
     @Test
     public void testAddTagsEmpty() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.addTags("1234", new ArrayList<String>());
         assertEquals(
@@ -539,7 +586,7 @@ public class SauceRESTTest {
     @Test
     public void testAddTags() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         List<String> tags = new ArrayList<>();
         tags.add("tag1");
@@ -557,7 +604,7 @@ public class SauceRESTTest {
     @Test
     public void testGetFullJobs() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getFullJobs();
         assertEquals(
@@ -577,7 +624,7 @@ public class SauceRESTTest {
     @Test
     public void testGetJobs() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getJobs();
         assertEquals(
@@ -591,7 +638,7 @@ public class SauceRESTTest {
     @Test
     public void testGetJobsLimit() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getJobs(100);
         assertEquals(
@@ -611,7 +658,7 @@ public class SauceRESTTest {
     @Test
     public void testGetJobsSkipLimit() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getJobs(100, 1470689339, 1470862161);
         assertEquals(
@@ -632,7 +679,7 @@ public class SauceRESTTest {
     @Test
     public void testBuildFullJobs() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getBuildFullJobs("fakePath");
         assertEquals(
@@ -645,7 +692,7 @@ public class SauceRESTTest {
     @Test
     public void testGetBuild() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes("UTF-8")));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         sauceREST.getBuild("fakePath");
         assertEquals(
