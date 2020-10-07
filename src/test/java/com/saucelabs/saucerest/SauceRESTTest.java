@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -418,6 +420,57 @@ public class SauceRESTTest {
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadWithCustomFileName() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        boolean downloaded = sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath(), "foobar.log");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().equals("foobar.log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameEmptyDefaultFallback() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        boolean downloaded = sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath(), "");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().endsWith(".log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameSlashed() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        boolean downloaded = sauceREST.downloadLog("1234", folder.getRoot().getAbsolutePath(), "foo/bar.log");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(folder.getRoot().listFiles());
+        assertEquals(1, folder.getRoot().listFiles().length);
+        assertTrue(folder.getRoot().listFiles()[0].getName().endsWith("foo_bar.log"));
         assertTrue(downloaded);
     }
 
