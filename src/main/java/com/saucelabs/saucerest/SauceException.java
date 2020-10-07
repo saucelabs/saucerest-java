@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest;
-/** @// TODO: 2020-02-27 Lets have all these take a message, yeah?
- * @// TODO: 2020-02-27 And also, we should make these IOExceptions, not Runtime.
+/**
+ * TODO: 2020-02-27 Lets have all these take a message, yeah?
+ * TODO: 2020-02-27 And also, we should make these IOExceptions, not Runtime.
  */
 
 /**
@@ -9,6 +10,7 @@ package com.saucelabs.saucerest;
 public class SauceException extends RuntimeException {
     /**
      * Created by gavinmogan on 2015-02-11.
+     * {@inheritDoc}
      */
     public SauceException(String message) {
         super(message);
@@ -17,7 +19,8 @@ public class SauceException extends RuntimeException {
     /**
      * Default case.
      */
-    public SauceException() {}
+    public SauceException() {
+    }
 
     public static class NotAuthorized extends SauceException {
 
@@ -25,9 +28,11 @@ public class SauceException extends RuntimeException {
             super(message);
         }
 
-        public NotAuthorized(){
+        public NotAuthorized() {
 
         }
     }
-    public static class TooManyRequests extends SauceException { }
+
+    public static class TooManyRequests extends SauceException {
+    }
 }
