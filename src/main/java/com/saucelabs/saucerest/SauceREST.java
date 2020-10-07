@@ -890,6 +890,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * @deprecated use {@link #uploadFile(File, String, boolean)}.
+     *
+     * Uploads a file to Sauce storage.
      * @param file      the file to upload
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
@@ -919,6 +922,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
+     * Uploads a file to Sauce storage.
+     *
      * @param is        Input stream of the file to be uploaded
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
