@@ -5,11 +5,11 @@ package com.saucelabs.saucerest;
  */
 
 /**
- * Created by gavinmogan on 2015-02-11.
+ * Created by gavinmogan on 2015-11-02.
  */
 public class SauceException extends RuntimeException {
     /**
-     * Created by gavinmogan on 2015-02-11.
+     * Created by gavinmogan on 2015-11-02.
      * {@inheritDoc}
      */
     public SauceException(String message) {
