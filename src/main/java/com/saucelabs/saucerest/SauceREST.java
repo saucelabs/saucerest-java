@@ -324,7 +324,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
+     * TODO: 2020-02-27 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
      * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
@@ -358,7 +358,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
+     * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
      * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
@@ -374,7 +374,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
+     * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
      * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
@@ -427,7 +427,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be renamed "attemptHARDownload" - Dylan
+     * TODO: 2020-02-27 I think this should be renamed "attemptHARDownload" - Dylan
      * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
@@ -446,7 +446,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "downloadHAR" and attemptHARDownload should be the silent failure method - Dylan
+     * TODO: 2020-02-27 I think this should be called "downloadHAR" and attemptHARDownload should be the silent failure method - Dylan
      * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
