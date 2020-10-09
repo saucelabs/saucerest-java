@@ -724,9 +724,9 @@ public class SauceREST implements Serializable {
 
                 String path = restEndpoint.getPath();
                 if (path.endsWith("mp4")) {
-                    error = String.join(System.getProperty("line.separator"), error, ErrorExplainers.videoMissing());
+                    error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
                 } else if (path.endsWith("har")) {
-                    error = String.join(System.getProperty("line.separator"), error, ErrorExplainers.HARMissing());
+                    error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
                 }
 
                 throw new FileNotFoundException(error);
@@ -734,15 +734,15 @@ public class SauceREST implements Serializable {
             case 401:
                 String errorReasons = new String();
                 if (username == null || username.isEmpty()) {
-                    errorReasons = String.join(System.getProperty("line.separator"), "Your username is empty or blank.");
+                    errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
                 }
 
                 if (accessKey == null || accessKey.isEmpty()) {
-                    errorReasons = String.join(System.getProperty("line.separator"), "Your access key is empty or blank.");
+                    errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
                 }
 
                 if (!errorReasons.isEmpty()) {
-                    errorReasons = (String.join(System.getProperty("line.separator"), errorReasons, ErrorExplainers.missingCreds()));
+                    errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
                 } else {
                     errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
                 }
