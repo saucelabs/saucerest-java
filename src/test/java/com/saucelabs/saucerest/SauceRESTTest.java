@@ -8,10 +8,10 @@ import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SauceRESTTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -213,9 +211,9 @@ public class SauceRESTTest {
     public void testDoJSONPOST_NotAuthorized() throws Exception {
         setConnectionThrowIOExceptionOnWrite();
         urlConnection.setResponseCode(401);
-
-        thrown.expect(SauceException.NotAuthorized.class);
-        this.sauceREST.doJSONPOST(new URL("http://example.org/blah"), new JSONObject());
+        URL url = new URL("http://example.org/blah");
+        JSONObject body = new JSONObject();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.doJSONPOST(url, body));
     }
 
     @Test
@@ -278,22 +276,20 @@ public class SauceRESTTest {
     public void testUpdateJobInfo_NotAuthorized() throws Exception {
         setConnectionThrowIOExceptionOnClose();
         urlConnection.setResponseCode(401);
-        thrown.expect(SauceException.NotAuthorized.class);
 
         HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
-        sauceREST.updateJobInfo("12345", updates);
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.updateJobInfo("12345", updates));
     }
 
     @Test
     public void testUpdateJobInfo_TooManyRequests() throws Exception {
         setConnectionThrowIOExceptionOnClose();
         urlConnection.setResponseCode(429);
-        thrown.expect(SauceException.TooManyRequests.class);
 
         HashMap<String, Object> updates = new HashMap<>();
         updates.put("passed", true);
-        sauceREST.updateJobInfo("12345", updates);
+        assertThrows(SauceException.TooManyRequests.class, () -> sauceREST.updateJobInfo("12345", updates));
     }
 
     @Test
@@ -422,17 +418,17 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadWithFileNotFoundThrowsException() throws Exception {
+    public void testDownloadWithFileNotFoundThrowsException() {
         urlConnection.setResponseCode(404);
-        thrown.expect(java.io.FileNotFoundException.class);
-        sauceREST.downloadLogOrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
     }
 
     @Test
-    public void testDownloadLogWithWrongCredentialsThrowsException() throws Exception {
+    public void testDownloadLogWithWrongCredentialsThrowsException() {
         urlConnection.setResponseCode(401);
-        thrown.expect(SauceException.NotAuthorized.class);
-        sauceREST.downloadLogOrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadLogOrThrow("1234", location));
     }
 
     @Test
@@ -450,17 +446,17 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadVideoWithFileNotFoundThrowsException() throws Exception {
+    public void testDownloadVideoWithFileNotFoundThrowsException() {
         urlConnection.setResponseCode(404);
-        thrown.expect(java.io.FileNotFoundException.class);
-        sauceREST.downloadVideoOrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
     }
 
     @Test
-    public void testDownloadVideoWithWrongCredentialsThrowsException() throws Exception {
+    public void testDownloadVideoWithWrongCredentialsThrowsException() {
         urlConnection.setResponseCode(401);
-        thrown.expect(SauceException.NotAuthorized.class);
-        sauceREST.downloadVideoOrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
     }
 
     @Test
@@ -478,17 +474,18 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadHARWithFileNotFoundThrowsException() throws Exception {
+    public void testDownloadHARWithFileNotFoundThrowsException() {
         urlConnection.setResponseCode(404);
-        thrown.expect(java.io.FileNotFoundException.class);
-        sauceREST.downloadHAROrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadHAROrThrow("1234", location));
     }
 
     @Test
-    public void testDownloadHARWithWrongCredentialsThrowsException() throws Exception {
+    public void testDownloadHARWithWrongCredentialsThrowsException()
+    {
         urlConnection.setResponseCode(401);
-        thrown.expect(SauceException.NotAuthorized.class);
-        sauceREST.downloadHAROrThrow("1234", folder.getRoot().getAbsolutePath());
+        String location = folder.getRoot().getAbsolutePath();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadHAROrThrow("1234", location));
     }
 
     @Test
