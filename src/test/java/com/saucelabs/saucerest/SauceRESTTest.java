@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -249,7 +250,18 @@ class SauceRESTTest {
         urlConnection.setResponseCode(404);
         urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
 
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
+        assertThrows(FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
+    }
+
+    @Test
+    void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        sauceREST.downloadAllAssets("1234", absolutePath);
+        //assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log", urlConnection.getRealURL().getPath());
+        assertNull(urlConnection.getRealURL().getQuery());
     }
 
     @Test

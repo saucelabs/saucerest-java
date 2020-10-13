@@ -3,6 +3,8 @@ package com.saucelabs.saucerest;
 import static com.saucelabs.saucerest.DataCenter.US;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -14,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -310,6 +313,44 @@ public class SauceREST implements Serializable {
     public BufferedInputStream getAvailableAssets(String jobId) throws IOException {
         URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets");
         return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads all available assets.
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the assets should be downloaded to
+     * @throws IOException
+     */
+    public void downloadAllAssets(String jobId, String location) throws IOException {
+        BufferedInputStream stream = getAvailableAssets(jobId);
+        JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
+        Iterator<String> keys = jsonObject.keys();
+
+        while(keys.hasNext()) {
+            String key = keys.next();
+            // key:value of this JSONObject are of type string
+            if (jsonObject.get(key) instanceof String) {
+                // JSON response hold video twice; this prevents us downloading it twice
+                if (jsonObject.get(key).equals("video.mp4")) {
+                    continue;
+                }
+
+                URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
+                saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+            }
+            // screenshots and the filenames of each single screenshot is/are in a JSONArray
+            else if (jsonObject.get(key) instanceof JSONArray) {
+                JSONArray jsonArray = (JSONArray) jsonObject.get(key);
+
+                for (int counter = 0; counter <= jsonArray.length() - 1; counter++) {
+                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonArray.getString(counter));
+                    saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+                }
+            } else {
+                // well, let's hope this case does not happen.
+                logger.log(Level.WARNING, "/assets endpoint must have changed significantly or some other error occurred.");
+            }
+        }
     }
 
     /**
