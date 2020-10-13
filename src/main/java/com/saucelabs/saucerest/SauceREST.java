@@ -66,6 +66,8 @@ public class SauceREST implements Serializable {
     private String edsServer;
     private String appServer;
 
+    private String restApiEndpoint;
+
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
@@ -98,8 +100,9 @@ public class SauceREST implements Serializable {
         this.username = username;
         this.accessKey = accessKey;
         this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
-        this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
+        this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
+        this.restApiEndpoint = server + "rest/v1/";
     }
 
     /**
@@ -160,18 +163,21 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Returns REST API endpoint assigned to this interface
+     * @return Returns REST API endpoint assigned to this interface
+     */
+    public String getRestApiEndpoint() {
+        return this.restApiEndpoint;
+    }
+
+    /**
      * Build the url to be
      *
      * @param endpoint Endpoint url, example "info/platforms/appium"
      * @return URL to use in direct fetch functions
      */
     protected URL buildURL(String endpoint) {
-        try {
-            return new URL(new URL(this.server), "/rest/" + endpoint);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-            return null;
-        }
+        return buildEndpoint(restApiEndpoint, endpoint, "URL");
     }
 
     /**
@@ -181,10 +187,15 @@ public class SauceREST implements Serializable {
      * @return URL to use in direct fetch functions
      */
     protected URL buildEDSURL(String endpoint) {
+        return buildEndpoint(edsServer, endpoint, "EDS URL");
+    }
+
+    private URL buildEndpoint(String server, String endpoint, String urlDescription) {
         try {
-            return new URL(new URL(this.edsServer), endpoint);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce EDS URL", e);
+            return new URL(new URL(server), endpoint);
+        }
+        catch (MalformedURLException e) {
+            logger.log(Level.WARNING, e, () -> "Error constructing Sauce " + urlDescription);
             return null;
         }
     }
@@ -375,9 +386,8 @@ public class SauceREST implements Serializable {
      * @return A BufferedInputStream containing the video info
      * @throws IOException if there is a problem fetching the data
      */
-
     public BufferedInputStream downloadVideo(String jobId) throws IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -455,7 +465,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the file
      */
     public BufferedInputStream downloadLog(String jobId) throws IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -582,7 +592,7 @@ public class SauceREST implements Serializable {
      * @return HTTP response contents
      */
     public String retrieveResults(String path) {
-        URL restEndpoint = this.buildURL("v1/" + path);
+        URL restEndpoint = buildURL(path);
         return retrieveResults(restEndpoint);
     }
 
@@ -593,7 +603,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getJobInfo(String jobId) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId);
         return retrieveResults(restEndpoint);
     }
 
@@ -613,7 +623,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getFullJobs(int limit) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?full=true&limit=" + limit);
+        URL restEndpoint = buildURL(username + "/jobs?full=true&limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 
@@ -623,7 +633,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs");
+        URL restEndpoint = buildURL(username + "/jobs");
         return retrieveResults(restEndpoint);
     }
 
@@ -635,7 +645,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs(int limit) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit);
+        URL restEndpoint = buildURL(username + "/jobs?limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 
@@ -648,7 +658,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs(int limit, long to, int from) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
+        URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
         return retrieveResults(restEndpoint);
     }
 
@@ -839,7 +849,7 @@ public class SauceREST implements Serializable {
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId);
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
@@ -862,7 +872,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
 
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/stop");
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/stop");
 
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
@@ -886,7 +896,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
 
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId);
 
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
@@ -1034,7 +1044,7 @@ public class SauceREST implements Serializable {
      */
     public String uploadFile(InputStream is, String fileName, boolean overwrite) throws IOException {
         try {
-            URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
+            URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
 
             HttpURLConnection connection = openConnection(restEndpoint);
 
@@ -1125,7 +1135,7 @@ public class SauceREST implements Serializable {
 
         HttpURLConnection connection = null;
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
+            URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
             connection = openConnection(restEndpoint);
             connection.setRequestProperty("User-Agent", this.getUserAgent());
             connection.setDoOutput(true);
@@ -1146,7 +1156,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnels() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels");
+        URL restEndpoint = buildURL(username + "/tunnels");
         return retrieveResults(restEndpoint);
     }
 
@@ -1157,7 +1167,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnelInformation(String tunnelId) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
+        URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
         return retrieveResults(restEndpoint);
     }
 
@@ -1167,7 +1177,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = this.buildURL("v1/users/" + username + "/concurrency");
+        URL restEndpoint = buildURL("users/" + username + "/concurrency");
         return retrieveResults(restEndpoint);
     }
 
@@ -1177,7 +1187,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the activity information
      */
     public String getActivity() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/activity");
+        URL restEndpoint = buildURL(username + "/activity");
         return retrieveResults(restEndpoint);
     }
 
@@ -1187,7 +1197,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the stored files list
      */
     public String getStoredFiles() {
-        URL restEndpoint = this.buildURL("v1/storage/" + username);
+        URL restEndpoint = buildURL("storage/" + username);
         return retrieveResults(restEndpoint);
     }
 
@@ -1197,7 +1207,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the basic account information
      */
     public String getUser() {
-        URL restEndpoint = this.buildURL("v1/users/" + username);
+        URL restEndpoint = buildURL("users/" + username);
         return retrieveResults(restEndpoint);
     }
 
@@ -1209,7 +1219,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the supported platforms information
      */
     public String getSupportedPlatforms(String automationApi) {
-        URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
+        URL restEndpoint = buildURL("info/platforms/" + automationApi);
         return retrieveResults(restEndpoint);
     }
 
@@ -1221,10 +1231,8 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing jobs associated with a build
      */
     public String getBuildFullJobs(String build, int limit) {
-        URL restEndpoint = this.buildURL(
-            "v1/" + this.username + "/build/" + build + "/jobs?full=1" +
-                (limit == 0 ? "" : "&limit=" + limit)
-        );
+        URL restEndpoint = buildURL(username + "/build/" + build + "/jobs?full=1" +
+                (limit == 0 ? "" : "&limit=" + limit));
         return retrieveResults(restEndpoint);
     }
 
@@ -1239,8 +1247,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the build
      */
     public String getBuild(String build) {
-        URL restEndpoint = this.buildURL(
-            "v1/" + this.username + "/builds/" + build); // yes, this goes to builds instead of build like the above
+        URL restEndpoint = buildURL(username + "/builds/" + build); // yes, this goes to builds instead of build like the above
         return retrieveResults(restEndpoint);
     }
 
@@ -1252,7 +1259,7 @@ public class SauceREST implements Serializable {
      * @return if it was a success or not
      */
     public boolean recordCI(String platform, String platformVersion) {
-        URL restEndpoint = this.buildURL("v1/stats/ci");
+        URL restEndpoint = buildURL("stats/ci");
         JSONObject obj = new JSONObject();
         try {
             obj.put("platform", platform);
