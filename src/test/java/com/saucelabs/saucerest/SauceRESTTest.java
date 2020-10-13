@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
@@ -228,6 +229,30 @@ class SauceRESTTest {
     }
 
     @Test
+    public void testGetAvailableAssets() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
+
+        BufferedInputStream stream = sauceREST.getAvailableAssets("1234");
+        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets", urlConnection.getRealURL().getPath());
+
+        String results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        JSONObject jsonObject = new JSONObject(results);
+
+        assertEquals("selenium-server.log", jsonObject.getString("selenium-log"));
+        assertFalse(jsonObject.isEmpty());
+        assertTrue(jsonObject.has("video"));
+    }
+
+    @Test
+    public void testGetAvailableAssets_NotFound() {
+        urlConnection.setResponseCode(404);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
+
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
+    }
+
+    @Test
     public void testRecordCI() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
@@ -239,7 +264,6 @@ class SauceRESTTest {
         assertEquals(new JSONObject(output).toString(),
             new JSONObject("{\"platform_version\":\"1.1\",\"platform\":\"jenkins\"}").toString());
     }
-
 
     @Test
     public void testGetUser() throws Exception {
@@ -475,6 +499,7 @@ class SauceRESTTest {
         assertTrue(downloaded);
     }
 
+    @Test
     public void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();

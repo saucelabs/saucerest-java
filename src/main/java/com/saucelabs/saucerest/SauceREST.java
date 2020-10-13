@@ -302,6 +302,16 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Returns a JSON object containing all available assets for a given job id.
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return JSON object with available assets for given job id
+     */
+    public BufferedInputStream getAvailableAssets(String jobId) throws IOException {
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
      * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
@@ -743,7 +753,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Returns the result of a HTTP get to the value of the <code>restEndpoint</code> parameter, as a
+     * Returns the result of a HTTP GET to the value of the <code>restEndpoint</code> parameter, as a
      * BufferedInputStream suitable for consumption or saving to file.
      *
      * @param jobId        the Sauce Job id
@@ -770,6 +780,7 @@ public class SauceREST implements Serializable {
             case 404:
                 String error = ErrorExplainers.resourceMissing();
 
+                // TODO: add more file extension like .log or .json
                 String path = restEndpoint.getPath();
                 if (path.endsWith("mp4")) {
                     error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
