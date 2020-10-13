@@ -425,6 +425,44 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return a BufferedInputStream containing the logfile
+     * @throws IOException if there is a problem fetching the file
+     */
+    public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadJsonLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadJsonLog(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, fileName, restEndpoint);
+    }
+
+    /**
      * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
      * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
@@ -821,6 +859,8 @@ public class SauceREST implements Serializable {
             return ".mp4";
         } else if (restEndpoint.getPath().endsWith(".har")) {
             return ".har";
+        } else if (restEndpoint.getPath().endsWith(".json")) {
+            return ".json";
         } else {
             return ".log";
         }

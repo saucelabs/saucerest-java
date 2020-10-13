@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -527,6 +528,41 @@ class SauceRESTTest {
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadJsonLog(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        boolean downloaded = sauceREST.downloadJsonLog("1234", tempDir.toAbsolutePath().toString());
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+
+        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith(".json"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadJsonLogStream() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        BufferedInputStream stream = sauceREST.downloadJsonLog("1234");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
+            this.urlConnection.getRealURL().getPath()
+        );
+
+        byte[] targetArray = new byte[stream.available()];
+        stream.read(targetArray);
+        assertTrue(new String(targetArray).length() > 0);
+        assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
     @Test
