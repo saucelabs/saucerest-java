@@ -108,8 +108,8 @@ public class SauceREST implements Serializable {
     /**
      * Build URL with environment variable, or system property, or default URL.
      *
-     * @param defaultUrl default URL if no URL is found in environment variables and system properties
-     * @param envVarName the name of the environment variable that may contain URL
+     * @param defaultUrl         default URL if no URL is found in environment variables and system properties
+     * @param envVarName         the name of the environment variable that may contain URL
      * @param systemPropertyName the name of the system property that may contain URL
      * @return URL to use
      */
@@ -164,6 +164,7 @@ public class SauceREST implements Serializable {
 
     /**
      * Returns REST API endpoint assigned to this interface
+     *
      * @return Returns REST API endpoint assigned to this interface
      */
     public String getRestApiEndpoint() {
@@ -193,8 +194,7 @@ public class SauceREST implements Serializable {
     private URL buildEndpoint(String server, String endpoint, String urlDescription) {
         try {
             return new URL(new URL(server), endpoint);
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             logger.log(Level.WARNING, e, () -> "Error constructing Sauce " + urlDescription);
             return null;
         }
@@ -403,7 +403,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadLog(String jobId, String location) {
-        URL restEndpoint = this.buildURL( username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
         return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
 
@@ -421,6 +421,44 @@ public class SauceREST implements Serializable {
      */
     public boolean downloadLog(String jobId, String location, String fileName) {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return saveFile(jobId, location, fileName, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return a BufferedInputStream containing the logfile
+     * @throws IOException if there is a problem fetching the file
+     */
+    public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadJsonLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadJsonLog(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
         return saveFile(jobId, location, fileName, restEndpoint);
     }
 
@@ -821,6 +859,8 @@ public class SauceREST implements Serializable {
             return ".mp4";
         } else if (restEndpoint.getPath().endsWith(".har")) {
             return ".har";
+        } else if (restEndpoint.getPath().endsWith(".json")) {
+            return ".json";
         } else {
             return ".log";
         }
@@ -984,16 +1024,15 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @deprecated use {@link #uploadFile(File, String, boolean)}.
-     *
-     * Uploads a file to Sauce storage.
-     *
      * @param file      the file to upload
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the
      *                     200 range)
+     * @deprecated use {@link #uploadFile(File, String, boolean)}.
+     * <p>
+     * Uploads a file to Sauce storage.
      */
     @Deprecated
     public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
@@ -1017,15 +1056,14 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
-     * Uploads a file to Sauce storage.
-     *
      * @param is        Input stream of the file to be uploaded
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the
      *                     200 range)
+     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
+     * Uploads a file to Sauce storage.
      */
     @Deprecated
     public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
@@ -1232,7 +1270,7 @@ public class SauceREST implements Serializable {
      */
     public String getBuildFullJobs(String build, int limit) {
         URL restEndpoint = buildURL(username + "/build/" + build + "/jobs?full=1" +
-                (limit == 0 ? "" : "&limit=" + limit));
+            (limit == 0 ? "" : "&limit=" + limit));
         return retrieveResults(restEndpoint);
     }
 
