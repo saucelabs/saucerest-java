@@ -151,6 +151,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
+                    <projectVersionPolicyId>SemVerVersionPolicy</projectVersionPolicyId>
                     <goals>deploy</goals>
                 </configuration>
                 <dependencies>
