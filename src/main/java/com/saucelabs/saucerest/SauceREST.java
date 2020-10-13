@@ -1,44 +1,29 @@
 package com.saucelabs.saucerest;
 
+import static com.saucelabs.saucerest.DataCenter.US;
+
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.saucelabs.saucerest.DataCenter.US;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API
@@ -81,6 +66,8 @@ public class SauceREST implements Serializable {
     private String edsServer;
     private String appServer;
 
+    private String restApiEndpoint;
+
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
@@ -113,15 +100,16 @@ public class SauceREST implements Serializable {
         this.username = username;
         this.accessKey = accessKey;
         this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
-        this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
+        this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
+        this.restApiEndpoint = server + "rest/v1/";
     }
 
     /**
      * Build URL with environment variable, or system property, or default URL.
      *
-     * @param defaultUrl         default URL if no URL is found in environment variables and system properties
-     * @param envVarName         the name of the environment variable that may contain URL
+     * @param defaultUrl default URL if no URL is found in environment variables and system properties
+     * @param envVarName the name of the environment variable that may contain URL
      * @param systemPropertyName the name of the system property that may contain URL
      * @return URL to use
      */
@@ -175,18 +163,21 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Returns REST API endpoint assigned to this interface
+     * @return Returns REST API endpoint assigned to this interface
+     */
+    public String getRestApiEndpoint() {
+        return this.restApiEndpoint;
+    }
+
+    /**
      * Build the url to be
      *
      * @param endpoint Endpoint url, example "info/platforms/appium"
      * @return URL to use in direct fetch functions
      */
     protected URL buildURL(String endpoint) {
-        try {
-            return new URL(new URL(this.server), "/rest/" + endpoint);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce URL", e);
-            return null;
-        }
+        return buildEndpoint(restApiEndpoint, endpoint, "URL");
     }
 
     /**
@@ -196,10 +187,15 @@ public class SauceREST implements Serializable {
      * @return URL to use in direct fetch functions
      */
     protected URL buildEDSURL(String endpoint) {
+        return buildEndpoint(edsServer, endpoint, "EDS URL");
+    }
+
+    private URL buildEndpoint(String server, String endpoint, String urlDescription) {
         try {
-            return new URL(new URL(this.edsServer), endpoint);
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING, "Error constructing Sauce EDS URL", e);
+            return new URL(new URL(server), endpoint);
+        }
+        catch (MalformedURLException e) {
+            logger.log(Level.WARNING, e, () -> "Error constructing Sauce " + urlDescription);
             return null;
         }
     }
@@ -319,8 +315,27 @@ public class SauceREST implements Serializable {
      * @return True if the video was downloaded successfully; Otherwise false
      */
     public boolean downloadVideo(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
-        return saveFile(jobId, location, restEndpoint);
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
+     * is not set to false.
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the video was downloaded successfully; Otherwise false
+     */
+    public boolean downloadVideo(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
+        return saveFile(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -338,8 +353,28 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadVideoOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
-        saveFileOrThrowException(jobId, location, restEndpoint);
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
+     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
+     * is not set to false.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadVideoOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
+        saveFileOrThrowException(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -351,9 +386,8 @@ public class SauceREST implements Serializable {
      * @return A BufferedInputStream containing the video info
      * @throws IOException if there is a problem fetching the data
      */
-
     public BufferedInputStream downloadVideo(String jobId) throws IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/video.mp4");
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/video.mp4");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -369,8 +403,25 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadLog(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        return saveFile(jobId, location, restEndpoint);
+        URL restEndpoint = this.buildURL( username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadLog(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return saveFile(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -385,33 +436,25 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadLogOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        saveFileOrThrowException(jobId, location, restEndpoint);
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
 
     /**
-     * Downloads the log file for a Sauce Job and returns it.
-     *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return a BufferedInputStream containing the logfile
-     * @throws IOException if there is a problem fetching the file
-     */
-    public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/log.json");
-        return downloadFileData(jobId, restEndpoint);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
-     * a directory specified by the <code>location</code> field.
+     * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
-     * @return True if the Log file downloads successfully; Otherwise false.
+     * @param fileName represents the filename to store the content
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
      */
-    public boolean downloadJsonLog(String jobId, String location) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/log.json");
-        return saveFile(jobId, location, restEndpoint);
+    public void downloadLogOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        saveFileOrThrowException(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -422,7 +465,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the file
      */
     public BufferedInputStream downloadLog(String jobId) throws IOException {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -442,7 +485,27 @@ public class SauceREST implements Serializable {
      */
     public boolean downloadHAR(String jobId, String location) {
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
-        return saveFile(jobId, location, restEndpoint);
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be renamed "attemptHARDownload" - Dylan
+     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * This will only work for jobs which support Extended Debugging, which were started with the
+     * 'extendedDebugging' capability set to true.
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadHAROrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the HAR file should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the HAR file downloads successfully, otherwise false
+     */
+    public boolean downloadHAR(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
+        return saveFile(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -461,7 +524,27 @@ public class SauceREST implements Serializable {
      */
     public void downloadHAROrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
-        saveFileOrThrowException(jobId, location, restEndpoint);
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be called "downloadHAR" and attemptHARDownload should be the silent failure method - Dylan
+     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * This will only work for jobs which support Extended Debugging, which were started with the
+     * 'extendedDebugging' capability set to true.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the HAR file should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @throws FileNotFoundException                                When HAR File is unavailable or doesn't exist.
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadHAROrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
+        saveFileOrThrowException(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -481,16 +564,16 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a {@link JSONTokener}.
+     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
      * <p>
-     * Pass this {@link JSONTokener} to a {@link JSONObject} when you wish to read JSON.  The stream will be read as
-     * soon as a {@link JSONObject} is created.
+     * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The stream will be read as
+     * soon as a JSONObject is created.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return A {@link JSONTokener} containing the HAR data, tokenized
+     * @return A JSONTokener containing the HAR data, tokenized
      * @throws IOException   if there is a problem fetching the HAR file
      * @throws JSONException if encoding can't be determined or there's an IO problem
      */
@@ -509,7 +592,7 @@ public class SauceREST implements Serializable {
      * @return HTTP response contents
      */
     public String retrieveResults(String path) {
-        URL restEndpoint = this.buildURL("v1/" + path);
+        URL restEndpoint = buildURL(path);
         return retrieveResults(restEndpoint);
     }
 
@@ -520,7 +603,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getJobInfo(String jobId) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId);
         return retrieveResults(restEndpoint);
     }
 
@@ -540,7 +623,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getFullJobs(int limit) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?full=true&limit=" + limit);
+        URL restEndpoint = buildURL(username + "/jobs?full=true&limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 
@@ -550,7 +633,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs");
+        URL restEndpoint = buildURL(username + "/jobs");
         return retrieveResults(restEndpoint);
     }
 
@@ -562,7 +645,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs(int limit) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit);
+        URL restEndpoint = buildURL(username + "/jobs?limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 
@@ -575,7 +658,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
     public String getJobs(int limit, long to, int from) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
+        URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
         return retrieveResults(restEndpoint);
     }
 
@@ -679,7 +762,8 @@ public class SauceREST implements Serializable {
 
         logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
-        return new BufferedInputStream(stream);
+        BufferedInputStream in = new BufferedInputStream(stream);
+        return in;
     }
 
     /**
@@ -687,16 +771,16 @@ public class SauceREST implements Serializable {
      * the resulting file to the directory defined by the <code>location</code> parameter.
      * <p>
      * If an IOException is thrown during this process, this method will fail _silently_ (although it will record the error
-     * at Level.WARNING.  Use {@link #saveFileOrThrowException(String, String, URL)} to fail with an exception.
+     * at Level.WARNING.  Use {@link #saveFileOrThrowException(String, String, String, URL)} to fail with an exception.
      *
      * @param jobId        the Sauce Job id
      * @param location     represents the location that the result file should be stored in
      * @param restEndpoint the URL to perform a HTTP GET
      * @return Whether the request successfully fetched a resource or not
      */
-    private boolean saveFile(String jobId, String location, URL restEndpoint) {
+    private boolean saveFile(String jobId, String location, String fileName, URL restEndpoint) {
         try {
-            saveFileOrThrowException(jobId, location, restEndpoint);
+            saveFileOrThrowException(jobId, location, fileName, restEndpoint);
             return true;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error downloading Sauce Results", e);
@@ -704,31 +788,41 @@ public class SauceREST implements Serializable {
         }
     }
 
-    private void saveFileOrThrowException(String jobId, String location, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
+    private String getDefaultFileName(String jobId, URL restEndpoint) {
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        String saveName = jobId + format.format(new Date());
+        String extension = getExtension(restEndpoint);
+        saveName += extension;
+        return saveName;
+    }
+
+    private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
         logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
 
         BufferedInputStream in = downloadFileData(jobId, restEndpoint);
-        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String saveName = jobId + format.format(new Date());
-        if (restEndpoint.getPath().endsWith(".mp4")) {
-            saveName = saveName + ".mp4";
-        } else if (restEndpoint.getPath().endsWith(".har")) {
-            saveName = saveName + ".har";
-        } else if (restEndpoint.getPath().endsWith(".json")) {
-            saveName = saveName + ".json";
-        } else {
-            saveName = saveName + ".log";
+        if (fileName == null || fileName.length() < 1) {
+            fileName = getDefaultFileName(jobId, restEndpoint);
         }
-
-        logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + saveName);
-        FileOutputStream file = new FileOutputStream(new File(location, saveName));
-        try (BufferedOutputStream out = new BufferedOutputStream(file)) {
+        File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
+        System.out.println("Saving " + jobAndAsset + " as " + targetFile);
+        logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile))) {
             int i;
             while ((i = in.read()) != -1) {
                 out.write(i);
             }
             out.flush();
+        }
+    }
+
+    private String getExtension(URL restEndpoint) {
+        if (restEndpoint.getPath().endsWith(".mp4")) {
+            return ".mp4";
+        } else if (restEndpoint.getPath().endsWith(".har")) {
+            return ".har";
+        } else {
+            return ".log";
         }
     }
 
@@ -755,7 +849,7 @@ public class SauceREST implements Serializable {
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId);
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
             postBack.setDoOutput(true);
@@ -778,7 +872,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
 
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId + "/stop");
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/stop");
 
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
@@ -802,7 +896,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
 
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/jobs/" + jobId);
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId);
 
             postBack = openConnection(restEndpoint);
             postBack.setRequestProperty("User-Agent", this.getUserAgent());
@@ -893,6 +987,7 @@ public class SauceREST implements Serializable {
      * @deprecated use {@link #uploadFile(File, String, boolean)}.
      *
      * Uploads a file to Sauce storage.
+     *
      * @param file      the file to upload
      * @param fileName  name of the file in sauce storage
      * @param overwrite boolean flag to overwrite file in sauce storage if it exists
@@ -949,7 +1044,7 @@ public class SauceREST implements Serializable {
      */
     public String uploadFile(InputStream is, String fileName, boolean overwrite) throws IOException {
         try {
-            URL restEndpoint = this.buildURL("v1/storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
+            URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
 
             HttpURLConnection connection = openConnection(restEndpoint);
 
@@ -1040,7 +1135,7 @@ public class SauceREST implements Serializable {
 
         HttpURLConnection connection = null;
         try {
-            URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
+            URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
             connection = openConnection(restEndpoint);
             connection.setRequestProperty("User-Agent", this.getUserAgent());
             connection.setDoOutput(true);
@@ -1061,7 +1156,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnels() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels");
+        URL restEndpoint = buildURL(username + "/tunnels");
         return retrieveResults(restEndpoint);
     }
 
@@ -1072,7 +1167,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnelInformation(String tunnelId) {
-        URL restEndpoint = this.buildURL("v1/" + username + "/tunnels/" + tunnelId);
+        URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
         return retrieveResults(restEndpoint);
     }
 
@@ -1082,7 +1177,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = this.buildURL("v1/users/" + username + "/concurrency");
+        URL restEndpoint = buildURL("users/" + username + "/concurrency");
         return retrieveResults(restEndpoint);
     }
 
@@ -1092,7 +1187,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the activity information
      */
     public String getActivity() {
-        URL restEndpoint = this.buildURL("v1/" + username + "/activity");
+        URL restEndpoint = buildURL(username + "/activity");
         return retrieveResults(restEndpoint);
     }
 
@@ -1102,7 +1197,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the stored files list
      */
     public String getStoredFiles() {
-        URL restEndpoint = this.buildURL("v1/storage/" + username);
+        URL restEndpoint = buildURL("storage/" + username);
         return retrieveResults(restEndpoint);
     }
 
@@ -1112,7 +1207,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the basic account information
      */
     public String getUser() {
-        URL restEndpoint = this.buildURL("v1/users/" + username);
+        URL restEndpoint = buildURL("users/" + username);
         return retrieveResults(restEndpoint);
     }
 
@@ -1124,7 +1219,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the supported platforms information
      */
     public String getSupportedPlatforms(String automationApi) {
-        URL restEndpoint = this.buildURL("v1/info/platforms/" + automationApi);
+        URL restEndpoint = buildURL("info/platforms/" + automationApi);
         return retrieveResults(restEndpoint);
     }
 
@@ -1136,10 +1231,8 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing jobs associated with a build
      */
     public String getBuildFullJobs(String build, int limit) {
-        URL restEndpoint = this.buildURL(
-            "v1/" + this.username + "/build/" + build + "/jobs?full=1" +
-                (limit == 0 ? "" : "&limit=" + limit)
-        );
+        URL restEndpoint = buildURL(username + "/build/" + build + "/jobs?full=1" +
+                (limit == 0 ? "" : "&limit=" + limit));
         return retrieveResults(restEndpoint);
     }
 
@@ -1154,8 +1247,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the build
      */
     public String getBuild(String build) {
-        URL restEndpoint = this.buildURL(
-            "v1/" + this.username + "/builds/" + build); // yes, this goes to builds instead of build like the above
+        URL restEndpoint = buildURL(username + "/builds/" + build); // yes, this goes to builds instead of build like the above
         return retrieveResults(restEndpoint);
     }
 
@@ -1167,7 +1259,7 @@ public class SauceREST implements Serializable {
      * @return if it was a success or not
      */
     public boolean recordCI(String platform, String platformVersion) {
-        URL restEndpoint = this.buildURL("v1/stats/ci");
+        URL restEndpoint = buildURL("stats/ci");
         JSONObject obj = new JSONObject();
         try {
             obj.put("platform", platform);
