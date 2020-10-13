@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -421,10 +421,63 @@ class SauceRESTTest {
     }
 
     @Test
+    public void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foobar.log");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith(".log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foo/bar.log");
+        assertEquals(
+            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith("foo_bar.log"));
+        assertTrue(downloaded);
+    }
+
     public void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
-        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
     }
 
     @Test
@@ -452,7 +505,7 @@ class SauceRESTTest {
     public void testDownloadVideoWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
-        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
     }
 
     @Test
@@ -480,7 +533,7 @@ class SauceRESTTest {
     public void testDownloadHARWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
-        assertThrows(FileNotFoundException.class, () -> sauceREST.downloadHAROrThrow("1234", location));
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadHAROrThrow("1234", location));
     }
 
     @Test
