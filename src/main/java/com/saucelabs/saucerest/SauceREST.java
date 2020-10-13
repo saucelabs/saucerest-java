@@ -303,6 +303,7 @@ public class SauceREST implements Serializable {
 
     /**
      * Returns a JSON object containing all available assets for a given job id.
+     *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @return JSON object with available assets for given job id
      */
@@ -458,6 +459,7 @@ public class SauceREST implements Serializable {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
         return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
+
     /**
      * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
      * a directory specified by the <code>location</code> field.

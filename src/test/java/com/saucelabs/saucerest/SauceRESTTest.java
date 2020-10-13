@@ -92,7 +92,7 @@ class SauceRESTTest {
             this.mockInputStream = mockInputStream;
         }
 
-        protected MockHttpURLConnection(ExceptionThrowingMockOutputStream mockOutputStream) throws  MalformedURLException {
+        protected MockHttpURLConnection(ExceptionThrowingMockOutputStream mockOutputStream) throws MalformedURLException {
             this();
             this.mockOutputStream = mockOutputStream;
         }
@@ -563,8 +563,7 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadHARWithWrongCredentialsThrowsException(@TempDir Path tempDir)
-    {
+    public void testDownloadHARWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(401);
         String location = tempDir.toAbsolutePath().toString();
         assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadHAROrThrow("1234", location));
