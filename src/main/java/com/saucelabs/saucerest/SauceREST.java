@@ -323,6 +323,7 @@ public class SauceREST implements Serializable {
      * @throws IOException
      */
     public void downloadAllAssets(String jobId, String location) throws IOException {
+        Boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
         BufferedInputStream stream = getAvailableAssets(jobId);
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
         Iterator<String> keys = jsonObject.keys();
@@ -331,13 +332,18 @@ public class SauceREST implements Serializable {
             String key = keys.next();
             // key:value of this JSONObject are of type string
             if (jsonObject.get(key) instanceof String) {
-                // JSON response hold video twice; this prevents us downloading it twice
+                // JSON response holds video twice; this prevents us downloading it twice
                 if (key.equals("video.mp4")) {
                     continue;
+                } else if (isAppiumBackend && key.equals("selenium-log")) {
+                    // this is the appium-server log from a VDC (Emu/Sim) test. This makes sure it is aligned with the
+                    // naming used in the web UI
+                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
+                    saveFile(jobId, location, getDefaultFileName(jobId, "appium-server.log"), restEndpoint);
+                } else {
+                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
+                    saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
                 }
-
-                URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
-                saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
             }
             // screenshots are in a JSONArray
             else if (jsonObject.get(key) instanceof JSONArray) {
@@ -352,6 +358,19 @@ public class SauceREST implements Serializable {
                 logger.log(Level.WARNING, "No valid JSON response found.");
             }
         }
+    }
+
+    private AutomationBackend getAutomationBackend(String jobId) {
+        JSONObject jsonObject = new JSONObject(getJobInfo(jobId));
+        String automationBackend = jsonObject.getString("automation_backend");
+
+        if (automationBackend.equals(AutomationBackend.APPIUM.label)) {
+            return AutomationBackend.APPIUM;
+        } else if (automationBackend.equals(AutomationBackend.WEBDRIVER.label)) {
+            return AutomationBackend.WEBDRIVER;
+        }
+
+        return null;
     }
 
     /**
@@ -884,6 +903,11 @@ public class SauceREST implements Serializable {
     private String getDefaultFileName(String jobId, URL restEndpoint) {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
         return String.format("%s_%s_%s", jobId, format.format(new Date()), FilenameUtils.getName(restEndpoint.getPath()));
+    }
+
+    private String getDefaultFileName(String jobId, String overwriteFilename) {
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        return String.format("%s_%s_%s", jobId, format.format(new Date()), overwriteFilename));
     }
 
     private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
