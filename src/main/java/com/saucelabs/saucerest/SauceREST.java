@@ -332,14 +332,14 @@ public class SauceREST implements Serializable {
             // key:value of this JSONObject are of type string
             if (jsonObject.get(key) instanceof String) {
                 // JSON response hold video twice; this prevents us downloading it twice
-                if (jsonObject.get(key).equals("video.mp4")) {
+                if (key.equals("video.mp4")) {
                     continue;
                 }
 
                 URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
                 saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
             }
-            // screenshots and the filenames of each single screenshot is/are in a JSONArray
+            // screenshots are in a JSONArray
             else if (jsonObject.get(key) instanceof JSONArray) {
                 JSONArray jsonArray = (JSONArray) jsonObject.get(key);
 
@@ -349,7 +349,7 @@ public class SauceREST implements Serializable {
                 }
             } else {
                 // well, let's hope this case does not happen.
-                logger.log(Level.WARNING, "/assets endpoint must have changed significantly or some other error occurred.");
+                logger.log(Level.WARNING, "No valid JSON response found.");
             }
         }
     }

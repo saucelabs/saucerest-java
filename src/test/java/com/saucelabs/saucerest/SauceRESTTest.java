@@ -12,10 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +41,11 @@ class SauceRESTTest {
 
     private SauceREST sauceREST;
     private MockHttpURLConnection urlConnection;
+
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+    private final PrintStream originalErr = System.err;
 
     public static class MockOutputStream extends OutputStream {
         public StringBuffer output = new StringBuffer();
@@ -164,6 +172,14 @@ class SauceRESTTest {
                 return SauceRESTTest.this.urlConnection;
             }
         };
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
     }
 
     private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
@@ -260,8 +276,14 @@ class SauceRESTTest {
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         sauceREST.downloadAllAssets("1234", absolutePath);
-        //assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log", urlConnection.getRealURL().getPath());
+
         assertNull(urlConnection.getRealURL().getQuery());
+        assertNotNull(urlConnection.getRealURL().getPath());
+        assertTrue(outContent.toString().contains("selenium-server.log"));
+        assertTrue(outContent.toString().contains("logcat.log"));
+        assertTrue(outContent.toString().contains("log.json"));
+        assertTrue(outContent.toString().contains("video.mp4"));
+        assertTrue(outContent.toString().contains("0000screenshot.png"));
     }
 
     @Test
