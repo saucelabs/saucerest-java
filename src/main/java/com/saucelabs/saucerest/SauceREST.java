@@ -310,6 +310,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @return JSON object with available assets for given job id
+     * @throws IOException if something else goes wrong during asset retrieval
      */
     public BufferedInputStream getAvailableAssets(String jobId) throws IOException {
         URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets");
@@ -321,7 +322,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the assets should be downloaded to
-     * @throws IOException
+     * @throws IOException if file cannot be saved
      */
     public void downloadAllAssets(String jobId, String location) throws IOException {
         Boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;

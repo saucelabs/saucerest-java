@@ -126,7 +126,7 @@ class SauceRESTTest {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            if (multipleMockInputStream.isEmpty()) {
+            if (multipleMockInputStream == null) {
                 return mockInputStream;
             } else {
                 // this allows us to specify multiple responses when we test requests or methods with multiple calls
