@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -86,6 +87,8 @@ class SauceRESTTest {
         private URL realURL;
         private InputStream mockInputStream;
         private OutputStream mockOutputStream;
+        private List<InputStream> multipleMockInputStream;
+        private int multipleMockInputStreamCounter = 0;
 
         /**
          * Constructor for the HttpURLConnection.
@@ -122,12 +125,33 @@ class SauceRESTTest {
         }
 
         @Override
-        public InputStream getInputStream() {
-            return mockInputStream;
+        public InputStream getInputStream() throws IOException {
+            if (multipleMockInputStream.isEmpty()) {
+                return mockInputStream;
+            } else {
+                // this allows us to specify multiple responses when we test requests or methods with multiple calls
+                InputStream inputStream =  multipleMockInputStream.get(multipleMockInputStreamCounter);
+                multipleMockInputStreamCounter++;
+
+                // reset counter back to 0 otherwise there won't be any other InputStream to return
+                // this means we also loop back to return the first InputStream from the list
+                if (multipleMockInputStreamCounter >= multipleMockInputStream.size()) {
+                    multipleMockInputStreamCounter = multipleMockInputStream.size() - 1;
+                }
+                return inputStream;
+            }
         }
 
         public void setInputStream(InputStream mockInputStream) {
             this.mockInputStream = mockInputStream;
+        }
+
+        public void setMultipleInputStreams(List<InputStream> multipleMockInputStream) {
+            this.multipleMockInputStream = multipleMockInputStream;
+        }
+
+        public List<InputStream> getMultipleInputStreams() {
+            return multipleMockInputStream;
         }
 
         @Override
@@ -271,8 +295,13 @@ class SauceRESTTest {
 
     @Test
     void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
+        List<InputStream> inputStreamList = Arrays.asList(
+            new ByteArrayInputStream("{\"automation_backend\": \"appium\"}".getBytes(StandardCharsets.UTF_8)),
+            getClass().getResource("/assets.json").openStream()
+        );
+
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
+        urlConnection.setMultipleInputStreams(inputStreamList);
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         sauceREST.downloadAllAssets("1234", absolutePath);

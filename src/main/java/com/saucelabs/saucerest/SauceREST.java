@@ -318,7 +318,8 @@ public class SauceREST implements Serializable {
 
     /**
      * Downloads all available assets.
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the assets should be downloaded to
      * @throws IOException
      */
@@ -328,7 +329,7 @@ public class SauceREST implements Serializable {
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
         Iterator<String> keys = jsonObject.keys();
 
-        while(keys.hasNext()) {
+        while (keys.hasNext()) {
             String key = keys.next();
             // key:value of this JSONObject are of type string
             if (jsonObject.get(key) instanceof String) {
@@ -907,7 +908,7 @@ public class SauceREST implements Serializable {
 
     private String getDefaultFileName(String jobId, String overwriteFilename) {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        return String.format("%s_%s_%s", jobId, format.format(new Date()), overwriteFilename));
+        return String.format("%s_%s_%s", jobId, format.format(new Date()), overwriteFilename);
     }
 
     private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {

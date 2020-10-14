@@ -2,7 +2,7 @@ package com.saucelabs.saucerest;
 
 public enum AutomationBackend {
     APPIUM("appium"),
-    WEBDRIVER("webdriver)");
+    WEBDRIVER("webdriver");
 
     public final String label;
 
