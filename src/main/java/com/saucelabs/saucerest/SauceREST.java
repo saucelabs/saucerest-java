@@ -3,6 +3,7 @@ package com.saucelabs.saucerest;
 import static com.saucelabs.saucerest.DataCenter.US;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -882,10 +883,7 @@ public class SauceREST implements Serializable {
 
     private String getDefaultFileName(String jobId, URL restEndpoint) {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        String saveName = jobId + format.format(new Date());
-        String extension = getExtension(restEndpoint);
-        saveName += extension;
-        return saveName;
+        return String.format("%s_%s_%s", jobId, format.format(new Date()), FilenameUtils.getName(restEndpoint.getPath()));
     }
 
     private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
@@ -905,18 +903,6 @@ public class SauceREST implements Serializable {
                 out.write(i);
             }
             out.flush();
-        }
-    }
-
-    private String getExtension(URL restEndpoint) {
-        if (restEndpoint.getPath().endsWith(".mp4")) {
-            return ".mp4";
-        } else if (restEndpoint.getPath().endsWith(".har")) {
-            return ".har";
-        } else if (restEndpoint.getPath().endsWith(".json")) {
-            return ".json";
-        } else {
-            return ".log";
         }
     }
 
