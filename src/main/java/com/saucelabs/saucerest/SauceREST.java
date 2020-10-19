@@ -329,7 +329,6 @@ public class SauceREST implements Serializable {
         Boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
         BufferedInputStream stream = getAvailableAssets(jobId);
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
-        Iterator<String> keys = jsonObject.keys();
 
         // redundant key
         jsonObject.remove("video.mp4");
@@ -339,6 +338,8 @@ public class SauceREST implements Serializable {
             // rather download all screenshots using /screenshots.zip than a request per screenshot
             jsonObject.remove("screenshots");
         }
+
+        Iterator<String> keys = jsonObject.keys();
 
         // iterate response and download assets
         while (keys.hasNext()) {

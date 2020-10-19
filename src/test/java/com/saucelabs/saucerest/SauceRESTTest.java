@@ -312,7 +312,7 @@ class SauceRESTTest {
         assertTrue(outContent.toString().contains("logcat.log"));
         assertTrue(outContent.toString().contains("log.json"));
         assertTrue(outContent.toString().contains("video.mp4"));
-        assertTrue(outContent.toString().contains("0000screenshot.png"));
+        assertTrue(outContent.toString().contains("screenshots.zip"));
     }
 
     @Test
