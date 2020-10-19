@@ -316,6 +316,46 @@ class SauceRESTTest {
     }
 
     @Test
+    void testDownloadScreenshots(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadScreenshots("1234", tempDir.toAbsolutePath().toString());
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadScreenshotsWithCustomFileName(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadScreenshots("1234", absolutePath, "foobar.zip");
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.zip"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadScreenshotsWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(401);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
+    }
+
+    @Test
+    void testDownloadScreenshotsWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(404);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
+    }
+
+    @Test
     public void testRecordCI() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(

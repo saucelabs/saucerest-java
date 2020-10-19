@@ -325,19 +325,27 @@ public class SauceREST implements Serializable {
      * @throws IOException if file cannot be saved
      */
     public void downloadAllAssets(String jobId, String location) throws IOException {
+        boolean hasScreenshots = false;
         Boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
         BufferedInputStream stream = getAvailableAssets(jobId);
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
         Iterator<String> keys = jsonObject.keys();
 
+        // redundant key
+        jsonObject.remove("video.mp4");
+
+        if (jsonObject.keySet().contains("screenshots")) {
+            hasScreenshots = true;
+            // rather download all screenshots using /screenshots.zip than a request per screenshot
+            jsonObject.remove("screenshots");
+        }
+
+        // iterate response and download assets
         while (keys.hasNext()) {
             String key = keys.next();
             // key:value of this JSONObject are of type string
             if (jsonObject.get(key) instanceof String) {
-                // JSON response holds video twice; this prevents us downloading it twice
-                if (key.equals("video.mp4")) {
-                    continue;
-                } else if (isAppiumBackend && key.equals("selenium-log")) {
+                if (isAppiumBackend && key.equals("selenium-log")) {
                     // this is the appium-server log from a VDC (Emu/Sim) test. This makes sure it is aligned with the
                     // naming used in the web UI
                     URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
@@ -346,19 +354,15 @@ public class SauceREST implements Serializable {
                     URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
                     saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
                 }
-            }
-            // screenshots are in a JSONArray
-            else if (jsonObject.get(key) instanceof JSONArray) {
-                JSONArray jsonArray = (JSONArray) jsonObject.get(key);
-
-                for (int counter = 0; counter <= jsonArray.length() - 1; counter++) {
-                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonArray.getString(counter));
-                    saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
-                }
             } else {
                 // well, let's hope this case does not happen.
                 logger.log(Level.WARNING, "No valid JSON response found.");
             }
+        }
+
+        if (hasScreenshots) {
+            URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
+            saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
         }
     }
 
@@ -373,6 +377,74 @@ public class SauceREST implements Serializable {
         }
 
         return null;
+    }
+
+    /**
+     * Downloads the screenshots as a zip for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     * Jobs are only available for jobs which finished without a Sauce side error
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the video was downloaded successfully; Otherwise false
+     */
+    public boolean downloadScreenshots(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Downloads the screenshots as a zip for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     * Jobs are only available for jobs which finished without a Sauce side error
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param filename represents the filename to store the content
+     * @return True if the video was downloaded successfully; Otherwise false
+     */
+    public boolean downloadScreenshots(String jobId, String location, String filename) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
+        return saveFile(jobId, location, filename, restEndpoint);
+    }
+
+    /**
+     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadScreenshotsOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param filename represents the filename to store the content
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadScreenshotsOrThrow(String jobId, String location, String filename) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
+        saveFileOrThrowException(jobId, location, filename, restEndpoint);
     }
 
     /**
