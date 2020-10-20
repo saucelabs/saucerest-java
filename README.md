@@ -6,7 +6,7 @@ A Java client for Sauce Labs’s REST API.
 
 Using this client you can update Job info, including pass/fail status and other information supported.  Only the Sauce Labs Virtual Device Cloud is supported.  For Real Devices, please see [the docs](https://api.testobject.com/).
 
-If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md)
+If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
 
 <http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods>
 
@@ -127,8 +127,7 @@ String tunnels = sauce.getTunnels();
 </dependencies>
 ```
 
-For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22
+For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22.
 
 # Contributing
-Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md).
-
+Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
