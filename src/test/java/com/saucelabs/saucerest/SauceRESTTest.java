@@ -2,16 +2,20 @@ package com.saucelabs.saucerest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,14 +27,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class SauceRESTTest {
 
@@ -400,167 +411,112 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownload(@TempDir Path tempDir) {
+    public void testDownloadLog(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            sauceREST::downloadLog,
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/selenium-server.log",
+            jobId -> matchesPattern(jobId + "[\\d_]+\\.log")
+        );
+    }
+
+    @Test
+    public void testDownloadVideo(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            sauceREST::downloadVideo,
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/video.mp4",
+            jobId -> matchesPattern(jobId + "[\\d_]+\\.mp4")
+        );
+    }
+
+    @Test
+    public void testDownloadJsonLog(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            sauceREST::downloadJsonLog,
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/log.json",
+            jobId -> matchesPattern(jobId + "[\\d_]+\\.json")
+        );
+    }
+
+    @Test
+    public void testDownloadHAR(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            sauceREST::downloadHAR,
+            jobId -> "/v1/eds/" + jobId + "/network.har",
+            jobId -> matchesPattern(jobId + "[\\d_]+\\.har")
+        );
+    }
+
+    @Test
+    public void testDownloadWithCustomFileName(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            (jobId, absolutePath) -> sauceREST.downloadLog(jobId, absolutePath, "foobar.log"),
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/selenium-server.log",
+            jobId -> equalTo("foobar.log")
+        );
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            (jobId, absolutePath) -> sauceREST.downloadLog(jobId, absolutePath, ""),
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/selenium-server.log",
+            jobId -> matchesPattern(jobId + "[\\d_]+\\.log")
+        );
+    }
+
+    @Test
+    public void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) {
+        testDownload(tempDir,
+            (jobId, absolutePath) -> sauceREST.downloadLog(jobId, absolutePath, "foo/bar.log"),
+            jobId -> "/rest/v1/" + sauceREST.getUsername() + "/jobs/" + jobId + "/assets/selenium-server.log",
+            jobId -> equalTo("foo_bar.log")
+        );
+    }
+
+    private void testDownload(Path tempDir, BiPredicate<String, String> methodUnderTest,
+        Function<String, String> expectedEndpointFactory, Function<String, Matcher<String>> fileNameMatcherFactory) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
-        sauceREST.downloadLog("1234", absolutePath);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
+        String jobId = "1234";
 
-        boolean downloaded = sauceREST.downloadVideo("1234", absolutePath);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
+        boolean downloaded = methodUnderTest.test(jobId, absolutePath);
         assertTrue(downloaded);
+        assertNull(urlConnection.getRealURL().getQuery());
+        assertEquals(expectedEndpointFactory.apply(jobId), urlConnection.getRealURL().getPath());
+        File[] files = tempDir.toFile().listFiles();
+        assertNotNull(files);
+        assertEquals(1, files.length);
+        assertThat(files[0].getName(), fileNameMatcherFactory.apply(jobId));
     }
 
-    @Test
-    public void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foobar.log");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
+    static Stream<Arguments> downloadWithExceptionArguments(){
+        return Stream.of(
+            arguments(404, FileNotFoundException.class),
+            arguments(401, SauceException.NotAuthorized.class)
         );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
-        assertTrue(downloaded);
     }
 
-    @Test
-    public void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith(".log"));
-        assertTrue(downloaded);
+    @ParameterizedTest
+    @MethodSource("downloadWithExceptionArguments")
+    public void testDownloadLogThrowsException(int responseCode, Class<? extends Throwable> expectedExceptionClass) {
+        urlConnection.setResponseCode(responseCode);
+        assertThrows(expectedExceptionClass, () -> sauceREST.downloadLogOrThrow("1234", null));
     }
 
-    @Test
-    public void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foo/bar.log");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith("foo_bar.log"));
-        assertTrue(downloaded);
+    @ParameterizedTest
+    @MethodSource("downloadWithExceptionArguments")
+    public void testDownloadVideoThrowsException(int responseCode, Class<? extends Throwable> expectedExceptionClass) {
+        urlConnection.setResponseCode(responseCode);
+        assertThrows(expectedExceptionClass, () -> sauceREST.downloadVideoOrThrow("1234", null));
     }
 
-    public void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(404);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
-    }
-
-    @Test
-    public void testDownloadLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(401);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadLogOrThrow("1234", location));
-    }
-
-    @Test
-    public void testVideoDownload(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        boolean downloaded = sauceREST.downloadVideo("1234", tempDir.toAbsolutePath().toString());
-        assertEquals(
-            "/rest/v1/fakeuser/jobs/1234/assets/video.mp4",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertTrue(downloaded);
-    }
-
-    @Test
-    public void testDownloadVideoWithFileNotFoundThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(404);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
-    }
-
-    @Test
-    public void testDownloadVideoWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(401);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadVideoOrThrow("1234", location));
-    }
-
-    @Test
-    public void testHARDownload(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        boolean downloaded = sauceREST.downloadHAR("1234", tempDir.toAbsolutePath().toString());
-        assertEquals(
-            "/v1/eds/1234/network.har",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertTrue(downloaded);
-    }
-
-    @Test
-    public void testDownloadHARWithFileNotFoundThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(404);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadHAROrThrow("1234", location));
-    }
-
-    @Test
-    public void testDownloadHARWithWrongCredentialsThrowsException(@TempDir Path tempDir)
-    {
-        urlConnection.setResponseCode(401);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadHAROrThrow("1234", location));
-    }
-
-    @Test
-    public void testDownloadJsonLog(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        boolean downloaded = sauceREST.downloadJsonLog("1234", tempDir.toAbsolutePath().toString());
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-
-        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith(".json"));
-        assertTrue(downloaded);
+    @ParameterizedTest
+    @MethodSource("downloadWithExceptionArguments")
+    public void testDownloadHarThrowsException(int responseCode, Class<? extends Throwable> expectedExceptionClass) {
+        urlConnection.setResponseCode(responseCode);
+        assertThrows(expectedExceptionClass, () -> sauceREST.downloadHAROrThrow("1234", null));
     }
 
     @Test
