@@ -441,12 +441,12 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownload(@TempDir Path tempDir) {
+    void testdownloadServerLog(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
-        sauceREST.downloadLog("1234", absolutePath);
+        sauceREST.downloadServerLog("1234", absolutePath);
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
@@ -463,12 +463,12 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testdownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foobar.log");
+        boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "foobar.log");
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
@@ -481,12 +481,12 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
+    void testdownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "");
+        boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "");
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
@@ -499,12 +499,12 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
+    void testdownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foo/bar.log");
+        boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "foo/bar.log");
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
             this.urlConnection.getRealURL().getPath()
@@ -517,17 +517,17 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+    void testDownloadServerLogWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadServerLogOrThrow("1234", location));
     }
 
     @Test
-    void testDownloadLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+    void testDownloadServerLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(401);
         String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadLogOrThrow("1234", location));
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadServerLogOrThrow("1234", location));
     }
 
     @Test
@@ -673,11 +673,11 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadJsonLog(@TempDir Path tempDir) throws Exception {
+    void downloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
-        boolean downloaded = sauceREST.downloadJsonLog("1234", tempDir.toAbsolutePath().toString());
+        boolean downloaded = sauceREST.downloadSauceLabsLog("1234", tempDir.toAbsolutePath().toString());
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
             this.urlConnection.getRealURL().getPath()
@@ -691,11 +691,11 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownloadJsonLogStream() throws Exception {
+    void downloadSauceLabsLogStream() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
-        BufferedInputStream stream = sauceREST.downloadJsonLog("1234");
+        BufferedInputStream stream = sauceREST.downloadSauceLabsLog("1234");
         assertEquals(
             "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
             this.urlConnection.getRealURL().getPath()
