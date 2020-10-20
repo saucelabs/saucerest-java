@@ -1,13 +1,12 @@
-# SauceREST Java
-
-[![codecov.io](https://codecov.io/github/saucelabs/saucerest-java/coverage.svg?branch=master)](https://codecov.io/github/saucelabs/saucerest-java?branch=master)
+SauceREST Java [![codecov.io](https://codecov.io/github/saucelabs/saucerest-java/coverage.svg?branch=master)](https://codecov.io/github/saucelabs/saucerest-java?branch=master)
 [![Build Status](https://travis-ci.org/saucelabs/saucerest-java.svg?branch=master)](https://travis-ci.org/saucelabs/saucerest-java)
+==============
 
-A Java client for Sauce Labs’s REST API. This supercedes the old [sauce-rest-api].
+A Java client for Sauce Labs’s REST API.
 
 Using this client you can update Job info, including pass/fail status and other information supported.  Only the Sauce Labs Virtual Device Cloud is supported.  For Real Devices, please see [the docs](https://api.testobject.com/).
 
-If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md)
+If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
 
 <http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods>
 
@@ -20,7 +19,7 @@ OR
 ```java
 SauceREST sauce = new SauceREST("username", "access-key", Datacenter.US);
 ```
-Paramaters: 
+Paramaters:
 
 | Name        | Type              | Details       |
 | ----------- | ----------------- | ------------- |
@@ -128,8 +127,7 @@ String tunnels = sauce.getTunnels();
 </dependencies>
 ```
 
-For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22
+For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22.
 
 # Contributing
-Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md).
-
+Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
