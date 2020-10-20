@@ -270,92 +270,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testGetAvailableAssets() throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
-
-        BufferedInputStream stream = sauceREST.getAvailableAssets("1234");
-        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets", urlConnection.getRealURL().getPath());
-
-        String results = IOUtils.toString(stream, StandardCharsets.UTF_8);
-        JSONObject jsonObject = new JSONObject(results);
-
-        assertEquals("selenium-server.log", jsonObject.getString("selenium-log"));
-        assertFalse(jsonObject.isEmpty());
-        assertTrue(jsonObject.has("video"));
-    }
-
-    @Test
-    void testGetAvailableAssets_NotFound() {
-        urlConnection.setResponseCode(404);
-        urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
-
-        assertThrows(FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
-    }
-
-    @Test
-    void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
-        List<InputStream> inputStreamList = Arrays.asList(
-            new ByteArrayInputStream("{\"automation_backend\": \"appium\"}".getBytes(StandardCharsets.UTF_8)),
-            getClass().getResource("/assets.json").openStream()
-        );
-
-        urlConnection.setResponseCode(200);
-        urlConnection.setMultipleInputStreams(inputStreamList);
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        sauceREST.downloadAllAssets("1234", absolutePath);
-
-        assertNull(urlConnection.getRealURL().getQuery());
-        assertNotNull(urlConnection.getRealURL().getPath());
-        assertTrue(outContent.toString().contains("selenium-server.log"));
-        assertTrue(outContent.toString().contains("logcat.log"));
-        assertTrue(outContent.toString().contains("log.json"));
-        assertTrue(outContent.toString().contains("video.mp4"));
-        assertTrue(outContent.toString().contains("screenshots.zip"));
-    }
-
-    @Test
-    void testDownloadScreenshots(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        boolean downloaded = sauceREST.downloadScreenshots("1234", tempDir.toAbsolutePath().toString());
-        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadScreenshotsWithCustomFileName(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadScreenshots("1234", absolutePath, "foobar.zip");
-        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.zip"));
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadScreenshotsWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(401);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
-    }
-
-    @Test
-    void testDownloadScreenshotsWithFileNotFoundThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(404);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
-    }
-
-    @Test
     void testRecordCI() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
@@ -617,6 +531,92 @@ class SauceRESTTest {
     }
 
     @Test
+    void testGetAvailableAssets() throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
+
+        BufferedInputStream stream = sauceREST.getAvailableAssets("1234");
+        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets", urlConnection.getRealURL().getPath());
+
+        String results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        JSONObject jsonObject = new JSONObject(results);
+
+        assertEquals("selenium-server.log", jsonObject.getString("selenium-log"));
+        assertFalse(jsonObject.isEmpty());
+        assertTrue(jsonObject.has("video"));
+    }
+
+    @Test
+    void testGetAvailableAssets_NotFound() {
+        urlConnection.setResponseCode(404);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
+
+        assertThrows(FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
+    }
+
+    @Test
+    void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
+        List<InputStream> inputStreamList = Arrays.asList(
+            new ByteArrayInputStream("{\"automation_backend\": \"appium\"}".getBytes(StandardCharsets.UTF_8)),
+            getClass().getResource("/assets.json").openStream()
+        );
+
+        urlConnection.setResponseCode(200);
+        urlConnection.setMultipleInputStreams(inputStreamList);
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        sauceREST.downloadAllAssets("1234", absolutePath);
+
+        assertNull(urlConnection.getRealURL().getQuery());
+        assertNotNull(urlConnection.getRealURL().getPath());
+        assertTrue(outContent.toString().contains("selenium-server.log"));
+        assertTrue(outContent.toString().contains("logcat.log"));
+        assertTrue(outContent.toString().contains("log.json"));
+        assertTrue(outContent.toString().contains("video.mp4"));
+        assertTrue(outContent.toString().contains("screenshots.zip"));
+    }
+
+    @Test
+    void testDownloadScreenshots(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadScreenshots("1234", tempDir.toAbsolutePath().toString());
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadScreenshotsWithCustomFileName(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadScreenshots("1234", absolutePath, "foobar.zip");
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/screenshots.zip", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.zip"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadScreenshotsWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(401);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
+    }
+
+    @Test
+    void testDownloadScreenshotsWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(404);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadScreenshotsOrThrow("1234", location));
+    }
+
+    @Test
     void testVideoDownload(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
@@ -705,6 +705,84 @@ class SauceRESTTest {
         stream.read(targetArray);
         assertTrue(new String(targetArray).length() > 0);
         assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testDownloadDeviceLogOfEmulator(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadDeviceLog("1234", tempDir.toAbsolutePath().toString(), true);
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/logcat.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadDeviceLogOfEmulatorWithCustomFilename(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadDeviceLog("1234", tempDir.toAbsolutePath().toString(), "device.log", true);
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/logcat.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("device.log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadDeviceLogOfEmulatorWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(401);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadDeviceLogOrThrow("1234", location, true));
+    }
+
+    @Test
+    void testDownloadDeviceLogOfEmulatorWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(404);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadDeviceLogOrThrow("1234", location, true));
+    }
+
+    @Test
+    void testDownloadDeviceLogOfSimulator(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadDeviceLog("1234", tempDir.toAbsolutePath().toString(), false);
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/ios-syslog.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadDeviceLogOfSimulatorWithCustomFilename(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        boolean downloaded = sauceREST.downloadDeviceLog("1234", tempDir.toAbsolutePath().toString(), "device.log", false);
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/ios-syslog.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("device.log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
+    void testDownloadDeviceLogOfSimulatorWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(401);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadDeviceLogOrThrow("1234", location, false));
+    }
+
+    @Test
+    void testDownloadDeviceLogOfSimulatorWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(404);
+        String location = tempDir.toAbsolutePath().toString();
+        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadDeviceLogOrThrow("1234", location, false));
     }
 
     @Test

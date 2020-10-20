@@ -5,7 +5,6 @@ import static com.saucelabs.saucerest.DataCenter.US;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -66,11 +65,11 @@ public class SauceREST implements Serializable {
 
     private static String extraUserAgent = "";
 
-    private String server;
-    private String edsServer;
-    private String appServer;
+    private final String server;
+    private final String edsServer;
+    private final String appServer;
 
-    private String restApiEndpoint;
+    private final String restApiEndpoint;
 
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
@@ -305,6 +304,19 @@ public class SauceREST implements Serializable {
         updateJobInfo(jobId, updates);
     }
 
+    private AutomationBackend getAutomationBackend(String jobId) {
+        JSONObject jsonObject = new JSONObject(getJobInfo(jobId));
+        String automationBackend = jsonObject.getString("automation_backend");
+
+        if (automationBackend.equals(AutomationBackend.APPIUM.label)) {
+            return AutomationBackend.APPIUM;
+        } else if (automationBackend.equals(AutomationBackend.WEBDRIVER.label)) {
+            return AutomationBackend.WEBDRIVER;
+        }
+
+        return null;
+    }
+
     /**
      * Returns a JSON object containing all available assets for a given job id.
      *
@@ -367,17 +379,93 @@ public class SauceREST implements Serializable {
         }
     }
 
-    private AutomationBackend getAutomationBackend(String jobId) {
-        JSONObject jsonObject = new JSONObject(getJobInfo(jobId));
-        String automationBackend = jsonObject.getString("automation_backend");
-
-        if (automationBackend.equals(AutomationBackend.APPIUM.label)) {
-            return AutomationBackend.APPIUM;
-        } else if (automationBackend.equals(AutomationBackend.WEBDRIVER.label)) {
-            return AutomationBackend.WEBDRIVER;
+    /**
+     * Downloads the device log for Android Emulator or iOS Simulator.
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the device log should be downloaded to
+     * @return True if the device log was downloaded successfully; Otherwise false
+     */
+    public boolean downloadDeviceLog(String jobId, String location, boolean isEmulator ) {
+        URL restEndpoint;
+        if (isEmulator) {
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
+        } else {
+            // isSimulator
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
         }
 
-        return null;
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Downloads the device log for Android Emulator or iOS Simulator. The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the device log should be downloaded to
+     * @param filename represents the filename to store the content
+     * @param isEmulator to determine what device log to download
+     * @return True if the device log was downloaded successfully; Otherwise false
+     */
+    public boolean downloadDeviceLog(String jobId, String location, String filename, boolean isEmulator ) {
+        URL restEndpoint;
+        if (isEmulator) {
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
+        } else {
+            // isSimulator
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
+        }
+
+        return saveFile(jobId, location, filename, restEndpoint);
+    }
+
+    /**
+     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the device log should be downloaded to
+     * @param isEmulator to determine what device log to download
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadDeviceLogOrThrow(String jobId, String location, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint;
+        if (isEmulator) {
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
+        } else {
+            // isSimulator
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
+        }
+
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     * <p>
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the device log should be downloaded to
+     * @param filename represents the filename to store the content
+     * @param isEmulator to determine what device log to download
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     */
+    public void downloadDeviceLogOrThrow(String jobId, String location, String filename, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint;
+        if (isEmulator) {
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
+        } else {
+            // isSimulator
+            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
+        }
+
+        saveFileOrThrowException(jobId, location, filename, restEndpoint);
     }
 
     /**
@@ -389,8 +477,8 @@ public class SauceREST implements Serializable {
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @return True if the video was downloaded successfully; Otherwise false
+     * @param location represents the base directory where the screenshots should be downloaded to
+     * @return True if the screenshots was downloaded successfully; Otherwise false
      */
     public boolean downloadScreenshots(String jobId, String location) {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
@@ -406,9 +494,9 @@ public class SauceREST implements Serializable {
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
+     * @param location represents the base directory where the screenshots should be downloaded to
      * @param filename represents the filename to store the content
-     * @return True if the video was downloaded successfully; Otherwise false
+     * @return True if the screenshots was downloaded successfully; Otherwise false
      */
     public boolean downloadScreenshots(String jobId, String location, String filename) {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/screenshots.zip");
@@ -421,7 +509,7 @@ public class SauceREST implements Serializable {
      * <p>
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
+     * @param location represents the base directory where the screenshots should be downloaded to
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
      * @throws IOException                                          if something else goes wrong during asset retrieval
@@ -437,7 +525,7 @@ public class SauceREST implements Serializable {
      * <p>
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
+     * @param location represents the base directory where the screenshots should be downloaded to
      * @param filename represents the filename to store the content
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -929,7 +1017,7 @@ public class SauceREST implements Serializable {
                 throw new FileNotFoundException(error);
 
             case 401:
-                String errorReasons = new String();
+                String errorReasons = "";
                 if (username == null || username.isEmpty()) {
                     errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
                 }
