@@ -130,5 +130,5 @@ String tunnels = sauce.getTunnels();
 For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22
 
 # Contributing
-Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRIBUTING.md).
+Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md).
 
