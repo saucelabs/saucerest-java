@@ -745,6 +745,33 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Download the automator log file for a Sauce job to the filesystem. The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadAutomatorLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/automator.log");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * Download the automator log file for a Sauce job to the filesystem. The file will be stored in a directory
+     * specified by the <code>location</code> field.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param filename represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     */
+    public boolean downloadAutomatorLog(String jobId, String location, String filename) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/automator.log");
+        return saveFile(jobId, location, filename, restEndpoint);
+    }
+
+    /**
      * TODO: 2020-02-27 I think this should be renamed "attemptHARDownload" - Dylan
      * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.

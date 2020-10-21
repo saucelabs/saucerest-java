@@ -47,7 +47,7 @@ String tunnels = sauce.getTunnels();
 ## Download Assets
 Assets are downloaded by providing a job ID and the location to save the asset to.
 
-Filenames are set automatically to `job_idyyyyMMdd_HHmmSS.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
+Filenames are set automatically to `jobId_yyyyMMdd_HHmmSS_filename.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
 
 Each of these methods comes in two flavours; the `downloadX` methods which ignore exceptions, and the `downloadXOrThrow` methods which throw:
  * SauceException.NotAuthorized if credentials are missing or wrong

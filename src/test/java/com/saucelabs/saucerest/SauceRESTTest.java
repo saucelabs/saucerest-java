@@ -531,6 +531,32 @@ class SauceRESTTest {
     }
 
     @Test
+    void testdownloadAutomatorLog(@TempDir Path tempDir) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        sauceREST.downloadAutomatorLog("1234", absolutePath);
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/automator.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testdownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadAutomatorLog("1234", absolutePath, "foobar.log");
+        assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/automator.log", this.urlConnection.getRealURL().getPath());
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
+        assertTrue(downloaded);
+    }
+
+    @Test
     void testGetAvailableAssets() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
