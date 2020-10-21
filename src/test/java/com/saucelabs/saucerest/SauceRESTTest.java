@@ -812,6 +812,38 @@ class SauceRESTTest {
     }
 
     @Test
+    void testDownloadServerLogWithRenaming(@TempDir Path tempDir) throws IOException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/appium-server.log").openStream());
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath);
+        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log", urlConnection.getRealURL().getPath());
+        assertTrue(downloaded);
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].length() > 0);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().contains("appium-server.log"), "Actual:" + tempDir.toFile().list()[0]);
+    }
+
+    @Test
+    void testDownloadServerLogWithoutRenaming(@TempDir Path tempDir) throws IOException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(getClass().getResource("/selenium-server.log").openStream());
+
+        String absolutePath = tempDir.toAbsolutePath().toString();
+        boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath);
+        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log", urlConnection.getRealURL().getPath());
+        assertTrue(downloaded);
+        assertNull(this.urlConnection.getRealURL().getQuery());
+        assertNotNull(tempDir.toFile().listFiles());
+        assertEquals(1, tempDir.toFile().listFiles().length);
+        assertTrue(tempDir.toFile().listFiles()[0].length() > 0);
+        assertTrue(tempDir.toFile().listFiles()[0].getName().contains("selenium-server.log"), "Actual:" + tempDir.toFile().list()[0]);
+    }
+
+    @Test
     void testJobFailed() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));

@@ -3,6 +3,7 @@ package com.saucelabs.saucerest;
 import static com.saucelabs.saucerest.DataCenter.US;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
@@ -338,7 +339,7 @@ public class SauceREST implements Serializable {
      */
     public void downloadAllAssets(String jobId, String location) throws IOException {
         boolean hasScreenshots = false;
-        Boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
+        boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
         BufferedInputStream stream = getAvailableAssets(jobId);
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
 
@@ -358,13 +359,13 @@ public class SauceREST implements Serializable {
             String key = keys.next();
             // key:value of this JSONObject are of type string
             if (jsonObject.get(key) instanceof String) {
+                URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
+
                 if (isAppiumBackend && key.equals("selenium-log")) {
                     // this is the appium-server log from a VDC (Emu/Sim) test. This makes sure it is aligned with the
                     // naming used in the web UI
-                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
                     saveFile(jobId, location, getDefaultFileName(jobId, "appium-server.log"), restEndpoint);
                 } else {
-                    URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
                     saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
                 }
             } else {
@@ -640,7 +641,7 @@ public class SauceREST implements Serializable {
      */
     public boolean downloadServerLog(String jobId, String location) {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+        return saveServerLogFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
 
     /**
@@ -657,7 +658,7 @@ public class SauceREST implements Serializable {
      */
     public boolean downloadServerLog(String jobId, String location, String fileName) {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        return saveFile(jobId, location, fileName, restEndpoint);
+        return saveServerLogFile(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -685,7 +686,7 @@ public class SauceREST implements Serializable {
      */
     public void downloadServerLogOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+        saveServerLogFileOrThrow(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
 
     /**
@@ -702,7 +703,7 @@ public class SauceREST implements Serializable {
      */
     public void downloadServerLogOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
         URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
-        saveFileOrThrowException(jobId, location, fileName, restEndpoint);
+        saveServerLogFileOrThrow(jobId, location, fileName, restEndpoint);
     }
 
     /**
@@ -955,7 +956,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @param limit Number of jobs to return(max of 500)
-     * @param to    value in Epoch time format denoting the time to end the job list searh
+     * @param to    value in Epoch time format denoting the time to end the job list search
      * @param from  value in Epoch time format denoting the time to start the search
      * @return String (in JSON format) representing the jobID for a sauce Job
      */
@@ -1027,8 +1028,8 @@ public class SauceREST implements Serializable {
         connection.setRequestMethod("GET");
         addAuthenticationProperty(connection);
 
-        Integer responseCode = connection.getResponseCode();
-        logger.log(Level.FINEST, responseCode.toString() + " - " + restEndpoint + " for: " + jobId);
+        int responseCode = connection.getResponseCode();
+        logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
 
         switch (responseCode) {
             case 404:
@@ -1065,8 +1066,7 @@ public class SauceREST implements Serializable {
 
         logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
-        BufferedInputStream in = new BufferedInputStream(stream);
-        return in;
+        return new BufferedInputStream(stream);
     }
 
     /**
@@ -1112,12 +1112,87 @@ public class SauceREST implements Serializable {
         File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
         System.out.println("Saving " + jobAndAsset + " as " + targetFile);
         logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(targetFile))) {
-            int i;
-            while ((i = in.read()) != -1) {
-                out.write(i);
+
+        FileUtils.copyInputStreamToFile(in, targetFile);
+    }
+
+    /**
+     * Currently Sauce Labs REST API /asset response contains selenium-server.log regardless if it is actually
+     * appium-server.log or selenium-server.log. To workaround this we inspect the returned server log stream
+     * and replace it with the appropriate name if necessary.
+     * @param jobId Sauce Labs job id of the session
+     * @param location where to save the file
+     * @param fileName the filename
+     * @param restEndpoint the called endpoint
+     * @throws SauceException.NotAuthorized thrown if username/access key are invalid
+     * @throws IOException thrown when saving the file to disk fails
+     */
+    private void saveServerLogFileOrThrow(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
+        String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
+        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+
+        BufferedInputStream in = downloadFileData(jobId, restEndpoint);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(in, baos);
+        byte[] bytes = baos.toByteArray();
+
+        if (fileName == null || fileName.length() < 1) {
+            fileName = getDefaultFileName(jobId, restEndpoint);
+        }
+
+        // only change filename if it is default selenium-server.log and if the stream contains Appium
+        if (fileName.contains("selenium-server.log") &&
+            IOUtils.toString(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8).contains("Appium")) {
+            fileName = fileName.replace("selenium-server", "appium-server");
+        }
+
+        File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
+        System.out.println("Saving " + jobAndAsset + " as " + targetFile);
+        logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+
+        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
+    }
+
+    /**
+     * Currently Sauce Labs REST API /asset response contains selenium-server.log regardless if it is actually
+     * appium-server.log or selenium-server.log. To workaround this we inspect the returned server log stream
+     * and replace it with the appropriate name if necessary. This method fails silently.
+     * @param jobId Sauce Labs job id of the session
+     * @param location where to save the file
+     * @param fileName the filename
+     * @param restEndpoint the called endpoint
+     * @throws SauceException.NotAuthorized thrown if username/access key are invalid
+     * @throws IOException thrown when saving the file to disk fails
+     */
+    private boolean saveServerLogFile(String jobId, String location, String fileName, URL restEndpoint) {
+        String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
+        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+
+        try {
+            BufferedInputStream in = downloadFileData(jobId, restEndpoint);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IOUtils.copy(in, baos);
+            byte[] bytes = baos.toByteArray();
+
+            if (fileName == null || fileName.length() < 1) {
+                fileName = getDefaultFileName(jobId, restEndpoint);
             }
-            out.flush();
+
+            // only change filename if it is default selenium-server.log and if the stream contains Appium
+            if (fileName.contains("selenium-server.log") &&
+                IOUtils.toString(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8).contains("Appium")) {
+                fileName = fileName.replace("selenium-server", "appium-server");
+            }
+
+            File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
+            System.out.println("Saving " + jobAndAsset + " as " + targetFile);
+            logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+
+            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to save file", e.getMessage());
+            return false;
         }
     }
 
