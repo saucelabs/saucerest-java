@@ -1019,8 +1019,79 @@ public class SauceREST implements Serializable {
      */
     // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
+        boolean retry = false;
+        int retryCounter = 1;
         logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
         logger.log(Level.FINEST, "Opening connection for Job " + jobId);
+        HttpURLConnection connection;
+
+        do {
+            retry = false;
+            connection = setConnection(restEndpoint);
+            int responseCode = connection.getResponseCode();
+            logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
+
+            switch (responseCode) {
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    String error = ErrorExplainers.resourceMissing();
+
+                    // TODO: add more file extension like .log or .json
+                    String path = restEndpoint.getPath();
+                    if (path.endsWith("mp4")) {
+                        error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
+                    } else if (path.endsWith("har")) {
+                        error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
+                    }
+
+                    throw new FileNotFoundException(error);
+                case HttpURLConnection.HTTP_UNAUTHORIZED:
+                    String errorReasons = "";
+                    if (username == null || username.isEmpty()) {
+                        errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
+                    }
+
+                    if (accessKey == null || accessKey.isEmpty()) {
+                        errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
+                    }
+
+                    if (!errorReasons.isEmpty()) {
+                        errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
+                    } else {
+                        errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
+                    }
+
+                    throw new SauceException.NotAuthorized(errorReasons);
+                case HttpURLConnection.HTTP_BAD_REQUEST:
+                    //logger.log(Level.SEVERE, connection.getErrorStream().toString());
+                    String errorStream = IOUtils.toString(connection.getErrorStream());
+
+                    if (!errorStream.isEmpty() && errorStream.contains("Job hasn't finished running")) {
+                        logger.log(Level.INFO, "Job " + jobId + " hasn't finished processing yet. Retrying. " + retryCounter + "/5");
+                        retry = true;
+                        retryCounter++;
+
+                        try {
+                            logger.log(Level.INFO, "Waiting " + 1 * retryCounter + "s");
+                            TimeUnit.SECONDS.sleep(1 * retryCounter);
+                        } catch (InterruptedException e) {
+                            logger.log(Level.SEVERE, "Thread interrupted");
+                        }
+                    }
+                    break;
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                default:
+                    logger.log(Level.WARNING, "Unknown response code received:" + responseCode);
+                    break;
+            }
+        } while (retry && retryCounter < 6);
+
+        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
+        InputStream stream = connection.getInputStream();
+        return new BufferedInputStream(stream);
+    }
+
+    private HttpURLConnection setConnection(URL restEndpoint) throws IOException {
         HttpURLConnection connection = openConnection(restEndpoint);
         connection.setRequestProperty("User-Agent", this.getUserAgent());
 
@@ -1028,45 +1099,7 @@ public class SauceREST implements Serializable {
         connection.setRequestMethod("GET");
         addAuthenticationProperty(connection);
 
-        int responseCode = connection.getResponseCode();
-        logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
-
-        switch (responseCode) {
-            case 404:
-                String error = ErrorExplainers.resourceMissing();
-
-                // TODO: add more file extension like .log or .json
-                String path = restEndpoint.getPath();
-                if (path.endsWith("mp4")) {
-                    error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
-                } else if (path.endsWith("har")) {
-                    error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
-                }
-
-                throw new FileNotFoundException(error);
-
-            case 401:
-                String errorReasons = "";
-                if (username == null || username.isEmpty()) {
-                    errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
-                }
-
-                if (accessKey == null || accessKey.isEmpty()) {
-                    errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
-                }
-
-                if (!errorReasons.isEmpty()) {
-                    errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
-                } else {
-                    errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
-                }
-
-                throw new SauceException.NotAuthorized(errorReasons);
-        }
-
-        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
-        InputStream stream = connection.getInputStream();
-        return new BufferedInputStream(stream);
+        return connection;
     }
 
     /**
