@@ -40,10 +40,17 @@ class ErrorExplainers {
         );
     }
 
-    public static String HARMissing() {
+    static String HARMissing() {
         return String.join(System.lineSeparator(),
             " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
             " * This test was not able to complete HAR file recording due to an error or early termination"
+        );
+    }
+
+    static String JobNotYetDone() {
+        return String.join(System.lineSeparator(),
+            " * This job hasn't finished processing yet.",
+            " * After driver.quit() is called it will take some seconds to process and make available all job assets"
         );
     }
 }

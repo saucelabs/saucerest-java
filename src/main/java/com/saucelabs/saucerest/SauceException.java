@@ -28,11 +28,17 @@ public class SauceException extends RuntimeException {
             super(message);
         }
 
-        public NotAuthorized() {
-
-        }
+        public NotAuthorized() { }
     }
 
     public static class TooManyRequests extends SauceException {
+    }
+
+    public static class NotYetDone extends SauceException {
+        public NotYetDone(String message) {
+            super(message);
+        }
+
+        public NotYetDone() { }
     }
 }

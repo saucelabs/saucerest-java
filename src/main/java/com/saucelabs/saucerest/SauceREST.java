@@ -1,7 +1,8 @@
 package com.saucelabs.saucerest;
 
-import static com.saucelabs.saucerest.DataCenter.US;
-
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.FailsafeException;
+import net.jodah.failsafe.RetryPolicy;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -10,7 +11,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.*;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -22,12 +35,19 @@ import java.rmi.UnexpectedException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
+import static com.saucelabs.saucerest.DataCenter.US;
 
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API
@@ -1019,79 +1039,36 @@ public class SauceREST implements Serializable {
      */
     // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
-        boolean retry = false;
-        int retryCounter = 1;
         logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
         logger.log(Level.FINEST, "Opening connection for Job " + jobId);
-        HttpURLConnection connection;
 
-        do {
-            retry = false;
-            connection = setConnection(restEndpoint);
-            int responseCode = connection.getResponseCode();
-            logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
+        HttpURLConnection connection = null;
+        RetryPolicy<Object> retryPolicy = new RetryPolicy<>()
+            .handle(SauceException.NotYetDone.class)
+            .withMaxDuration(Duration.ofSeconds(15))
+            .withMaxRetries(-1)
+            .withBackoff(1, 5, ChronoUnit.SECONDS, 2);
 
-            switch (responseCode) {
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    String error = ErrorExplainers.resourceMissing();
+        try {
+            connection = Failsafe.with(retryPolicy).get(() -> setConnection(jobId, restEndpoint));
+        } catch (FailsafeException e) {
+            Throwable throwable = e.getCause();
 
-                    // TODO: add more file extension like .log or .json
-                    String path = restEndpoint.getPath();
-                    if (path.endsWith("mp4")) {
-                        error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
-                    } else if (path.endsWith("har")) {
-                        error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
-                    }
-
-                    throw new FileNotFoundException(error);
-                case HttpURLConnection.HTTP_UNAUTHORIZED:
-                    String errorReasons = "";
-                    if (username == null || username.isEmpty()) {
-                        errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
-                    }
-
-                    if (accessKey == null || accessKey.isEmpty()) {
-                        errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
-                    }
-
-                    if (!errorReasons.isEmpty()) {
-                        errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
-                    } else {
-                        errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
-                    }
-
-                    throw new SauceException.NotAuthorized(errorReasons);
-                case HttpURLConnection.HTTP_BAD_REQUEST:
-                    //logger.log(Level.SEVERE, connection.getErrorStream().toString());
-                    String errorStream = IOUtils.toString(connection.getErrorStream());
-
-                    if (!errorStream.isEmpty() && errorStream.contains("Job hasn't finished running")) {
-                        logger.log(Level.INFO, "Job " + jobId + " hasn't finished processing yet. Retrying. " + retryCounter + "/5");
-                        retry = true;
-                        retryCounter++;
-
-                        try {
-                            logger.log(Level.INFO, "Waiting " + 1 * retryCounter + "s");
-                            TimeUnit.SECONDS.sleep(1 * retryCounter);
-                        } catch (InterruptedException e) {
-                            logger.log(Level.SEVERE, "Thread interrupted");
-                        }
-                    }
-                    break;
-                case HttpURLConnection.HTTP_OK:
-                    break;
-                default:
-                    logger.log(Level.WARNING, "Unknown response code received:" + responseCode);
-                    break;
+            if (throwable instanceof IOException) {
+                throw (IOException)throwable;
+            } else if (throwable instanceof FileNotFoundException) {
+                throw (FileNotFoundException)throwable;
+            } else if (throwable instanceof SauceException.NotAuthorized) {
+                throw (SauceException.NotAuthorized)throwable;
             }
-        } while (retry && retryCounter < 6);
+        }
 
         logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
         InputStream stream = connection.getInputStream();
         return new BufferedInputStream(stream);
     }
 
-    private HttpURLConnection setConnection(URL restEndpoint) throws IOException {
+    private HttpURLConnection setConnection(String jobId, URL restEndpoint) throws IOException {
         HttpURLConnection connection = openConnection(restEndpoint);
         connection.setRequestProperty("User-Agent", this.getUserAgent());
 
@@ -1099,7 +1076,57 @@ public class SauceREST implements Serializable {
         connection.setRequestMethod("GET");
         addAuthenticationProperty(connection);
 
-        return connection;
+        return processConnection(connection, jobId, restEndpoint) ? connection : null;
+    }
+
+    private boolean processConnection(HttpURLConnection connection, String jobId, URL restEndpoint) throws SauceException.NotAuthorized, SauceException.NotYetDone, IOException {
+        int responseCode = connection.getResponseCode();
+        logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
+        switch (responseCode) {
+            case HttpURLConnection.HTTP_NOT_FOUND:
+                String error = ErrorExplainers.resourceMissing();
+
+                // TODO: add more file extension like .log or .json
+                String path = restEndpoint.getPath();
+                if (path.endsWith("mp4")) {
+                    error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
+                } else if (path.endsWith("har")) {
+                    error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
+                }
+
+                throw new FileNotFoundException(error);
+            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                String errorReasons = "";
+                if (username == null || username.isEmpty()) {
+                    errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
+                }
+
+                if (accessKey == null || accessKey.isEmpty()) {
+                    errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
+                }
+
+                if (!errorReasons.isEmpty()) {
+                    errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
+                } else {
+                    errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
+                }
+
+                throw new SauceException.NotAuthorized(errorReasons);
+            case HttpURLConnection.HTTP_BAD_REQUEST:
+                String errorStream = IOUtils.toString(connection.getErrorStream());
+
+                if (!errorStream.isEmpty() && errorStream.contains("Job hasn't finished running")) {
+                    throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
+                }
+                break;
+            case HttpURLConnection.HTTP_OK:
+                break;
+            default:
+                logger.log(Level.WARNING, "Unknown response code received:" + responseCode);
+                break;
+        }
+
+        return true;
     }
 
     /**
