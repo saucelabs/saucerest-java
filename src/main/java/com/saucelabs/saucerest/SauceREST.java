@@ -292,9 +292,9 @@ public class SauceREST implements Serializable {
 
 
     /**
-     * Marks a Sauce Job as 'passed'.
+     * Marks a Sauce job as 'passed'.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -303,9 +303,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Marks a Sauce Job as 'failed'.
+     * Marks a Sauce job as 'failed'.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      */
     public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -314,9 +314,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Adds the provided tags to the Sauce Job
+     * Adds the provided tags to the Sauce job
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param tags  the tags to be added to the job, provided as a list of strings
      */
     public void addTags(String jobId, List<String> tags) {
@@ -339,10 +339,10 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Returns a JSON object containing all available assets for a given job id.
+     * Returns a JSON object containing all available assets for a given Sauce job ID.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return JSON object with available assets for given job id
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @return JSON object with available assets for a given job ID
      * @throws IOException if something else goes wrong during asset retrieval
      */
     public BufferedInputStream getAvailableAssets(String jobId) throws IOException {
@@ -351,9 +351,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads all available assets.
+     * Downloads all available assets for a given Sauce job ID to the <code>location</code>.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the assets should be downloaded to
      * @throws IOException if file cannot be saved
      */
@@ -402,12 +402,13 @@ public class SauceREST implements Serializable {
 
     /**
      * Downloads the device log for Android Emulator or iOS Simulator.
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the device log should be downloaded to
+     *
+     * @param jobId      the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @param location   represents the base directory where the device log should be downloaded to
      * @param isEmulator to determine what device log to download
      * @return True if the device log was downloaded successfully; Otherwise false
      */
-    public boolean downloadDeviceLog(String jobId, String location, boolean isEmulator ) {
+    public boolean downloadDeviceLog(String jobId, String location, boolean isEmulator) {
         URL restEndpoint;
         if (isEmulator) {
             restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
@@ -423,13 +424,13 @@ public class SauceREST implements Serializable {
      * Downloads the device log for Android Emulator or iOS Simulator. The file will be stored in a directory
      * specified by the <code>location</code> field.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the device log should be downloaded to
-     * @param filename represents the filename to store the content
+     * @param jobId      the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @param location   represents the base directory where the device log should be downloaded to
+     * @param filename   represents the filename to store the content
      * @param isEmulator to determine what device log to download
      * @return True if the device log was downloaded successfully; Otherwise false
      */
-    public boolean downloadDeviceLog(String jobId, String location, String filename, boolean isEmulator ) {
+    public boolean downloadDeviceLog(String jobId, String location, String filename, boolean isEmulator) {
         URL restEndpoint;
         if (isEmulator) {
             restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
@@ -442,12 +443,12 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the device log should be downloaded to
+     * @param jobId      the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @param location   represents the base directory where the device log should be downloaded to
      * @param isEmulator to determine what device log to download
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -466,13 +467,13 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the device log should be downloaded to
-     * @param filename represents the filename to store the content
+     * @param jobId      the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @param location   represents the base directory where the device log should be downloaded to
+     * @param filename   represents the filename to store the content
      * @param isEmulator to determine what device log to download
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -491,14 +492,14 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots as a zip for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots as a zip for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
      * @return True if the screenshots was downloaded successfully; Otherwise false
      */
@@ -508,14 +509,14 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots as a zip for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots as a zip for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
      * @param filename represents the filename to store the content
      * @return True if the screenshots was downloaded successfully; Otherwise false
@@ -526,11 +527,11 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -542,11 +543,11 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
      * @param filename represents the filename to store the content
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
@@ -559,7 +560,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
@@ -567,7 +568,7 @@ public class SauceREST implements Serializable {
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @return True if the video was downloaded successfully; Otherwise false
      */
@@ -577,7 +578,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
@@ -585,7 +586,7 @@ public class SauceREST implements Serializable {
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param fileName represents the filename to store the content
      * @return True if the video was downloaded successfully; Otherwise false
@@ -597,13 +598,13 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
-     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
      * is not set to false.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -615,14 +616,14 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
-     * Downloads the video for a Sauce Job to the filesystem.  The file will be stored in a directory
+     * TODO: 2020-02-27 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
+     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
      * is not set to false.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param fileName represents the filename to store the content
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
@@ -635,11 +636,11 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the video for a Sauce Job and returns it.
+     * Downloads the video for a Sauce job and returns it.
      * <p>
      * Will probably eat your memory.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return A BufferedInputStream containing the video info
      * @throws IOException if there is a problem fetching the data
      */
@@ -655,7 +656,7 @@ public class SauceREST implements Serializable {
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadServerLogOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @return True if the Log file downloads successfully; Otherwise false.
      */
@@ -665,13 +666,13 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
+     * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
      * Downloads the Selenium/Appium server log for a Sauce Labs job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadServerLogOrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param fileName represents the filename to store the content
      * @return True if the Log file downloads successfully; Otherwise false.
@@ -684,7 +685,7 @@ public class SauceREST implements Serializable {
     /**
      * Downloads the Selenium/Appium server log for a Sauce Labs job and returns it.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return a BufferedInputStream containing the logfile
      * @throws IOException if there is a problem fetching the file
      */
@@ -695,10 +696,10 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the log file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -710,11 +711,11 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
+     * Downloads the log file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param fileName represents the filename to store the content
      * @throws FileNotFoundException                                if the log is missing or doesn't exist
@@ -727,9 +728,9 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Labs Job and returns it.
+     * Downloads the log file for a Sauce Labs job and returns it.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return a BufferedInputStream containing the logfile
      * @throws IOException if there is a problem fetching the file
      */
@@ -739,10 +740,10 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * Downloads the log file for a Sauce job to the filesystem.  The file will be stored in
      * a directory specified by the <code>location</code> field.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @return True if the Log file downloads successfully; Otherwise false.
      */
@@ -752,10 +753,10 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * Downloads the log file for a Sauce job to the filesystem.  The file will be stored in
      * a directory specified by the <code>location</code> field.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param fileName represents the filename to store the content
      * @return True if the Log file downloads successfully; Otherwise false.
@@ -769,7 +770,7 @@ public class SauceREST implements Serializable {
      * Download the automator log file for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @return True if the Log file downloads successfully; Otherwise false.
      */
@@ -782,7 +783,7 @@ public class SauceREST implements Serializable {
      * Download the automator log file for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
      * @param filename represents the filename to store the content
      * @return True if the Log file downloads successfully; Otherwise false.
@@ -794,7 +795,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be renamed "attemptHARDownload" - Dylan
-     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the HAR file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
@@ -802,7 +803,7 @@ public class SauceREST implements Serializable {
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadHAROrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the HAR file should be downloaded to
      * @return True if the HAR file downloads successfully, otherwise false
      */
@@ -813,7 +814,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 27/2/20 I think this should be renamed "attemptHARDownload" - Dylan
-     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the HAR file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
@@ -821,7 +822,7 @@ public class SauceREST implements Serializable {
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadHAROrThrow(String, String)}
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the HAR file should be downloaded to
      * @param fileName represents the filename to store the content
      * @return True if the HAR file downloads successfully, otherwise false
@@ -833,13 +834,13 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadHAR" and attemptHARDownload should be the silent failure method - Dylan
-     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the HAR file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the HAR file should be downloaded to
      * @throws FileNotFoundException                                When HAR File is unavailable or doesn't exist.
      * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
@@ -852,13 +853,13 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 27/2/20 I think this should be called "downloadHAR" and attemptHARDownload should be the silent failure method - Dylan
-     * Downloads the HAR file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the HAR file for a Sauce job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the HAR file should be downloaded to
      * @param fileName represents the filename to store the content
      * @throws FileNotFoundException                                When HAR File is unavailable or doesn't exist.
@@ -871,12 +872,12 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the HAR file for a Sauce Job.
+     * Downloads the HAR file for a Sauce job.
      * <p>
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return A BufferedInputStream containing the HAR data, unparsed
      * @throws IOException if there is a problem fetching the HAR file
      */
@@ -887,7 +888,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the HAR file for a Sauce Job, and returns it wrapped in a JSONTokener.
+     * Downloads the HAR file for a Sauce job, and returns it wrapped in a JSONTokener.
      * <p>
      * Pass this JSONTokener to a JSONObject when you wish to read JSON.  The stream will be read as
      * soon as a JSONObject is created.
@@ -895,7 +896,7 @@ public class SauceREST implements Serializable {
      * This will only work for jobs which support Extended Debugging, which were started with the
      * 'extendedDebugging' capability set to true.
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return A JSONTokener containing the HAR data, tokenized
      * @throws IOException   if there is a problem fetching the HAR file
      * @throws JSONException if encoding can't be determined or there's an IO problem
@@ -922,7 +923,7 @@ public class SauceREST implements Serializable {
     /**
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
-     * @param jobId the Sauce Job id to retrieve
+     * @param jobId the Sauce job ID to retrieve
      * @return String (in JSON format) representing the details for a Sauce job
      */
     public String getJobInfo(String jobId) {
@@ -953,7 +954,7 @@ public class SauceREST implements Serializable {
     /**
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
-     * @return String (in JSON format) representing the jobID for a sauce Job
+     * @return String (in JSON format) representing the jobID for a sauce job
      */
     public String getJobs() {
         URL restEndpoint = buildURL(username + "/jobs");
@@ -965,7 +966,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @param limit Number of jobs to return(max of 500)
-     * @return String (in JSON format) representing the jobID for a sauce Job
+     * @return String (in JSON format) representing the jobID for a sauce job
      */
     public String getJobs(int limit) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit);
@@ -978,7 +979,7 @@ public class SauceREST implements Serializable {
      * @param limit Number of jobs to return(max of 500)
      * @param to    value in Epoch time format denoting the time to end the job list search
      * @param from  value in Epoch time format denoting the time to start the search
-     * @return String (in JSON format) representing the jobID for a sauce Job
+     * @return String (in JSON format) representing the jobID for a sauce job
      */
     public String getJobs(int limit, long to, int from) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
@@ -1031,7 +1032,7 @@ public class SauceREST implements Serializable {
      * Returns the result of a HTTP GET to the value of the <code>restEndpoint</code> parameter, as a
      * BufferedInputStream suitable for consumption or saving to file.
      *
-     * @param jobId        the Sauce Job id
+     * @param jobId        the Sauce job ID
      * @param restEndpoint the URL to perform a HTTP GET
      * @throws FileNotFoundException        if the requested resource is missing
      * @throws SauceException.NotAuthorized if the credentials are wrong
@@ -1055,11 +1056,11 @@ public class SauceREST implements Serializable {
             Throwable throwable = e.getCause();
 
             if (throwable instanceof IOException) {
-                throw (IOException)throwable;
+                throw (IOException) throwable;
             } else if (throwable instanceof FileNotFoundException) {
-                throw (FileNotFoundException)throwable;
+                throw (FileNotFoundException) throwable;
             } else if (throwable instanceof SauceException.NotAuthorized) {
-                throw (SauceException.NotAuthorized)throwable;
+                throw (SauceException.NotAuthorized) throwable;
             }
         }
 
@@ -1085,13 +1086,14 @@ public class SauceREST implements Serializable {
         switch (responseCode) {
             case HttpURLConnection.HTTP_NOT_FOUND:
                 String error = ErrorExplainers.resourceMissing();
-
-                // TODO: add more file extension like .log or .json
+                
                 String path = restEndpoint.getPath();
                 if (path.endsWith("mp4")) {
                     error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
                 } else if (path.endsWith("har")) {
                     error = String.join(System.lineSeparator(), error, ErrorExplainers.HARMissing());
+                } else if (path.endsWith("log") || path.endsWith("json")) {
+                    error = String.join(System.lineSeparator(), error, ErrorExplainers.LogNotFound());
                 }
 
                 throw new FileNotFoundException(error);
@@ -1136,7 +1138,7 @@ public class SauceREST implements Serializable {
      * If an IOException is thrown during this process, this method will fail _silently_ (although it will record the error
      * at Level.WARNING.  Use {@link #saveFileOrThrowException(String, String, String, URL)} to fail with an exception.
      *
-     * @param jobId        the Sauce Job id
+     * @param jobId        the Sauce job ID
      * @param location     represents the location that the result file should be stored in
      * @param restEndpoint the URL to perform a HTTP GET
      * @return Whether the request successfully fetched a resource or not
@@ -1177,15 +1179,16 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Currently Sauce Labs REST API /asset response contains selenium-server.log regardless if it is actually
+     * Currently Sauce Labs REST API endpoint /asset response contains selenium-server.log regardless if it is actually
      * appium-server.log or selenium-server.log. To workaround this we inspect the returned server log stream
      * and replace it with the appropriate name if necessary.
-     * @param jobId Sauce Labs job id of the session
-     * @param location where to save the file
-     * @param fileName the filename
+     *
+     * @param jobId        Sauce Labs job ID of the session
+     * @param location     where to save the file
+     * @param fileName     the filename
      * @param restEndpoint the called endpoint
      * @throws SauceException.NotAuthorized thrown if username/access key are invalid
-     * @throws IOException thrown when saving the file to disk fails
+     * @throws IOException                  thrown when saving the file to disk fails
      */
     private void saveServerLogFileOrThrow(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
@@ -1214,15 +1217,16 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Currently Sauce Labs REST API /asset response contains selenium-server.log regardless if it is actually
+     * Currently Sauce Labs REST API endpoint /asset response contains selenium-server.log regardless if it is actually
      * appium-server.log or selenium-server.log. To workaround this we inspect the returned server log stream
-     * and replace it with the appropriate name if necessary. This method fails silently.
-     * @param jobId Sauce Labs job id of the session
-     * @param location where to save the file
-     * @param fileName the filename
+     * and replace it with the appropriate name if necessary.
+     *
+     * @param jobId        Sauce Labs job ID of the session
+     * @param location     where to save the file
+     * @param fileName     the filename
      * @param restEndpoint the called endpoint
      * @throws SauceException.NotAuthorized thrown if username/access key are invalid
-     * @throws IOException thrown when saving the file to disk fails
+     * @throws IOException                  thrown when saving the file to disk fails
      */
     private boolean saveServerLogFile(String jobId, String location, String fileName, URL restEndpoint) {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
@@ -1273,7 +1277,7 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to update the details of a Sauce job, using the details included in
      * the <code>updates</code> parameter.
      *
-     * @param jobId   the Sauce job id to update
+     * @param jobId   the Sauce job ID to update
      * @param updates Map of attributes to update
      */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
@@ -1296,7 +1300,7 @@ public class SauceREST implements Serializable {
     /**
      * Invokes the Sauce REST API to stop a running job.
      *
-     * @param jobId the Sauce Job id
+     * @param jobId the Sauce job ID
      */
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1320,7 +1324,7 @@ public class SauceREST implements Serializable {
     /**
      * Invokes the Sauce REST API to delete a completed job from Sauce.
      *
-     * @param jobId the Sauce Job id
+     * @param jobId the Sauce job ID
      */
     public void deleteJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1528,7 +1532,7 @@ public class SauceREST implements Serializable {
      * credentials. Auth token is HMAC/MD5 of the job ID with the key &lt;username&gt;:&lt;api key&gt;
      * (see <a href="http://saucelabs.com/docs/integration#public-job-links">http://saucelabs.com/docs/integration#public-job-links</a>).
      *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return link to the job page with authorization token
      */
     public String getPublicJobLink(String jobId) {
@@ -1591,7 +1595,7 @@ public class SauceREST implements Serializable {
     /**
      * Invokes the Sauce REST API to retrieve the details of the tunnel.
      *
-     * @param tunnelId the Sauce Tunnel id
+     * @param tunnelId the Sauce Tunnel ID
      * @return String (in JSON format) representing the tunnel information
      */
     public String getTunnelInformation(String tunnelId) {
@@ -1654,7 +1658,7 @@ public class SauceREST implements Serializable {
     /**
      * Retrieve jobs associated with a build
      *
-     * @param build Build Id
+     * @param build Build ID
      * @param limit Max jobs to return
      * @return String (in JSON format) representing jobs associated with a build
      */

@@ -53,4 +53,12 @@ class ErrorExplainers {
             " * After driver.quit() is called it will take some seconds to process and make available all job assets"
         );
     }
+
+    static String LogNotFound() {
+        return String.join(System.lineSeparator(),
+            " * Log file could not be found. Possible reasons:",
+            " * The requested log does not exist for the used framework. For example asking for the Selenium log when using Appium",
+            " * A error occurred where the job was created on Sauce Labs but no test were executed."
+        );
+    }
 }
