@@ -329,7 +329,7 @@ public class SauceREST implements Serializable {
         JSONObject jsonObject = new JSONObject(getJobInfo(jobId));
         String automationBackend = jsonObject.getString("automation_backend");
 
-        if (automationBackend.equals(AutomationBackend.APPIUM.label)) {
+        if (AutomationBackend.APPIUM.label.equalsIgnoreCase(automationBackend)) {
             return AutomationBackend.APPIUM;
         } else if (automationBackend.equals(AutomationBackend.WEBDRIVER.label)) {
             return AutomationBackend.WEBDRIVER;
