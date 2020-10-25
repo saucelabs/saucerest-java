@@ -650,6 +650,134 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
+     * <p>
+     * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     *
+     * @deprecated Use {@link #downloadSauceLabsLog(String, String)}
+     */
+    @Deprecated boolean downloadLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     * <p>
+     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     *
+     * @deprecated Use {@link #downloadSauceLabsLog(String, String, String)}
+     */
+    @Deprecated boolean downloadLog(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return saveFile(jobId, location, fileName, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return a BufferedInputStream containing the logfile
+     * @throws IOException if there is a problem fetching the file
+     *
+     * @deprecated Use {@link #downloadSauceLabsLog(String)}
+     */
+    @Deprecated BufferedInputStream downloadLog(String jobId) throws IOException {
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     *
+     * @deprecated
+     */
+    @Deprecated public void downloadLogOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        saveFileOrThrowException(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+
+    /**
+     * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @throws FileNotFoundException                                if the log is missing or doesn't exist
+     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
+     * @throws IOException                                          if something else goes wrong during asset retrieval
+     * @deprecated
+     */
+    @Deprecated public void downloadLogOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/selenium-server.log");
+        saveFileOrThrowException(jobId, location, fileName, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job and returns it.
+     *
+     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @return a BufferedInputStream containing the logfile
+     * @throws IOException if there is a problem fetching the file
+     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
+     */
+    @Deprecated public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return downloadFileData(jobId, restEndpoint);
+    }
+
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @return True if the Log file downloads successfully; Otherwise false.
+     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
+     */
+    @Deprecated public boolean downloadJsonLog(String jobId, String location) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
+    }
+    /**
+     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * a directory specified by the <code>location</code> field.
+     *
+     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
+     * @param location represents the base directory where the video should be downloaded to
+     * @param fileName represents the filename to store the content
+     * @return True if the Log file downloads successfully; Otherwise false.
+     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
+     */
+    @Deprecated public boolean downloadJsonLog(String jobId, String location, String fileName) {
+        URL restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/log.json");
+        return saveFile(jobId, location, fileName, restEndpoint);
+    }
+
+    /**
      * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
      * Downloads the Selenium/Appium server log for a Sauce Labs job to the filesystem.  The file will be stored in a
      * directory specified by the <code>location</code> field.
