@@ -331,7 +331,7 @@ public class SauceREST implements Serializable {
 
         if (AutomationBackend.APPIUM.label.equalsIgnoreCase(automationBackend)) {
             return AutomationBackend.APPIUM;
-        } else if (automationBackend.equals(AutomationBackend.WEBDRIVER.label)) {
+        } else if (AutomationBackend.WEBDRIVER.label.equalsIgnoreCase(automationBackend)) {
             return AutomationBackend.WEBDRIVER;
         }
 
@@ -1086,7 +1086,7 @@ public class SauceREST implements Serializable {
         switch (responseCode) {
             case HttpURLConnection.HTTP_NOT_FOUND:
                 String error = ErrorExplainers.resourceMissing();
-                
+
                 String path = restEndpoint.getPath();
                 if (path.endsWith("mp4")) {
                     error = String.join(System.lineSeparator(), error, ErrorExplainers.videoMissing());
