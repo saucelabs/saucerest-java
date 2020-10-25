@@ -381,7 +381,7 @@ public class SauceREST implements Serializable {
             if (jsonObject.get(key) instanceof String) {
                 URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + jsonObject.getString(key));
 
-                if (isAppiumBackend && key.equals("selenium-log")) {
+                if (isAppiumBackend && "selenium-log".equalsIgnoreCase(key)) {
                     // this is the appium-server log from a VDC (Emu/Sim) test. This makes sure it is aligned with the
                     // naming used in the web UI
                     saveFile(jobId, location, getDefaultFileName(jobId, "appium-server.log"), restEndpoint);
