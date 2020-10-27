@@ -38,12 +38,12 @@ jobs:
         
       - name: Prepare Release
         env:
-          GPG-PASSPHRASE: ${{ secrets.gpg-passphrase }}
-          GPG-PRIVATE-KEY: ${{ secrets.gpg-private-key }} 
+          GPG-PASSPHRASE: ${{ secrets.gpg_passphrase }}
+          GPG-PRIVATE-KEY: ${{ secrets.gpg_private_key }} 
         run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE
       
       - name: Perform Release
         env:
-          ossrc-username: ${{ secrets.ossrc-username }}
-          ossrc-password: ${{ secrets.ossrc-password }}
+          ossrc-username: ${{ secrets.ossrc_username }}
+          ossrc-password: ${{ secrets.ossrc_password }}
         run: mvn -B release:perform
