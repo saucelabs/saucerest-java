@@ -47,6 +47,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static com.saucelabs.saucerest.DataCenter.US;
 
@@ -363,13 +364,10 @@ public class SauceREST implements Serializable {
         JSONObject jsonObject = new JSONObject(getJobInfo(jobId));
         String automationBackend = jsonObject.getString("automation_backend");
 
-        if (AutomationBackend.APPIUM.label.equalsIgnoreCase(automationBackend)) {
-            return AutomationBackend.APPIUM;
-        } else if (AutomationBackend.WEBDRIVER.label.equalsIgnoreCase(automationBackend)) {
-            return AutomationBackend.WEBDRIVER;
-        }
-
-        return null;
+        return Stream.of(AutomationBackend.values())
+            .filter(backend -> backend.label.equalsIgnoreCase(automationBackend))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
@@ -445,12 +443,7 @@ public class SauceREST implements Serializable {
      * @return True if the device log was downloaded successfully; Otherwise false
      */
     public boolean downloadDeviceLog(String jobId, String location, boolean isEmulator) {
-        String filename = "";
-        if (isEmulator) {
-            filename = "logcat.log";
-        } else {
-            filename = "ios-syslog.log";
-        }
+        String filename = isEmulator ? "logcat.log" : "ios-syslog.log";
 
         return downloadDeviceLog(jobId, location, filename, isEmulator);
     }
@@ -466,13 +459,7 @@ public class SauceREST implements Serializable {
      * @return True if the device log was downloaded successfully; Otherwise false
      */
     public boolean downloadDeviceLog(String jobId, String location, String filename, boolean isEmulator) {
-        URL restEndpoint;
-        if (isEmulator) {
-            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
-        } else {
-            // isSimulator
-            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
-        }
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + (isEmulator ? "logcat" : "ios-syslog") + ".log");
 
         return saveFile(jobId, location, filename, restEndpoint);
     }
@@ -490,12 +477,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadDeviceLogOrThrow(String jobId, String location, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
-        String filename = "";
-        if (isEmulator) {
-            filename = "logcat.log";
-        } else {
-            filename = "ios-syslog.log";
-        }
+        String filename = isEmulator ? "logcat.log" : "ios-syslog.log";
 
         downloadDeviceLogOrThrow(jobId, location, filename, isEmulator);
     }
@@ -514,13 +496,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadDeviceLogOrThrow(String jobId, String location, String filename, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
-        URL restEndpoint;
-        if (isEmulator) {
-            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/logcat.log");
-        } else {
-            // isSimulator
-            restEndpoint = this.buildURL(username + "/jobs/" + jobId + "/assets/ios-syslog.log");
-        }
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + (isEmulator ? "logcat" : "ios-syslog") + ".log");
 
         saveFileOrThrowException(jobId, location, filename, restEndpoint);
     }
@@ -1261,7 +1237,7 @@ public class SauceREST implements Serializable {
 
                 throw new SauceException.NotAuthorized(errorReasons);
             case HttpURLConnection.HTTP_BAD_REQUEST:
-                String errorStream = IOUtils.toString(connection.getErrorStream());
+                String errorStream = IOUtils.toString(connection.getErrorStream(), StandardCharsets.UTF_8);
 
                 if (!errorStream.isEmpty() && errorStream.contains("Job hasn't finished running")) {
                     throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
@@ -1355,8 +1331,7 @@ public class SauceREST implements Serializable {
             fileName = fileName.replace("selenium-server", "appium-server");
         }
 
-        File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
-        System.out.println("Saving " + jobAndAsset + " as " + targetFile);
+        File targetFile = new File(location, fileName.replace('/', '_'));
         logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
 
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
@@ -1394,8 +1369,7 @@ public class SauceREST implements Serializable {
                 fileName = fileName.replace("selenium-server", "appium-server");
             }
 
-            File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
-            System.out.println("Saving " + jobAndAsset + " as " + targetFile);
+            File targetFile = new File(location, fileName.replace('/', '_'));
             logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
 
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
