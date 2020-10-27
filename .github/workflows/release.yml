@@ -9,6 +9,9 @@ on:
       releaseType:
         description: MAJOR, MINOR or PATCH release
         default: 'PATCH'
+      dry_run:
+        description: Whether to perform a dry run instead of a full release.
+        default: false
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -40,9 +43,10 @@ jobs:
         env:
           GPG-PASSPHRASE: ${{ secrets.gpg_passphrase }}
           GPG-PRIVATE-KEY: ${{ secrets.gpg_private_key }} 
-        run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE
+        run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE -DdryRun=$INPUT_DRY_RUN
       
       - name: Perform Release
+        if:  ${{ env.INPUT_DRY_RUN == false }} 
         env:
           ossrc-username: ${{ secrets.ossrc_username }}
           ossrc-password: ${{ secrets.ossrc_password }}
