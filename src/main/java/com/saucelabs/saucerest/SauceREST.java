@@ -37,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -93,6 +94,17 @@ public class SauceREST implements Serializable {
     private final String restApiEndpoint;
 
     /**
+     * Retry policy default values.
+     */
+    private int maxDuration;
+    private int maxRetries;
+    private int delay;
+    private int maxDelay;
+    private int delayFactor;
+    private ChronoUnit chronoUnit = ChronoUnit.SECONDS;
+    private List<Class<? extends Throwable>> throwableList = Collections.singletonList(SauceException.NotYetDone.class);
+
+    /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
      * @param username  The username to use when performing HTTP requests to the Sauce REST API
@@ -121,12 +133,26 @@ public class SauceREST implements Serializable {
      * @param dataCenter the datacenter to use
      */
     public SauceREST(String username, String accessKey, DataCenter dataCenter) {
+        this(username, accessKey, dataCenter, 15, -1, 1, 5, ChronoUnit.SECONDS,
+            2, Collections.singletonList(SauceException.NotYetDone.class));
+    }
+
+    public SauceREST(String username, String accessKey, DataCenter dataCenter, int maxDuration, int maxRetries,
+                     int delay, int maxDelay, ChronoUnit chronoUnit, int delayFactor,
+                     List<Class<? extends Throwable>> throwableList) {
         this.username = username;
         this.accessKey = accessKey;
         this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
         this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
         this.restApiEndpoint = server + "rest/v1/";
+        this.maxDuration = maxDuration;
+        this.maxRetries = maxRetries;
+        this.delay = delay;
+        this.maxDelay = maxDelay;
+        this.chronoUnit = chronoUnit;
+        this.delayFactor = delayFactor;
+        this.throwableList = throwableList;
     }
 
     /**
@@ -140,6 +166,14 @@ public class SauceREST implements Serializable {
     private String buildUrl(String defaultUrl, String envVarName, String systemPropertyName) {
         String envVar = System.getenv(envVarName);
         return envVar != null ? envVar : System.getProperty(systemPropertyName, defaultUrl);
+    }
+
+    private RetryPolicy<Object> getRetryPolicy() {
+        return new RetryPolicy<>()
+            .handle(this.throwableList)
+            .withMaxDuration(Duration.ofSeconds(this.maxDuration))
+            .withMaxRetries(this.maxRetries)
+            .withBackoff(this.delay, this.maxDelay, this.chronoUnit, this.delayFactor);
     }
 
     public static String getExtraUserAgent() {
@@ -1156,27 +1190,21 @@ public class SauceREST implements Serializable {
      * @throws SauceException.NotAuthorized if the credentials are wrong
      * @throws IOException                  when something goes wrong fetching the data
      */
-    // TODO: Asset fetching can fail just after a test finishes.  Allow for configurable retries.
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
         logger.log(Level.FINEST, "Opening connection for Job " + jobId);
 
         HttpURLConnection connection = null;
-        RetryPolicy<Object> retryPolicy = new RetryPolicy<>()
-            .handle(SauceException.NotYetDone.class)
-            .withMaxDuration(Duration.ofSeconds(15))
-            .withMaxRetries(-1)
-            .withBackoff(1, 5, ChronoUnit.SECONDS, 2);
 
         try {
-            connection = Failsafe.with(retryPolicy).get(() -> setConnection(jobId, restEndpoint));
+            connection = Failsafe.with(getRetryPolicy()).get(() -> setConnection(jobId, restEndpoint));
         } catch (FailsafeException e) {
             Throwable throwable = e.getCause();
 
-            if (throwable instanceof IOException) {
-                throw (IOException) throwable;
-            } else if (throwable instanceof FileNotFoundException) {
+            if (throwable instanceof FileNotFoundException) {
                 throw (FileNotFoundException) throwable;
+            } else if (throwable instanceof IOException) {
+                throw (IOException) throwable;
             } else if (throwable instanceof SauceException.NotAuthorized) {
                 throw (SauceException.NotAuthorized) throwable;
             }

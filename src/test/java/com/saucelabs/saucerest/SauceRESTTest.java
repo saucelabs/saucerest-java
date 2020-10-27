@@ -229,6 +229,12 @@ class SauceRESTTest {
     }
 
     @Test
+    void testBuilder() {
+        assertThrows(IllegalStateException.class, () ->
+            new SauceRESTBuilder().setUsername(null).setAccessKey(null).build());
+    }
+
+    @Test
     void testUserAgent() {
         String agent = this.sauceREST.getUserAgent();
         assertNotNull(agent);
