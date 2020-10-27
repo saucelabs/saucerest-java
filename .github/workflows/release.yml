@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  prepare_build:
+  release:
     name: Preparing Build Environment
     
     # The type of runner that the job will run on
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-java@v1.4.3
         with:
           java-version: 1.8
-          gpg-private-key: ${{ secrets.gpg_private_key }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       
       - name: Install Maven
         uses: aahmed-se/setup-maven@v3
@@ -42,7 +42,7 @@ jobs:
         
       - name: Prepare Release
         env:
-          gpg.passphrase: ${{ secrets.gpg_passphrase }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
         run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE -DdryRun=$INPUT_DRY_RUN
       
       - name: Perform Release
