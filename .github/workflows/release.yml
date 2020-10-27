@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release to Maven Central
+
+# Run this manually
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: MAJOR, MINOR or PATCH release
+        default: 'PATCH'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  prepare_build:
+    name: Preparing Build Environment
+    
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      
+      - name: Install Maven
+        uses: aahmed-se/setup-maven@v3
+        with:
+          maven-version: 3.6.1
+      
+      - uses: actions/checkout@v2
+
+      - name: Build & Test
+        run: mvn -B test --file pom.xml
+        
+      - name: Prepare Release
+        env:
+          GPG-PASSPHRASE: ${{ secrets.gpg-passphrase }}
+          GPG-PRIVATE-KEY: ${{ secrets.gpg-private-key }} 
+        run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE
+      
+      - name: Perform Release
+        env:
+          ossrc-username: ${{ secrets.ossrc-username }}
+          ossrc-password: ${{ secrets.ossrc-password }}
+        run: mvn -B release:perform
