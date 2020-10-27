@@ -465,7 +465,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
@@ -483,7 +483,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
@@ -502,12 +502,12 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots as a zip for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots as a zip for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error
      * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
+     * If an IOException is encountered during operation, this method will fail _silently_. Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
      * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
@@ -518,12 +518,12 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots as a zip for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots as a zip for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error
      * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadScreenshotsOrThrow(String, String)}
+     * If an IOException is encountered during operation, this method will fail _silently_. Prefer {@link #downloadScreenshotsOrThrow(String, String)}
      *
      * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the screenshots should be downloaded to
@@ -536,7 +536,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
@@ -551,7 +551,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the screenshots for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the screenshots for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      *
@@ -568,13 +568,13 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
      * is not set to false.
      * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
+     * If an IOException is encountered during operation, this method will fail _silently_. Prefer {@link #downloadVideoOrThrow(String, String)}
      *
      * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
@@ -585,13 +585,13 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
      * is not set to false.
      * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadVideoOrThrow(String, String)}
+     * If an IOException is encountered during operation, this method will fail _silently_. Prefer {@link #downloadVideoOrThrow(String, String)}
      *
      * @param jobId    the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param location represents the base directory where the video should be downloaded to
@@ -619,7 +619,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
-     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
@@ -637,7 +637,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadVideo" and "attemptVideoDownload" should be the silent failure method - Dylan
-     * Downloads the video for a Sauce job to the filesystem.  The file will be stored in a directory
+     * Downloads the video for a Sauce job to the filesystem. The file will be stored in a directory
      * specified by the <code>location</code> field.
      * <p>
      * Jobs are only available for jobs which finished without a Sauce side error, and for which the 'recordVideo' capability
@@ -656,7 +656,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
@@ -675,7 +675,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
@@ -708,7 +708,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
@@ -726,7 +726,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in a
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
@@ -756,7 +756,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in
      * a directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
@@ -769,7 +769,7 @@ public class SauceREST implements Serializable {
         return saveFile(jobId, location, getDefaultFileName(jobId, restEndpoint), restEndpoint);
     }
     /**
-     * Downloads the log file for a Sauce Job to the filesystem.  The file will be stored in
+     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in
      * a directory specified by the <code>location</code> field.
      *
      * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
@@ -785,7 +785,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
-     * Downloads the Selenium/Appium server log for a Sauce Labs job to the filesystem.  The file will be stored in a
+     * Downloads the server log for a Sauce Labs job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadServerLogOrThrow(String, String)}
@@ -800,7 +800,7 @@ public class SauceREST implements Serializable {
 
     /**
      * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
-     * Downloads the Selenium/Appium server log for a Sauce Labs job to the filesystem.  The file will be stored in a
+     * Downloads the server log for a Sauce Labs job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
      * <p>
      * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadServerLogOrThrow(String, String)}
@@ -816,7 +816,7 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the Selenium/Appium server log for a Sauce Labs job and returns it.
+     * Downloads the server log for a Sauce Labs job and returns it.
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return a BufferedInputStream containing the logfile
