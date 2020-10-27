@@ -363,7 +363,9 @@ public class SauceREST implements Serializable {
         BufferedInputStream stream = getAvailableAssets(jobId);
         JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
 
-        // redundant key
+        // redundant key because JSON response has 2 video keys with the same content: video.mp4 and video.
+        // removing one prevents us from downloading the video twice
+        // TODO: 2020-10-27 YY: remove this when response is fixed and does not send video.mp4 anymore
         jsonObject.remove("video.mp4");
 
         if (jsonObject.keySet().contains("screenshots")) {
