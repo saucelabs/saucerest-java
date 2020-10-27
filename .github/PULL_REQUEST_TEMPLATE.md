@@ -29,7 +29,7 @@
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 <!--- This is simply a reminder of what we are going to look for before merging your code --->
 
-- [ ] I have read the [CONTRIBUTING](https://github.com/saucelabs/saucerest-java/blob/master/contributing.md) doc
+- [ ] I have read the [CONTRIBUTING](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md) doc
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] All new and existing tests passed locally
 - [ ] I have added necessary documentation (if appropriate)
