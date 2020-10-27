@@ -42,7 +42,7 @@ jobs:
         
       - name: Prepare Release
         env:
-          GPG-PASSPHRASE: ${{ secrets.gpg_passphrase }}
+          gpg.passphrase: ${{ secrets.gpg_passphrase }}
         run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE -DdryRun=$INPUT_DRY_RUN
       
       - name: Perform Release
