@@ -159,6 +159,7 @@
                 <configuration>
                     <goals>deploy nexus-staging:release</goals>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <projectVersionPolicyId>SemverPropertyPolicy</projectVersionPolicyId>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
@@ -168,6 +169,11 @@
                         <groupId>org.apache.maven.scm</groupId>
                         <artifactId>maven-scm-provider-gitexe</artifactId>
                         <version>1.11.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>codes.dylanlacey</groupId>
+                        <artifactId>SemverPropertyPolicy</artifactId>
+                        <version>0.0.7</version>
                     </dependency>
                 </dependencies>
             </plugin>
