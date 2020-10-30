@@ -1,11 +1,7 @@
 package com.saucelabs.saucerest;
 
-import java.util.logging.Logger;
-
 public class BuildUtils
 {
-    private static final Logger log = Logger.getLogger(BuildUtils.class.getName());
-
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String version = "@VERSION@";

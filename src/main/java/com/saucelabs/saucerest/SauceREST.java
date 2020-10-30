@@ -264,7 +264,7 @@ public class SauceREST implements Serializable {
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
         }
-        logger.log(Level.FINEST, "userAgent is set to " + userAgent);
+        logger.log(Level.FINEST, "userAgent is set to {0}", userAgent);
         return userAgent;
     }
 
@@ -286,7 +286,7 @@ public class SauceREST implements Serializable {
             postBack.setRequestProperty("Content-Type", "application/json");
             addAuthenticationProperty(postBack);
 
-            logger.log(Level.FINE, "POSTing to " + url.toString());
+            logger.log(Level.FINE, "POSTing to {0}", url);
             logger.log(Level.FINE, body.toString(2));   // PrettyPrint JSON with an indent of 2
 
             postBack.getOutputStream().write(body.toString().getBytes());
@@ -296,22 +296,22 @@ public class SauceREST implements Serializable {
             String inputLine;
             logger.log(Level.FINEST, "Building string from response.");
             while ((inputLine = reader.readLine()) != null) {
-                logger.log(Level.FINEST, "  " + inputLine);
+                logger.log(Level.FINEST, "  {0}", inputLine);
                 builder.append(inputLine);
             }
         } catch (IOException e) {
             try {
                 if (postBack.getResponseCode() == 401) {
-                    logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ": Unauthorized (401)");
+                    logger.log(Level.SEVERE, "Error POSTing to {0}: Unauthorized (401)", url);
                     throw new SauceException.NotAuthorized();
                 }
             } catch (IOException e1) {
-                logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + " and getting status code: ", e);
+                logger.log(Level.SEVERE, e, () -> "Error POSTing to " + url + " and getting status code: ");
             }
 
-            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
+            logger.log(Level.SEVERE, e, () -> "Error POSTing to " + url + ":");
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            logger.log(Level.SEVERE, "Error POSTing to " + url.toString() + ":", e);
+            logger.log(Level.SEVERE, e, () -> "Error POSTing to " + url + ":");
         } finally {
             closeInputStream(postBack);
             try {
@@ -1010,7 +1010,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the HAR file
      */
     public BufferedInputStream getHARDataStream(String jobId) throws IOException {
-        logger.log(Level.FINEST, "getHARDataStream for " + jobId);
+        logger.log(Level.FINEST, "getHARDataStream for {0}", jobId);
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
         return downloadFileData(jobId, restEndpoint);
     }
@@ -1030,7 +1030,7 @@ public class SauceREST implements Serializable {
      * @throws JSONException if encoding can't be determined or there's an IO problem
      */
     public JSONTokener getHARData(String jobId) throws IOException, JSONException {
-        logger.log(Level.FINEST, "getHARData for " + jobId);
+        logger.log(Level.FINEST, "getHARData for {0}", jobId);
         URL restEndpoint = this.buildEDSURL(jobId + "/network.har");
 
         BufferedInputStream har_stream = downloadFileData(jobId, restEndpoint);
@@ -1167,8 +1167,8 @@ public class SauceREST implements Serializable {
      * @throws IOException                  when something goes wrong fetching the data
      */
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
-        logger.log(Level.FINE, "Downloading asset " + restEndpoint.toString() + " For Job " + jobId);
-        logger.log(Level.FINEST, "Opening connection for Job " + jobId);
+        logger.log(Level.FINE, "Downloading asset {0} For Job {1}", new Object[] { restEndpoint, jobId });
+        logger.log(Level.FINEST, "Opening connection for Job {0}", jobId);
 
         HttpURLConnection connection = null;
 
@@ -1186,7 +1186,7 @@ public class SauceREST implements Serializable {
             }
         }
 
-        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job " + jobId);
+        logger.log(Level.FINEST, "Obtaining input stream for request issued for Job {0}", jobId);
         InputStream stream = connection.getInputStream();
         return new BufferedInputStream(stream);
     }
@@ -1204,7 +1204,7 @@ public class SauceREST implements Serializable {
 
     private boolean processConnection(HttpURLConnection connection, String jobId, URL restEndpoint) throws SauceException.NotAuthorized, SauceException.NotYetDone, IOException {
         int responseCode = connection.getResponseCode();
-        logger.log(Level.FINEST, responseCode + " - " + restEndpoint + " for: " + jobId);
+        logger.log(Level.FINEST, "{0} - {1} for: {2}", new Object[] { responseCode, restEndpoint, jobId });
         switch (responseCode) {
             case HttpURLConnection.HTTP_NOT_FOUND:
                 String error = ErrorExplainers.resourceMissing();
@@ -1246,7 +1246,7 @@ public class SauceREST implements Serializable {
             case HttpURLConnection.HTTP_OK:
                 break;
             default:
-                logger.log(Level.WARNING, "Unknown response code received:" + responseCode);
+                logger.log(Level.WARNING, "Unknown response code received:{0}", responseCode);
                 break;
         }
 
@@ -1287,7 +1287,7 @@ public class SauceREST implements Serializable {
 
     private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
-        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+        logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
         BufferedInputStream in = downloadFileData(jobId, restEndpoint);
         if (fileName == null || fileName.length() < 1) {
@@ -1295,7 +1295,7 @@ public class SauceREST implements Serializable {
         }
         File targetFile = new File(location, fileName.replaceAll("\\/", "_"));
         System.out.println("Saving " + jobAndAsset + " as " + targetFile);
-        logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+        logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
         FileUtils.copyInputStreamToFile(in, targetFile);
     }
@@ -1314,7 +1314,7 @@ public class SauceREST implements Serializable {
      */
     private void saveServerLogFileOrThrow(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
-        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+        logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
         BufferedInputStream in = downloadFileData(jobId, restEndpoint);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1332,7 +1332,7 @@ public class SauceREST implements Serializable {
         }
 
         File targetFile = new File(location, fileName.replace('/', '_'));
-        logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+        logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
     }
@@ -1351,7 +1351,7 @@ public class SauceREST implements Serializable {
      */
     private boolean saveServerLogFile(String jobId, String location, String fileName, URL restEndpoint) {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
-        logger.log(Level.FINEST, "Attempting to save asset " + jobAndAsset + " to " + location);
+        logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
         try {
             BufferedInputStream in = downloadFileData(jobId, restEndpoint);
@@ -1370,12 +1370,12 @@ public class SauceREST implements Serializable {
             }
 
             File targetFile = new File(location, fileName.replace('/', '_'));
-            logger.log(Level.FINEST, "Saving " + jobAndAsset + " as " + targetFile);
+            logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
             FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
             return true;
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to save file", e.getMessage());
+            logger.log(Level.WARNING, "Failed to save file", e);
             return false;
         }
     }
@@ -1388,7 +1388,7 @@ public class SauceREST implements Serializable {
     protected void addAuthenticationProperty(HttpURLConnection connection) {
         if (username != null && accessKey != null) {
             String auth = encodeAuthentication();
-            logger.log(Level.FINE, "Encoded Authorization: " + auth);
+            logger.log(Level.FINE, "Encoded Authorization: {0}", auth);
             connection.setRequestProperty("Authorization", auth);
         }
     }
@@ -1497,8 +1497,8 @@ public class SauceREST implements Serializable {
     public HttpURLConnection openConnection(URL url) throws IOException {
         HttpURLConnection con;
         if ("true".equals(System.getenv("USE_PROXY"))) {
-            logger.log(Level.SEVERE, "Using proxy: " + System.getenv("http.proxyHost")
-                + System.getenv("http.proxyPort"));
+            logger.log(Level.SEVERE, "Using proxy: {0}:{1}",
+                new Object[] { System.getenv("http.proxyHost"), System.getenv("http.proxyPort") });
 
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(System.getenv("http.proxyHost"),
                 Integer.parseInt(System.getenv("http.proxyPort"))));
