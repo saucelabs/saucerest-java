@@ -6,7 +6,7 @@ A Java client for Sauce Labs’s REST API.
 
 Using this client you can update Job info, including pass/fail status and other information supported.  Only the Sauce Labs Virtual Device Cloud is supported.  For Real Devices, please see [the docs](https://api.testobject.com/).
 
-If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
+If a function you're after isn't supported, we suggest either shelling out and using the curl version, _or_ sending a pull request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRIBUTING.md).
 
 <http://saucelabs.com/docs/sauce-ondemand#alternative-annotation-methods>
 
@@ -47,7 +47,7 @@ String tunnels = sauce.getTunnels();
 ## Download Assets
 Assets are downloaded by providing a job ID and the location to save the asset to.
 
-Filenames are set automatically to `job_idyyyyMMdd_HHmmSS.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
+Filenames are set automatically to `jobId_yyyyMMdd_HHmmSS_filename.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
 
 Each of these methods comes in two flavours; the `downloadX` methods which ignore exceptions, and the `downloadXOrThrow` methods which throw:
  * SauceException.NotAuthorized if credentials are missing or wrong
@@ -130,4 +130,4 @@ String tunnels = sauce.getTunnels();
 For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22.
 
 # Contributing
-Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRUBUTING.md).
+Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRIBUTING.md).
