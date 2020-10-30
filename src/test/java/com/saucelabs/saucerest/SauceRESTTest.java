@@ -567,10 +567,13 @@ class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(getClass().getResource("/assets.json").openStream());
 
-        BufferedInputStream stream = sauceREST.getAvailableAssets("1234");
-        assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets", urlConnection.getRealURL().getPath());
+        String results;
+        try (BufferedInputStream stream = sauceREST.getAvailableAssets("1234")) {
+            assertEquals("/rest/v1/" + sauceREST.getUsername() + "/jobs/1234/assets",
+                urlConnection.getRealURL().getPath());
 
-        String results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        }
         JSONObject jsonObject = new JSONObject(results);
 
         assertEquals("selenium-server.log", jsonObject.getString("selenium-log"));
@@ -727,15 +730,14 @@ class SauceRESTTest {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
-        BufferedInputStream stream = sauceREST.downloadSauceLabsLog("1234");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
-            this.urlConnection.getRealURL().getPath()
-        );
+        byte[] targetArray;
+        try (BufferedInputStream stream = sauceREST.downloadSauceLabsLog("1234")) {
+            assertEquals("/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/log.json",
+                this.urlConnection.getRealURL().getPath());
 
-        byte[] targetArray = new byte[stream.available()];
-        stream.read(targetArray);
-        assertTrue(new String(targetArray).length() > 0);
+            targetArray = IOUtils.toByteArray(stream);
+        }
+        assertTrue(targetArray.length > 0);
         assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
