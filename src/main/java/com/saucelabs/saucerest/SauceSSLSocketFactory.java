@@ -129,10 +129,10 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         }
 
         List<String> aa = new ArrayList<>();
-        for (int i = 0; i < preferredProtocols.length; i++) {
-            int idx = Arrays.binarySearch(availableProtocols, preferredProtocols[i]);
+        for (String preferredProtocol : preferredProtocols) {
+            int idx = Arrays.binarySearch(availableProtocols, preferredProtocol);
             if (idx >= 0)
-                aa.add(preferredProtocols[i]);
+                aa.add(preferredProtocol);
         }
 
         return aa.toArray(new String[0]);
@@ -211,10 +211,10 @@ class SauceSSLSocketFactory extends SSLSocketFactory {
         }
 
         List<String> aa = new ArrayList<>();
-        for (int i = 0; i < preferredCiphers.length; i++) {
-            int idx = Arrays.binarySearch(availableCiphers, preferredCiphers[i]);
+        for (String preferredCipher : preferredCiphers) {
+            int idx = Arrays.binarySearch(availableCiphers, preferredCipher);
             if (idx >= 0)
-                aa.add(preferredCiphers[i]);
+                aa.add(preferredCipher);
         }
 
         aa.add("TLS_EMPTY_RENEGOTIATION_INFO_SCSV");
