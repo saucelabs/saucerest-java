@@ -925,6 +925,7 @@ class SauceRESTTest {
         assertTrue(downloaded);
     }
 
+    @Test
     public void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
