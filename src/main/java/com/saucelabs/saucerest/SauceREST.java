@@ -102,8 +102,8 @@ public class SauceREST implements Serializable {
     private int delay;
     private int maxDelay;
     private int delayFactor;
-    private ChronoUnit chronoUnit = ChronoUnit.SECONDS;
-    private List<Class<? extends Throwable>> throwableList = Collections.singletonList(SauceException.NotYetDone.class);
+    private ChronoUnit chronoUnit;
+    private List<Class<? extends Throwable>> throwableList;
 
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
