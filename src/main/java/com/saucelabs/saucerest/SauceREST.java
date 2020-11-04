@@ -1347,7 +1347,6 @@ public class SauceREST implements Serializable {
      * @param fileName     the filename
      * @param restEndpoint the called endpoint
      * @throws SauceException.NotAuthorized thrown if username/access key are invalid
-     * @throws IOException                  thrown when saving the file to disk fails
      */
     private boolean saveServerLogFile(String jobId, String location, String fileName, URL restEndpoint) {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
