@@ -482,7 +482,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "foobar.log");
         assertTrue(downloaded);
     }
 
@@ -558,7 +558,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "foobar.log");
         assertTrue(downloaded);
     }
 
@@ -630,7 +630,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.zip"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "foobar.zip");
         assertTrue(downloaded);
     }
 
@@ -760,7 +760,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("device.log"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "device.log");
         assertTrue(downloaded);
     }
 
@@ -799,7 +799,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("device.log"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "device.log");
         assertTrue(downloaded);
     }
 
@@ -885,7 +885,7 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
         assertNotNull(tempDir.toFile().listFiles());
         assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().equals("foobar.log"));
+        assertEquals(tempDir.toFile().listFiles()[0].getName(), "foobar.log");
         assertTrue(downloaded);
     }
 
