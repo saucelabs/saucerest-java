@@ -850,7 +850,7 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownload(@TempDir Path tempDir) {
+    void testDownload(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
@@ -872,7 +872,7 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -890,7 +890,7 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
+    void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -908,7 +908,7 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
+    void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -926,14 +926,14 @@ class SauceRESTTest {
     }
 
     @Test
-    public void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
+    void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(404);
         String location = tempDir.toAbsolutePath().toString();
         assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
     }
 
     @Test
-    public void testDownloadLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
+    void testDownloadLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
         urlConnection.setResponseCode(401);
         String location = tempDir.toAbsolutePath().toString();
         assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadLogOrThrow("1234", location));
