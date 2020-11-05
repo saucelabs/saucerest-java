@@ -14,8 +14,6 @@ import org.json.JSONTokener;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -392,8 +390,10 @@ public class SauceREST implements Serializable {
     public void downloadAllAssets(String jobId, String location) throws IOException {
         boolean hasScreenshots = false;
         boolean isAppiumBackend = getAutomationBackend(jobId) == AutomationBackend.APPIUM;
-        BufferedInputStream stream = getAvailableAssets(jobId);
-        JSONObject jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
+        JSONObject jsonObject;
+        try (BufferedInputStream stream = getAvailableAssets(jobId)) {
+            jsonObject = new JSONObject(IOUtils.toString(stream, StandardCharsets.UTF_8));
+        }
 
         // redundant key because JSON response has 2 video keys with the same content: video.mp4 and video.
         // removing one prevents us from downloading the video twice
@@ -1289,7 +1289,6 @@ public class SauceREST implements Serializable {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
         logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
-        BufferedInputStream in = downloadFileData(jobId, restEndpoint);
         if (fileName == null || fileName.length() < 1) {
             fileName = getDefaultFileName(jobId, restEndpoint);
         }
@@ -1297,7 +1296,9 @@ public class SauceREST implements Serializable {
         System.out.println("Saving " + jobAndAsset + " as " + targetFile);
         logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
-        FileUtils.copyInputStreamToFile(in, targetFile);
+        try (BufferedInputStream in = downloadFileData(jobId, restEndpoint)) {
+            FileUtils.copyInputStreamToFile(in, targetFile);
+        }
     }
 
     /**
@@ -1316,10 +1317,10 @@ public class SauceREST implements Serializable {
         String jobAndAsset = restEndpoint.toString() + " for Job " + jobId;
         logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
-        BufferedInputStream in = downloadFileData(jobId, restEndpoint);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(in, baos);
-        byte[] bytes = baos.toByteArray();
+        byte[] bytes;
+        try (BufferedInputStream in = downloadFileData(jobId, restEndpoint)) {
+            bytes = IOUtils.toByteArray(in);
+        }
 
         if (fileName == null || fileName.length() < 1) {
             fileName = getDefaultFileName(jobId, restEndpoint);
@@ -1327,14 +1328,14 @@ public class SauceREST implements Serializable {
 
         // only change filename if it is default selenium-server.log and if the stream contains Appium
         if (fileName.contains("selenium-server.log") &&
-            IOUtils.toString(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8).contains("Appium")) {
+            new String(bytes, StandardCharsets.UTF_8).contains("Appium")) {
             fileName = fileName.replace("selenium-server", "appium-server");
         }
 
         File targetFile = new File(location, fileName.replace('/', '_'));
         logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
-        FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
+        FileUtils.writeByteArrayToFile(targetFile, bytes);
     }
 
     /**
@@ -1353,10 +1354,10 @@ public class SauceREST implements Serializable {
         logger.log(Level.FINEST, "Attempting to save asset {0} to {1}", new Object[] { jobAndAsset, location });
 
         try {
-            BufferedInputStream in = downloadFileData(jobId, restEndpoint);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IOUtils.copy(in, baos);
-            byte[] bytes = baos.toByteArray();
+            byte[] bytes;
+            try (BufferedInputStream in = downloadFileData(jobId, restEndpoint)) {
+                bytes = IOUtils.toByteArray(in);
+            }
 
             if (fileName == null || fileName.length() < 1) {
                 fileName = getDefaultFileName(jobId, restEndpoint);
@@ -1364,14 +1365,14 @@ public class SauceREST implements Serializable {
 
             // only change filename if it is default selenium-server.log and if the stream contains Appium
             if (fileName.contains("selenium-server.log") &&
-                IOUtils.toString(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8).contains("Appium")) {
+                new String(bytes, StandardCharsets.UTF_8).contains("Appium")) {
                 fileName = fileName.replace("selenium-server", "appium-server");
             }
 
             File targetFile = new File(location, fileName.replace('/', '_'));
             logger.log(Level.FINEST, "Saving {0} as {1}", new Object[] { jobAndAsset, targetFile });
 
-            FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bytes), targetFile);
+            FileUtils.writeByteArrayToFile(targetFile, bytes);
             return true;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to save file", e);
@@ -1613,25 +1614,16 @@ public class SauceREST implements Serializable {
             connection.setRequestProperty("Cache-Control", "no-cache");
             connection.setRequestProperty("Content-Type", "application/octet-stream");
 
-            DataOutputStream oos = new DataOutputStream(connection.getOutputStream());
-
-            int c;
-            byte[] buf = new byte[8192];
-
-            while ((c = is.read(buf, 0, buf.length)) > 0) {
-                oos.write(buf, 0, c);
-                oos.flush();
-            }
-            oos.close();
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            StringBuilder builder = new StringBuilder();
-            while ((line = rd.readLine()) != null) {
-                builder.append(line);
+            try (DataOutputStream oos = new DataOutputStream(connection.getOutputStream())) {
+                IOUtils.copy(is, oos);
             }
 
-            JSONObject sauceUploadResponse = new JSONObject(builder.toString());
+            String result;
+            try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                result = IOUtils.toString(rd);
+            }
+
+            JSONObject sauceUploadResponse = new JSONObject(result);
             if (sauceUploadResponse.has("error")) {
                 throw new UnexpectedException("Failed to upload to sauce-storage: "
                     + sauceUploadResponse.getString("error"));
