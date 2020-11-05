@@ -28,7 +28,7 @@ public class SecurityUtils {
     protected static String byteArrayToHex(byte[] bytes) {
         int hn, ln, cx;
         String hexDigitChars = "0123456789abcdef";
-        StringBuffer buf = new StringBuffer(bytes.length * 2);
+        StringBuilder buf = new StringBuilder(bytes.length * 2);
         for (cx = 0; cx < bytes.length; cx++) {
             hn = ((int) (bytes[cx]) & 0x00ff) / 16;
             ln = ((int) (bytes[cx]) & 0x000f);
