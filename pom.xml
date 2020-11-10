@@ -9,8 +9,8 @@
     <url>https://saucelabs.com</url>
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>The MIT License</name>
+            <url>https://github.com/saucelabs/saucerest-java/blob/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
