@@ -1,7 +1,7 @@
 package com.saucelabs.saucerest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
