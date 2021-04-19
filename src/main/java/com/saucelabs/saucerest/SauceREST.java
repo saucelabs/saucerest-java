@@ -276,17 +276,13 @@ public class SauceREST implements Serializable {
         BufferedReader reader = null;
 
         try {
-            postBack = openConnection(url);
-            postBack.setRequestProperty("User-Agent", this.getUserAgent());
+            postBack = openConnection("POST", url);
 
             if (postBack instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
                 ((HttpsURLConnection) postBack).setSSLSocketFactory(factory);
             }
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("POST");
             postBack.setRequestProperty("Content-Type", "application/json");
-            addAuthenticationProperty(postBack);
 
             logger.log(Level.FINE, "POSTing to {0}", url);
             logger.log(Level.FINE, body.toString(2));   // PrettyPrint JSON with an indent of 2
@@ -1107,8 +1103,7 @@ public class SauceREST implements Serializable {
         StringBuilder builder = new StringBuilder();
         try {
 
-            HttpURLConnection connection = openConnection(restEndpoint);
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
+            HttpURLConnection connection = openConnection("GET", restEndpoint);
 
             if (connection instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
@@ -1116,8 +1111,6 @@ public class SauceREST implements Serializable {
             }
 
             connection.setRequestProperty("charset", "utf-8");
-            connection.setDoOutput(true);
-            addAuthenticationProperty(connection);
 
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -1181,17 +1174,8 @@ public class SauceREST implements Serializable {
     }
 
     private HttpURLConnection setConnection(String jobId, URL restEndpoint) throws IOException {
-        HttpURLConnection connection = openConnection(restEndpoint);
-        connection.setRequestProperty("User-Agent", this.getUserAgent());
+        HttpURLConnection connection = openConnection("GET", restEndpoint);
 
-        connection.setDoOutput(true);
-        connection.setRequestMethod("GET");
-        addAuthenticationProperty(connection);
-
-        return processConnection(connection, jobId, restEndpoint) ? connection : null;
-    }
-
-    private boolean processConnection(HttpURLConnection connection, String jobId, URL restEndpoint) throws SauceException.NotAuthorized, SauceException.NotYetDone, IOException {
         int responseCode = connection.getResponseCode();
         logger.log(Level.FINEST, "{0} - {1} for: {2}", new Object[] { responseCode, restEndpoint, jobId });
         switch (responseCode) {
@@ -1241,7 +1225,7 @@ public class SauceREST implements Serializable {
                 break;
         }
 
-        return true;
+        return connection;
     }
 
     private boolean saveAsset(String jobId, String assetName, String location, String fileName) {
@@ -1367,11 +1351,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId);
-            postBack = openConnection(restEndpoint);
-            postBack.setRequestProperty("User-Agent", this.getUserAgent());
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("PUT");
-            addAuthenticationProperty(postBack);
+            postBack = openConnection("PUT", restEndpoint);
             postBack.getOutputStream().write(new JSONObject(updates).toString().getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error updating Sauce Results", e);
@@ -1391,11 +1371,7 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/stop");
 
-            postBack = openConnection(restEndpoint);
-            postBack.setRequestProperty("User-Agent", this.getUserAgent());
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("PUT");
-            addAuthenticationProperty(postBack);
+            postBack = openConnection("PUT", restEndpoint);
             postBack.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
@@ -1415,11 +1391,7 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId);
 
-            postBack = openConnection(restEndpoint);
-            postBack.setRequestProperty("User-Agent", this.getUserAgent());
-            postBack.setDoOutput(true);
-            postBack.setRequestMethod("DELETE");
-            addAuthenticationProperty(postBack);
+            postBack = openConnection("DELETE", restEndpoint);
             postBack.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
@@ -1472,6 +1444,15 @@ public class SauceREST implements Serializable {
         con.setReadTimeout((int) HTTP_READ_TIMEOUT_SECONDS);
         con.setConnectTimeout((int) HTTP_CONNECT_TIMEOUT_SECONDS);
         return con;
+    }
+
+    private HttpURLConnection openConnection(String method, URL url) throws IOException {
+        HttpURLConnection connection = openConnection(url);
+        connection.setRequestMethod(method);
+        connection.setRequestProperty("User-Agent", this.getUserAgent());
+        connection.setDoOutput(true);
+        addAuthenticationProperty(connection);
+        return connection;
     }
 
     /**
@@ -1561,18 +1542,14 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
 
-            HttpURLConnection connection = openConnection(restEndpoint);
+            HttpURLConnection connection = openConnection("POST", restEndpoint);
 
             if (connection instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
                 ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
             }
 
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
-            addAuthenticationProperty(connection);
             connection.setUseCaches(false);
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
             connection.setRequestProperty("Connection", "Keep-Alive");
             connection.setRequestProperty("Cache-Control", "no-cache");
             connection.setRequestProperty("Content-Type", "application/octet-stream");
@@ -1642,11 +1619,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection connection = null;
         try {
             URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
-            connection = openConnection(restEndpoint);
-            connection.setRequestProperty("User-Agent", this.getUserAgent());
-            connection.setDoOutput(true);
-            connection.setRequestMethod("DELETE");
-            addAuthenticationProperty(connection);
+            connection = openConnection("DELETE", restEndpoint);
             connection.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
