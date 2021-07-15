@@ -1,7 +1,7 @@
 SauceREST Java [![codecov.io](https://codecov.io/github/saucelabs/saucerest-java/coverage.svg?branch=master)](https://codecov.io/github/saucelabs/saucerest-java?branch=master)
 ![example workflow](https://github.com/saucelabs/saucerest-java/actions/workflows/java-ci.yml/badge.svg)
 
-==============
+---
 
 A Java client for Sauce Labs REST API.
 
