@@ -1,9 +1,0 @@
-language: java
-sudo: false
-before_script:
-  - pip install --user codecov
-install: mvn install -DskipTests=true -Dgpg.skip=true -B -V
-jdk:
-  - openjdk8
-after_success:
-  - codecov
