@@ -1173,8 +1173,8 @@ public class SauceREST implements Serializable {
         return new BufferedInputStream(stream);
     }
 
-    private HttpURLConnection setConnection(String jobId, URL restEndpoint) throws IOException {
-        HttpURLConnection connection = openConnection("GET", restEndpoint);
+    private HttpURLConnection setConnection(String jobId, URL restEndpoint, String method) throws IOException {
+        HttpURLConnection connection = openConnection(method, restEndpoint);
 
         int responseCode = connection.getResponseCode();
         logger.log(Level.FINEST, "{0} - {1} for: {2}", new Object[] { responseCode, restEndpoint, jobId });
@@ -1189,6 +1189,9 @@ public class SauceREST implements Serializable {
                     errorDetails = ErrorExplainers.HARMissing();
                 } else if (path.endsWith("log") || path.endsWith("json")) {
                     errorDetails = ErrorExplainers.LogNotFound();
+                } else if (path.contains("tunnels")) {
+                    errorDetails = ErrorExplainers.TunnelNotFound();
+                    throw new SauceException.NotFound(String.join(System.lineSeparator(), errorDetails));
                 }
 
                 String error = ErrorExplainers.resourceMissing();
@@ -1226,6 +1229,14 @@ public class SauceREST implements Serializable {
         }
 
         return connection;
+    }
+
+    private HttpURLConnection setConnection(String jobId, URL restEndpoint) throws IOException {
+        return setConnection(jobId, restEndpoint, "GET");
+    }
+
+    private HttpURLConnection setConnection(URL restEndpoint, String method) throws IOException {
+        return setConnection("", restEndpoint, method);
     }
 
     private boolean saveAsset(String jobId, String assetName, String location, String fileName) {
@@ -1613,19 +1624,26 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to delete a tunnel.
      *
      * @param tunnelId Identifier of the tunnel to delete
+     * @return BufferedInputStream with response from server
      */
-    public void deleteTunnel(String tunnelId) {
-
+    public BufferedInputStream deleteTunnel(String tunnelId) throws IOException {
         HttpURLConnection connection = null;
         try {
             URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
-            connection = openConnection("DELETE", restEndpoint);
-            connection.getOutputStream().write("".getBytes());
+            connection = setConnection(restEndpoint, "DELETE");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error stopping Sauce Job", e);
+            Throwable throwable = e.getCause();
+
+            if (throwable instanceof SauceException.NotAuthorized) {
+                throw (SauceException.NotAuthorized) throwable;
+            } else if (throwable instanceof SauceException.NotFound) {
+                throw (SauceException.NotFound) throwable;
+            }
+            logger.log(Level.WARNING, "Error deleting tunnel", e);
         }
 
-        closeInputStream(connection);
+        InputStream stream = connection.getInputStream();
+        return new BufferedInputStream(stream);
     }
 
     /**
