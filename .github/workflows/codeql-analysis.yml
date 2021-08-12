@@ -1,8 +1,10 @@
 name: "Code Scanning - Action"
 
 on:
-  push: [master, 1.1.0_master, 1.1.0_dev]
-  pull_request: [master, 1.1.0_master, 1.1.0_dev]
+  push:
+    branches: [master, 1.1.0_master, 1.1.0_dev]
+  pull_request:
+    branches: [master, 1.1.0_master, 1.1.0_dev]
   schedule:
     #        ┌───────────── minute (0 - 59)
     #        │  ┌───────────── hour (0 - 23)
