@@ -648,127 +648,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
-     * directory specified by the <code>location</code> field.
-     * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
-     * <p>
-     * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @return True if the Log file downloads successfully; Otherwise false.
-     *
-     * @deprecated Use {@link #downloadSauceLabsLog(String, String)}
-     */
-    @Deprecated boolean downloadLog(String jobId, String location) {
-        return downloadLog(jobId, location, null);
-    }
-
-    /**
-     * TODO: 27/2/20 I think this should be called "attemptLogDownload" - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
-     * directory specified by the <code>location</code> field.
-     * <p>
-     * If an IOException is encountered during operation, this method will fail _silently_.  Prefer {@link #downloadLogOrThrow(String, String)}
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @param fileName represents the filename to store the content
-     * @return True if the Log file downloads successfully; Otherwise false.
-     *
-     * @deprecated Use {@link #downloadSauceLabsLog(String, String, String)}
-     */
-    @Deprecated boolean downloadLog(String jobId, String location, String fileName) {
-        return saveAsset(jobId, "selenium-server.log", location, fileName);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job and returns it.
-     *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return a BufferedInputStream containing the logfile
-     * @throws IOException if there is a problem fetching the file
-     *
-     * @deprecated Use {@link #downloadSauceLabsLog(String)}
-     */
-    @Deprecated BufferedInputStream downloadLog(String jobId) throws IOException {
-        return downloadServerLog(jobId);
-    }
-
-    /**
-     * TODO: 2020-02-27 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
-     * directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @throws FileNotFoundException                                if the log is missing or doesn't exist
-     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
-     * @throws IOException                                          if something else goes wrong during asset retrieval
-     *
-     * @deprecated
-     */
-    @Deprecated public void downloadLogOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        downloadLogOrThrow(jobId, location, null);
-    }
-
-    /**
-     * TODO: 27/2/20 I think this should be called "downloadLog" and "attemptLogDownload" should be the silent failure method - Dylan
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in a
-     * directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @param fileName represents the filename to store the content
-     * @throws FileNotFoundException                                if the log is missing or doesn't exist
-     * @throws com.saucelabs.saucerest.SauceException.NotAuthorized if credentials are wrong or missing
-     * @throws IOException                                          if something else goes wrong during asset retrieval
-     * @deprecated
-     */
-    @Deprecated public void downloadLogOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
-        saveAssetOrThrowException(jobId, "selenium-server.log", location, fileName);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job and returns it.
-     *
-     * @param jobId the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @return a BufferedInputStream containing the logfile
-     * @throws IOException if there is a problem fetching the file
-     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
-     */
-    @Deprecated public BufferedInputStream downloadJsonLog(String jobId) throws IOException {
-        return downloadSauceLabsLog(jobId);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in
-     * a directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @return True if the Log file downloads successfully; Otherwise false.
-     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
-     */
-    @Deprecated public boolean downloadJsonLog(String jobId, String location) {
-        return downloadJsonLog(jobId, location, null);
-    }
-
-    /**
-     * Downloads the log file for a Sauce Job to the filesystem. The file will be stored in
-     * a directory specified by the <code>location</code> field.
-     *
-     * @param jobId    the Sauce Job Id, typically equal to the Selenium/WebDriver sessionId
-     * @param location represents the base directory where the video should be downloaded to
-     * @param fileName represents the filename to store the content
-     * @return True if the Log file downloads successfully; Otherwise false.
-     * @deprecated Use {@link #downloadDeviceLog(String, String, boolean)}
-     */
-    @Deprecated public boolean downloadJsonLog(String jobId, String location, String fileName) {
-        return downloadSauceLabsLog(jobId, location, fileName);
-    }
-
-    /**
      * TODO: 2020-02-27 I think this should be called "attemptLogDownload" - Dylan
      * Downloads the server log for a Sauce Labs job to the filesystem. The file will be stored in a
      * directory specified by the <code>location</code> field.
@@ -1504,22 +1383,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * @param file      the file to upload
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     * @deprecated use {@link #uploadFile(File, String, boolean)}.
-     * <p>
-     * Uploads a file to Sauce storage.
-     */
-    @Deprecated
-    public String uploadFile(File file, String fileName, Boolean overwrite) throws IOException {
-        return uploadFile(file, fileName, overwrite.booleanValue());
-    }
-
-    /**
      * Uploads a file to Sauce storage.
      *
      * @param file      the file to upload
@@ -1533,21 +1396,6 @@ public class SauceREST implements Serializable {
         try (FileInputStream is = new FileInputStream(file)) {
             return uploadFile(is, fileName, overwrite);
         }
-    }
-
-    /**
-     * @param is        Input stream of the file to be uploaded
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     * @deprecated use {@link #uploadFile(InputStream, String, boolean)}.
-     * Uploads a file to Sauce storage.
-     */
-    @Deprecated
-    public String uploadFile(InputStream is, String fileName, Boolean overwrite) throws IOException {
-        return uploadFile(is, fileName, overwrite.booleanValue());
     }
 
     /**
