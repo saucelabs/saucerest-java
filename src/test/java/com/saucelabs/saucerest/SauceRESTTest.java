@@ -475,7 +475,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLog(@TempDir Path tempDir) {
+    void testDownloadServerLog(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
@@ -497,7 +497,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -515,7 +515,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -533,7 +533,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -565,7 +565,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadAutomatorLog(@TempDir Path tempDir) {
+    void testDownloadAutomatorLog(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
@@ -576,7 +576,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testDownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -736,7 +736,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void downloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
+    void testDownloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -754,7 +754,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void downloadSauceLabsLogStream() throws Exception {
+    void testDownloadSauceLabsLogStream() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -1044,7 +1044,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_eu() {
+    void testGetPublicJobLinkFromEU() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU) {
             @Override
@@ -1060,7 +1060,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us() {
+    void testGetPublicJobLinkFromUS() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
@@ -1076,7 +1076,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_by_default() {
+    void testGetPublicJobLinkFromUSByDefault() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey") {
             @Override
@@ -1092,7 +1092,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_eu_with_string() {
+    void testGetPublicJobLinkFromEUWithString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "EU") {
             @Override
@@ -1108,7 +1108,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_east_with_string() {
+    void testGetPublicJobLinkFromUSEastWithString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "US_EAST") {
             @Override
@@ -1124,7 +1124,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_with_invalid_string() {
+    void testGetPublicJobLinkFromUsWithInvalidString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
             @Override
