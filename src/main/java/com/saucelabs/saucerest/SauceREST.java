@@ -276,7 +276,7 @@ public class SauceREST implements Serializable {
         BufferedReader reader = null;
 
         try {
-            postBack = openConnection("POST", url);
+            postBack = openConnection(HttpMethod.POST, url);
 
             if (postBack instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
@@ -1103,7 +1103,7 @@ public class SauceREST implements Serializable {
         StringBuilder builder = new StringBuilder();
         try {
 
-            HttpURLConnection connection = openConnection("GET", restEndpoint);
+            HttpURLConnection connection = openConnection(HttpMethod.GET, restEndpoint);
 
             if (connection instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
@@ -1173,7 +1173,7 @@ public class SauceREST implements Serializable {
         return new BufferedInputStream(stream);
     }
 
-    private HttpURLConnection setConnection(String jobId, URL restEndpoint, String method) throws IOException {
+    private HttpURLConnection setConnection(String jobId, URL restEndpoint, HttpMethod method) throws IOException {
         HttpURLConnection connection = openConnection(method, restEndpoint);
 
         int responseCode = connection.getResponseCode();
@@ -1232,10 +1232,10 @@ public class SauceREST implements Serializable {
     }
 
     private HttpURLConnection setConnection(String jobId, URL restEndpoint) throws IOException {
-        return setConnection(jobId, restEndpoint, "GET");
+        return setConnection(jobId, restEndpoint, HttpMethod.GET);
     }
 
-    private HttpURLConnection setConnection(URL restEndpoint, String method) throws IOException {
+    private HttpURLConnection setConnection(URL restEndpoint, HttpMethod method) throws IOException {
         return setConnection("", restEndpoint, method);
     }
 
@@ -1362,7 +1362,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection postBack = null;
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId);
-            postBack = openConnection("PUT", restEndpoint);
+            postBack = openConnection(HttpMethod.PUT, restEndpoint);
             postBack.getOutputStream().write(new JSONObject(updates).toString().getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error updating Sauce Results", e);
@@ -1382,7 +1382,7 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/stop");
 
-            postBack = openConnection("PUT", restEndpoint);
+            postBack = openConnection(HttpMethod.PUT, restEndpoint);
             postBack.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
@@ -1402,7 +1402,7 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL(username + "/jobs/" + jobId);
 
-            postBack = openConnection("DELETE", restEndpoint);
+            postBack = openConnection(HttpMethod.DELETE, restEndpoint);
             postBack.getOutputStream().write("".getBytes());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error stopping Sauce Job", e);
@@ -1457,9 +1457,20 @@ public class SauceREST implements Serializable {
         return con;
     }
 
-    private HttpURLConnection openConnection(String method, URL url) throws IOException {
+    /**
+     * This method takes an enum for the HTTP method even though it should take a String instead. Reason are below:
+     * See here: https://stackoverflow.com/questions/6722248/why-httprequest-httpmethod-is-string-instead-of-enum
+     * RFC 2616: https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9
+     * However, to better prevent typos and errors we opt to use an Enum and live with the possibility to have to extend it
+     * should the specification change.
+     * @param method
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    private HttpURLConnection openConnection(HttpMethod method, URL url) throws IOException {
         HttpURLConnection connection = openConnection(url);
-        connection.setRequestMethod(method);
+        connection.setRequestMethod(method.label);
         connection.setRequestProperty("User-Agent", this.getUserAgent());
         connection.setDoOutput(true);
         addAuthenticationProperty(connection);
@@ -1553,7 +1564,7 @@ public class SauceREST implements Serializable {
         try {
             URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
 
-            HttpURLConnection connection = openConnection("POST", restEndpoint);
+            HttpURLConnection connection = openConnection(HttpMethod.POST, restEndpoint);
 
             if (connection instanceof HttpsURLConnection) {
                 SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
@@ -1630,7 +1641,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection connection = null;
         try {
             URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
-            connection = setConnection(restEndpoint, "DELETE");
+            connection = setConnection(restEndpoint, HttpMethod.DELETE);
         } catch (IOException e) {
             Throwable throwable = e.getCause();
 
