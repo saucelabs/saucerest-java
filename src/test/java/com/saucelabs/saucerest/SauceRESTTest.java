@@ -356,6 +356,34 @@ class SauceRESTTest {
     }
 
     @Test
+    void testDeleteTunnel() throws Exception {
+        urlConnection.setResponseCode(401);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not authorized".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.deleteTunnel("1234"));
+
+        urlConnection.setResponseCode(404);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(SauceException.NotFound.class, () -> sauceREST.deleteTunnel("1234"));
+
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{\"result\": true, \"id\": \"1234\", \"jobs_running\": 0}".getBytes(StandardCharsets.UTF_8)));
+
+        String results;
+        try (BufferedInputStream stream = sauceREST.deleteTunnel("1234")) {
+            assertEquals("/rest/v1/" + sauceREST.getUsername() + "/tunnels/1234",
+                urlConnection.getRealURL().getPath());
+
+            results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        }
+        JSONObject jsonObject = new JSONObject(results);
+
+        assertTrue(jsonObject.getBoolean("result"));
+        assertEquals("1234", jsonObject.getString("id"));
+        assertEquals(0, jsonObject.getInt("jobs_running"));
+        assertFalse(jsonObject.isEmpty());
+    }
+
+    @Test
     void testGetActivity() {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getActivity();
