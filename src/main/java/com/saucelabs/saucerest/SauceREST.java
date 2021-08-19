@@ -30,6 +30,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -1458,16 +1459,14 @@ public class SauceREST implements Serializable {
      */
     public String getPublicJobLink(String jobId) {
         try {
-            String key = username + ":" + accessKey;
-            String auth_token = SecurityUtils.hmacEncode("HmacMD5", jobId, key);
-            return server + "jobs/" + jobId + "?auth=" + auth_token;
-        } catch (IllegalArgumentException ex) {
-            // someone messed up on the algorithm to hmacEncode
-            // For available algorithms see {@link http://docs.oracle.com/javase/7/docs/api/javax/crypto/Mac.html}
-            // we only want to use 'HmacMD5'
-            logger.log(Level.WARNING, "Unable to create an authenticated public link to job:", ex);
-            return "";
+            return SauceShareableLink.getShareableLink(getUsername(), accessKey, jobId, getAppServer());
+        } catch (NoSuchAlgorithmException e) {
+            logger.log(Level.WARNING, "Could not get an instance with provided HmacMD5 algorithm.", e.getCause());
+        } catch (InvalidKeyException e) {
+            logger.log(Level.WARNING, "Could not init a MAC object with the provided key.", e.getCause());
         }
+        logger.log(Level.WARNING, "Could not create a shareable link.");
+        return "";
     }
 
     /**
