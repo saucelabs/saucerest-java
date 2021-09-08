@@ -69,7 +69,7 @@ sauce.downloadLogOrThrow("job_id", "/var/tmp");
 Extension: `.log`
 
 ### HAR File
-HAR files are only available for jobs using [Extended Debugging](https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943).
+HAR files are only available for jobs using [Extended Debugging](https://docs.saucelabs.com/insights/debug/).
 
 ```java
 // Download the HAR file; Ignore exceptions
@@ -82,7 +82,7 @@ sauce.downloadHAROrThrow("job_id", "/var/tmp");
 Extension: `.har`
 
 ### Video
-Video is only available for jobs which have not [disabled video recording](https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options#TestConfigurationOptions-Disablevideorecording).
+Video is only available for jobs which have not [disabled video recording](https://docs.saucelabs.com/dev/test-configuration-options/#TestConfigurationOptions-Disablevideorecording.
 
 ```java
 // Download the Log; Ignore exceptions
