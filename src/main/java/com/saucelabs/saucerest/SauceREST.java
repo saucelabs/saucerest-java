@@ -240,7 +240,7 @@ public class SauceREST implements Serializable {
     }
 
     private URL buildHarUrl(String jobId) {
-        return this.buildEDSURL(jobId + "/network.har");
+        return this.buildEDSURL(jobId + "/" + TestAsset.HAR.label);
     }
 
     /**
@@ -399,7 +399,7 @@ public class SauceREST implements Serializable {
         // redundant key because JSON response has 2 video keys with the same content: video.mp4 and video.
         // removing one prevents us from downloading the video twice
         // TODO: 2020-10-27 YY: remove this when response is fixed and does not send video.mp4 anymore
-        jsonObject.remove("video.mp4");
+        jsonObject.remove(TestAsset.VIDEO.label);
 
         if (jsonObject.keySet().contains("screenshots")) {
             hasScreenshots = true;
@@ -417,14 +417,22 @@ public class SauceREST implements Serializable {
 
                 String assetName = jsonObject.getString(key);
                 String overwriteFilename;
+                TestAsset testAsset = null;
                 if (isAppiumBackend && "selenium-log".equalsIgnoreCase(key)) {
                     // this is the appium-server log from a VDC (Emu/Sim) test. This makes sure it is aligned with the
                     // naming used in the web UI
-                    overwriteFilename = "appium-server.log";
+                    overwriteFilename = TestAsset.APPIUM_LOG.label;
                 } else {
                     overwriteFilename = assetName;
                 }
-                saveAsset(jobId, assetName, location, getDefaultFileName(jobId, overwriteFilename));
+
+                for (TestAsset asset : TestAsset.values()) {
+                    if (asset.label.equalsIgnoreCase(assetName)) {
+                        testAsset = asset;
+                    }
+                }
+
+                saveAsset(jobId, testAsset, location, getDefaultFileName(jobId, overwriteFilename));
             } else {
                 // well, let's hope this case does not happen.
                 logger.log(Level.WARNING, "No valid JSON response found.");
@@ -445,7 +453,7 @@ public class SauceREST implements Serializable {
      * @return True if the device log was downloaded successfully; Otherwise false
      */
     public boolean downloadDeviceLog(String jobId, String location, boolean isEmulator) {
-        String filename = isEmulator ? "logcat.log" : "ios-syslog.log";
+        String filename = isEmulator ? TestAsset.LOGCAT_LOG.label : TestAsset.SYSLOG_LOG.label;
 
         return downloadDeviceLog(jobId, location, filename, isEmulator);
     }
@@ -477,7 +485,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadDeviceLogOrThrow(String jobId, String location, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
-        String filename = (isEmulator ? "logcat" : "ios-syslog") + ".log";
+        String filename = isEmulator ? TestAsset.LOGCAT_LOG.label : TestAsset.SYSLOG_LOG.label;
         downloadDeviceLogOrThrow(jobId, location, filename, isEmulator);
     }
 
@@ -495,8 +503,8 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadDeviceLogOrThrow(String jobId, String location, String filename, boolean isEmulator) throws SauceException.NotAuthorized, IOException {
-        String assetName = (isEmulator ? "logcat" : "ios-syslog") + ".log";
-        saveAssetOrThrowException(jobId, assetName, location, filename);
+        TestAsset asset = isEmulator ? TestAsset.LOGCAT_LOG : TestAsset.SYSLOG_LOG;
+        saveAssetOrThrowException(jobId, asset, location, filename);
     }
 
     /**
@@ -512,7 +520,7 @@ public class SauceREST implements Serializable {
      * @return True if the screenshots was downloaded successfully; Otherwise false
      */
     public boolean downloadScreenshots(String jobId, String location) {
-        return downloadScreenshots(jobId, location, "screenshots.zip");
+        return downloadScreenshots(jobId, location, TestAsset.SCREENSHOTS.label);
     }
 
     /**
@@ -544,7 +552,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadScreenshotsOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        downloadScreenshotsOrThrow(jobId, location, "screenshots.zip");
+        downloadScreenshotsOrThrow(jobId, location, TestAsset.SCREENSHOTS.label);
     }
 
     /**
@@ -560,7 +568,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadScreenshotsOrThrow(String jobId, String location, String filename) throws SauceException.NotAuthorized, IOException {
-        saveAssetOrThrowException(jobId, "screenshots.zip", location, filename);
+        saveAssetOrThrowException(jobId, TestAsset.SCREENSHOTS, location, filename);
     }
 
     /**
@@ -577,7 +585,7 @@ public class SauceREST implements Serializable {
      * @return True if the video was downloaded successfully; Otherwise false
      */
     public boolean downloadVideo(String jobId, String location) {
-        return downloadVideo(jobId, location, "video.mp4");
+        return downloadVideo(jobId, location, TestAsset.VIDEO.label);
     }
 
     /**
@@ -595,7 +603,7 @@ public class SauceREST implements Serializable {
      * @return True if the video was downloaded successfully; Otherwise false
      */
     public boolean downloadVideo(String jobId, String location, String fileName) {
-        return saveAsset(jobId, "video.mp4", location, fileName);
+        return saveAsset(jobId, TestAsset.VIDEO, location, fileName);
     }
 
     /**
@@ -608,7 +616,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the data
      */
     public BufferedInputStream downloadVideo(String jobId) throws IOException {
-        return downloadAssetData(jobId, "video.mp4");
+        return downloadAssetData(jobId, TestAsset.VIDEO);
     }
 
     /**
@@ -626,7 +634,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadVideoOrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        downloadVideoOrThrow(jobId, location, "video.mp4");
+        downloadVideoOrThrow(jobId, location, TestAsset.VIDEO.label);
     }
 
     /**
@@ -645,7 +653,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadVideoOrThrow(String jobId, String location, String fileName) throws SauceException.NotAuthorized, IOException {
-        saveAssetOrThrowException(jobId, "video.mp4", location, fileName);
+        saveAssetOrThrowException(jobId, TestAsset.VIDEO, location, fileName);
     }
 
     /**
@@ -660,7 +668,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadServerLog(String jobId, String location) {
-        return downloadServerLog(jobId, location, "selenium-server.log");
+        return downloadServerLog(jobId, location, TestAsset.SELENIUM_LOG.label);
     }
 
     /**
@@ -687,7 +695,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the file
      */
     public BufferedInputStream downloadServerLog(String jobId) throws IOException {
-        return downloadAssetData(jobId, "selenium-server.log");
+        return downloadAssetData(jobId, TestAsset.SELENIUM_LOG);
     }
 
     /**
@@ -730,7 +738,7 @@ public class SauceREST implements Serializable {
      * @throws IOException if there is a problem fetching the file
      */
     public BufferedInputStream downloadSauceLabsLog(String jobId) throws IOException {
-        return downloadAssetData(jobId, "log.json");
+        return downloadAssetData(jobId, TestAsset.SAUCE_LOG);
     }
 
     /**
@@ -742,7 +750,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadSauceLabsLog(String jobId, String location) {
-        return downloadSauceLabsLog(jobId, location, "log.json");
+        return downloadSauceLabsLog(jobId, location, TestAsset.SAUCE_LOG.label);
     }
 
     /**
@@ -755,7 +763,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadSauceLabsLog(String jobId, String location, String fileName) {
-        return saveAsset(jobId, "log.json", location, fileName);
+        return saveAsset(jobId, TestAsset.SAUCE_LOG, location, fileName);
     }
 
     /**
@@ -767,7 +775,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadAutomatorLog(String jobId, String location) {
-        return downloadAutomatorLog(jobId, location, "automator.log");
+        return downloadAutomatorLog(jobId, location, TestAsset.AUTOMATOR_LOG.label);
     }
 
     /**
@@ -780,7 +788,7 @@ public class SauceREST implements Serializable {
      * @return True if the Log file downloads successfully; Otherwise false.
      */
     public boolean downloadAutomatorLog(String jobId, String location, String filename) {
-        return saveAsset(jobId, "automator.log", location, filename);
+        return saveAsset(jobId, TestAsset.AUTOMATOR_LOG, location, filename);
     }
 
     /**
@@ -798,7 +806,7 @@ public class SauceREST implements Serializable {
      * @return True if the HAR file downloads successfully, otherwise false
      */
     public boolean downloadHAR(String jobId, String location) {
-        return downloadHAR(jobId, location, "network.har");
+        return downloadHAR(jobId, location, TestAsset.HAR.label);
     }
 
     /**
@@ -836,7 +844,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                                          if something else goes wrong during asset retrieval
      */
     public void downloadHAROrThrow(String jobId, String location) throws SauceException.NotAuthorized, IOException {
-        downloadHAROrThrow(jobId, location, "network.har");
+        downloadHAROrThrow(jobId, location, TestAsset.HAR.label);
     }
 
     /**
@@ -1013,8 +1021,8 @@ public class SauceREST implements Serializable {
         return builder.toString();
     }
 
-    private BufferedInputStream downloadAssetData(String jobId, String assetName) throws IOException {
-        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + assetName);
+    private BufferedInputStream downloadAssetData(String jobId, TestAsset assetName) throws IOException {
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + assetName.label);
         return downloadFileData(jobId, restEndpoint);
     }
 
@@ -1119,13 +1127,12 @@ public class SauceREST implements Serializable {
         return setConnection("", restEndpoint, method);
     }
 
-    private boolean saveAsset(String jobId, String assetName, String location, String fileName) {
+    private boolean saveAsset(String jobId, TestAsset assetName, String location, String fileName) {
         return handleErrorAtDownloadGracefully(() -> saveAssetOrThrowException(jobId, assetName, location, fileName));
     }
 
-    private void saveAssetOrThrowException(String jobId, String assetName, String location, String fileName)
-        throws IOException {
-        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + assetName);
+    private void saveAssetOrThrowException(String jobId, TestAsset assetName, String location, String fileName) throws IOException {
+        URL restEndpoint = buildURL(username + "/jobs/" + jobId + "/assets/" + assetName.label);
         saveFileOrThrowException(jobId, location, fileName, restEndpoint);
     }
 
@@ -1194,6 +1201,7 @@ public class SauceREST implements Serializable {
         fileName = getFileName(fileName, jobId, restEndpoint);
 
         // only change filename if it is default selenium-server.log and if the stream contains Appium
+        // TODO: remove this workaround as soon as appium-server.log is not named selenium-server.log anymore in assets endpoint
         if (fileName.contains("selenium-server.log") && new String(bytes, StandardCharsets.UTF_8).contains("Appium")) {
             fileName = fileName.replace("selenium-server", "appium-server");
         }
