@@ -38,6 +38,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -92,6 +93,15 @@ public class SauceREST implements Serializable {
     private final String appServer;
 
     private final String restApiEndpoint;
+
+    private static final Map<JobSource, String> jobSourcePathComponent = Collections.unmodifiableMap(
+        new EnumMap<JobSource, String>(JobSource.class) {
+            {
+                put(JobSource.RDC, "rdc");
+                put(JobSource.VDC, "vdc");
+            }
+        }
+    );
 
     /**
      * Retry policy default values.
@@ -237,6 +247,10 @@ public class SauceREST implements Serializable {
      */
     protected URL buildURL(String endpoint) {
         return buildEndpoint(restApiEndpoint, endpoint, "URL");
+    }
+
+    protected URL buildBuildUrl(JobSource source, String endpoint) {
+        return buildEndpoint(server, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
     }
 
     private URL buildHarUrl(String jobId) {
@@ -1589,18 +1603,13 @@ public class SauceREST implements Serializable {
     /**
      * Retrieve jobs associated with a build
      *
+     * @param source JobSource enum
      * @param build Build ID
-     * @param limit Max jobs to return
      * @return String (in JSON format) representing jobs associated with a build
      */
-    public String getBuildFullJobs(String build, int limit) {
-        URL restEndpoint = buildURL(username + "/build/" + build + "/jobs?full=1" +
-            (limit == 0 ? "" : "&limit=" + limit));
-        return retrieveResults(restEndpoint);
-    }
-
-    public String getBuildFullJobs(String build) {
-        return getBuildFullJobs(build, 0);
+    public String getBuildJobs(JobSource source, String build) {
+        URL jobsEndpoint = buildBuildUrl(source, build + "/jobs/");
+        return retrieveResults(jobsEndpoint);
     }
 
     /**
