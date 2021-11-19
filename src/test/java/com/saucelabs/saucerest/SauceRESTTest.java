@@ -1014,14 +1014,17 @@ class SauceRESTTest {
         );
     }
 
-    @Test
-    void testGetBuild() {
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuild(JobSource jobSource) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
 
-        sauceREST.getBuild("fakePath");
+        sauceREST.getBuild(jobSource, "01234567890123456789012345678901");
+
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/builds/fakePath",
+            "/v2/builds/" + urlComponent + "/01234567890123456789012345678901/",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());

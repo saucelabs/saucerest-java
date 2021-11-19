@@ -1615,11 +1615,12 @@ public class SauceREST implements Serializable {
     /**
      * Retrieve build info
      *
-     * @param build Build name
+     * @param source JobSource enum
+     * @param build Build ID
      * @return String (in JSON format) representing the build
      */
-    public String getBuild(String build) {
-        URL restEndpoint = buildURL(username + "/builds/" + build); // yes, this goes to builds instead of build like the above
+    public String getBuild(JobSource source, String build) {
+        URL restEndpoint = buildBuildUrl(source, build + "/");
         return retrieveResults(restEndpoint);
     }
 
