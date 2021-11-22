@@ -1068,6 +1068,22 @@ class SauceRESTTest {
         );
     }
 
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildForJob(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildForJob(jobSource, "fedcba9876543210fedcba9876543210");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/jobs/fedcba9876543210fedcba9876543210/build/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
     @Test
     void testGetPublicJobLinkFromEU() {
         // GIVEN

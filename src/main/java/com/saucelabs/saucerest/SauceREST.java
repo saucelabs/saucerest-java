@@ -1648,6 +1648,18 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildForJob(JobSource source, String jobId) {
+        URL restEndpoint = buildBuildUrl(source, "jobs/" + jobId + "/build/");
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
      * Record CI Usage to Sauce Labs
      *
      * @param platform        Platform string. Such as "jenkins", "bamboo", "teamcity"
