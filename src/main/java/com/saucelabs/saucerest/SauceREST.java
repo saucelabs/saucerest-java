@@ -72,6 +72,7 @@ public class SauceREST implements Serializable {
      * 10 seconds in milliseconds.
      */
     private static final long HTTP_CONNECT_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+    private static final int DEFAULT_BUILDS_LIMIT = 50;
     /**
      * The username to use when performing HTTP requests to the Sauce REST API.
      */
@@ -1621,6 +1622,28 @@ public class SauceREST implements Serializable {
      */
     public String getBuild(JobSource source, String build) {
         URL restEndpoint = buildBuildUrl(source, build + "/");
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuilds(JobSource source) {
+        return getBuilds(source, DEFAULT_BUILDS_LIMIT);
+    }
+
+    /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @param limit Max number of builds returned
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuilds(JobSource source, int limit) {
+        URL restEndpoint = buildBuildUrl(source, "?limit=" + limit);
         return retrieveResults(restEndpoint);
     }
 

@@ -1030,6 +1030,44 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuilds(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsWithLimit(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource, 20);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=20",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
     @Test
     void testGetPublicJobLinkFromEU() {
         // GIVEN
