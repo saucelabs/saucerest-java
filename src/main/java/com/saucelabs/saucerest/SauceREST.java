@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
 import java.security.InvalidKeyException;
@@ -1656,6 +1657,33 @@ public class SauceREST implements Serializable {
      */
     public String getBuildForJob(JobSource source, String jobId) {
         URL restEndpoint = buildBuildUrl(source, "jobs/" + jobId + "/build/");
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve builds by name
+     *
+     * @param source JobSource enum
+     * @param name Name of desired builds
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildsByName(JobSource source, String name) throws java.io.UnsupportedEncodingException {
+        return getBuildsByName(source, name, DEFAULT_BUILDS_LIMIT);
+    }
+
+    /**
+     * Retrieve builds by name
+     *
+     * @param source JobSource enum
+     * @param name Name of desired builds
+     * @param limit Max number of builds returned
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
+        URL restEndpoint = buildBuildUrl(
+            source,
+            "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "&limit=" + limit
+        );
         return retrieveResults(restEndpoint);
     }
 

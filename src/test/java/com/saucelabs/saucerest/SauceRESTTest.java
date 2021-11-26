@@ -1084,6 +1084,44 @@ class SauceRESTTest {
         assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByName(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByNameWithLimit(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1", 2);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=2",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
     @Test
     void testGetPublicJobLinkFromEU() {
         // GIVEN
