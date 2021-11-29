@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -943,26 +945,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testGetFullJobs() {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        sauceREST.getFullJobs();
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertEquals("full=true&limit=20", this.urlConnection.getRealURL().getQuery());
-
-        sauceREST.getFullJobs(50);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertEquals("full=true&limit=50", this.urlConnection.getRealURL().getQuery());
-    }
-
-    @Test
     void testGetJobs() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
@@ -1017,30 +999,127 @@ class SauceRESTTest {
 
     }
 
-    @Test
-    void testBuildFullJobs() {
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testBuildJobs(JobSource jobSource) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
 
-        sauceREST.getBuildFullJobs("fakePath");
+        sauceREST.getBuildJobs(jobSource, "01234567890123456789012345678901");
+
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/build/fakePath/jobs",
+            "/v2/builds/" + urlComponent + "/01234567890123456789012345678901/jobs/",
             this.urlConnection.getRealURL().getPath()
         );
-        assertEquals("full=1", this.urlConnection.getRealURL().getQuery());
     }
 
-    @Test
-    void testGetBuild() {
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuild(JobSource jobSource) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
 
-        sauceREST.getBuild("fakePath");
+        sauceREST.getBuild(jobSource, "01234567890123456789012345678901");
+
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/builds/fakePath",
+            "/v2/builds/" + urlComponent + "/01234567890123456789012345678901/",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuilds(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsWithLimit(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource, 20);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=20",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildForJob(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildForJob(jobSource, "fedcba9876543210fedcba9876543210");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/jobs/fedcba9876543210fedcba9876543210/build/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByName(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByNameWithLimit(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1", 2);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=2",
+            this.urlConnection.getRealURL().getQuery()
+        );
     }
 
     @Test

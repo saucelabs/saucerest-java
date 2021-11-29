@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.rmi.UnexpectedException;
 import java.security.InvalidKeyException;
@@ -38,6 +39,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +73,7 @@ public class SauceREST implements Serializable {
      * 10 seconds in milliseconds.
      */
     private static final long HTTP_CONNECT_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
+    private static final int DEFAULT_BUILDS_LIMIT = 50;
     /**
      * The username to use when performing HTTP requests to the Sauce REST API.
      */
@@ -92,6 +95,15 @@ public class SauceREST implements Serializable {
     private final String appServer;
 
     private final String restApiEndpoint;
+
+    private static final Map<JobSource, String> jobSourcePathComponent = Collections.unmodifiableMap(
+        new EnumMap<JobSource, String>(JobSource.class) {
+            {
+                put(JobSource.RDC, "rdc");
+                put(JobSource.VDC, "vdc");
+            }
+        }
+    );
 
     /**
      * Retry policy default values.
@@ -237,6 +249,10 @@ public class SauceREST implements Serializable {
      */
     protected URL buildURL(String endpoint) {
         return buildEndpoint(restApiEndpoint, endpoint, "URL");
+    }
+
+    protected URL buildBuildUrl(JobSource source, String endpoint) {
+        return buildEndpoint(server, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
     }
 
     private URL buildHarUrl(String jobId) {
@@ -1589,28 +1605,85 @@ public class SauceREST implements Serializable {
     /**
      * Retrieve jobs associated with a build
      *
+     * @param source JobSource enum
      * @param build Build ID
-     * @param limit Max jobs to return
      * @return String (in JSON format) representing jobs associated with a build
      */
-    public String getBuildFullJobs(String build, int limit) {
-        URL restEndpoint = buildURL(username + "/build/" + build + "/jobs?full=1" +
-            (limit == 0 ? "" : "&limit=" + limit));
-        return retrieveResults(restEndpoint);
-    }
-
-    public String getBuildFullJobs(String build) {
-        return getBuildFullJobs(build, 0);
+    public String getBuildJobs(JobSource source, String build) {
+        URL jobsEndpoint = buildBuildUrl(source, build + "/jobs/");
+        return retrieveResults(jobsEndpoint);
     }
 
     /**
      * Retrieve build info
      *
-     * @param build Build name
+     * @param source JobSource enum
+     * @param build Build ID
      * @return String (in JSON format) representing the build
      */
-    public String getBuild(String build) {
-        URL restEndpoint = buildURL(username + "/builds/" + build); // yes, this goes to builds instead of build like the above
+    public String getBuild(JobSource source, String build) {
+        URL restEndpoint = buildBuildUrl(source, build + "/");
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuilds(JobSource source) {
+        return getBuilds(source, DEFAULT_BUILDS_LIMIT);
+    }
+
+    /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @param limit Max number of builds returned
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuilds(JobSource source, int limit) {
+        URL restEndpoint = buildBuildUrl(source, "?limit=" + limit);
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve recent builds
+     *
+     * @param source JobSource enum
+     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildForJob(JobSource source, String jobId) {
+        URL restEndpoint = buildBuildUrl(source, "jobs/" + jobId + "/build/");
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Retrieve builds by name
+     *
+     * @param source JobSource enum
+     * @param name Name of desired builds
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildsByName(JobSource source, String name) throws java.io.UnsupportedEncodingException {
+        return getBuildsByName(source, name, DEFAULT_BUILDS_LIMIT);
+    }
+
+    /**
+     * Retrieve builds by name
+     *
+     * @param source JobSource enum
+     * @param name Name of desired builds
+     * @param limit Max number of builds returned
+     * @return String (in JSON format) representing the latest builds
+     */
+    public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
+        URL restEndpoint = buildBuildUrl(
+            source,
+            "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "&limit=" + limit
+        );
         return retrieveResults(restEndpoint);
     }
 
