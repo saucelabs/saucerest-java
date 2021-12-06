@@ -32,6 +32,16 @@ public class SauceException extends RuntimeException {
         }
     }
 
+    public static class NotFound extends SauceException {
+
+        public NotFound(String message) {
+            super(message);
+        }
+
+        public NotFound() {
+        }
+    }
+
     public static class TooManyRequests extends SauceException {
     }
 
