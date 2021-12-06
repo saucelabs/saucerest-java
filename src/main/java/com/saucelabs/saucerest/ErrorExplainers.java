@@ -61,4 +61,12 @@ class ErrorExplainers {
             " * A error occurred where the job was created on Sauce Labs but no test were executed."
         );
     }
+
+    static String TunnelNotFound() {
+        return String.join(System.lineSeparator(),
+            " * Tunnel id could not be found. Possible reasons:",
+            " * The tunnel id requested does not exist in this data center. Ensure the data center endpoint is correct.",
+            " * A tunnel with this id never existed."
+        );
+    }
 }

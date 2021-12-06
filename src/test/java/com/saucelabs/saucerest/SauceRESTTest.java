@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -356,6 +358,34 @@ class SauceRESTTest {
     }
 
     @Test
+    void testDeleteTunnel() throws Exception {
+        urlConnection.setResponseCode(401);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not authorized".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.deleteTunnel("1234"));
+
+        urlConnection.setResponseCode(404);
+        urlConnection.setInputStream(new ByteArrayInputStream("Not found".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(SauceException.NotFound.class, () -> sauceREST.deleteTunnel("1234"));
+
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{\"result\": true, \"id\": \"1234\", \"jobs_running\": 0}".getBytes(StandardCharsets.UTF_8)));
+
+        String results;
+        try (BufferedInputStream stream = sauceREST.deleteTunnel("1234")) {
+            assertEquals("/rest/v1/" + sauceREST.getUsername() + "/tunnels/1234",
+                urlConnection.getRealURL().getPath());
+
+            results = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        }
+        JSONObject jsonObject = new JSONObject(results);
+
+        assertTrue(jsonObject.getBoolean("result"));
+        assertEquals("1234", jsonObject.getString("id"));
+        assertEquals(0, jsonObject.getInt("jobs_running"));
+        assertFalse(jsonObject.isEmpty());
+    }
+
+    @Test
     void testGetActivity() {
         urlConnection.setResponseCode(200);
         String userInfo = sauceREST.getActivity();
@@ -447,7 +477,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLog(@TempDir Path tempDir) {
+    void testDownloadServerLog(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
@@ -469,7 +499,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -487,7 +517,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -505,7 +535,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
+    void testDownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -537,7 +567,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadAutomatorLog(@TempDir Path tempDir) {
+    void testDownloadAutomatorLog(@TempDir Path tempDir) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
@@ -548,7 +578,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void testdownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
+    void testDownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -708,7 +738,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void downloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
+    void testDownloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -726,7 +756,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void downloadSauceLabsLogStream() throws Exception {
+    void testDownloadSauceLabsLogStream() throws Exception {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
 
@@ -852,96 +882,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testDownload(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        sauceREST.downloadLog("1234", absolutePath);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-
-        boolean downloaded = sauceREST.downloadVideo("1234", absolutePath);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/video.mp4",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadWithCustomFileName(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foobar.log");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertEquals(tempDir.toFile().listFiles()[0].getName(), "foobar.log");
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith(".log"));
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
-
-        String absolutePath = tempDir.toAbsolutePath().toString();
-        boolean downloaded = sauceREST.downloadLog("1234", absolutePath, "foo/bar.log");
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs/1234/assets/selenium-server.log",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertNull(this.urlConnection.getRealURL().getQuery());
-        assertNotNull(tempDir.toFile().listFiles());
-        assertEquals(1, tempDir.toFile().listFiles().length);
-        assertTrue(tempDir.toFile().listFiles()[0].getName().endsWith("foo_bar.log"));
-        assertTrue(downloaded);
-    }
-
-    @Test
-    void testDownloadWithFileNotFoundThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(404);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(java.io.FileNotFoundException.class, () -> sauceREST.downloadLogOrThrow("1234", location));
-    }
-
-    @Test
-    void testDownloadLogWithWrongCredentialsThrowsException(@TempDir Path tempDir) {
-        urlConnection.setResponseCode(401);
-        String location = tempDir.toAbsolutePath().toString();
-        assertThrows(SauceException.NotAuthorized.class, () -> sauceREST.downloadLogOrThrow("1234", location));
-    }
-
-    @Test
     void testJobFailed() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
@@ -1005,26 +945,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testGetFullJobs() {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
-
-        sauceREST.getFullJobs();
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertEquals("full=true&limit=20", this.urlConnection.getRealURL().getQuery());
-
-        sauceREST.getFullJobs(50);
-        assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/jobs",
-            this.urlConnection.getRealURL().getPath()
-        );
-        assertEquals("full=true&limit=50", this.urlConnection.getRealURL().getQuery());
-    }
-
-    @Test
     void testGetJobs() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
@@ -1079,34 +999,131 @@ class SauceRESTTest {
 
     }
 
-    @Test
-    void testBuildFullJobs() {
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testBuildJobs(JobSource jobSource) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
 
-        sauceREST.getBuildFullJobs("fakePath");
+        sauceREST.getBuildJobs(jobSource, "01234567890123456789012345678901");
+
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/build/fakePath/jobs",
+            "/v2/builds/" + urlComponent + "/01234567890123456789012345678901/jobs/",
             this.urlConnection.getRealURL().getPath()
         );
-        assertEquals("full=1", this.urlConnection.getRealURL().getQuery());
     }
 
-    @Test
-    void testGetBuild() {
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuild(JobSource jobSource) {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
 
-        sauceREST.getBuild("fakePath");
+        sauceREST.getBuild(jobSource, "01234567890123456789012345678901");
+
         assertEquals(
-            "/rest/v1/" + this.sauceREST.getUsername() + "/builds/fakePath",
+            "/v2/builds/" + urlComponent + "/01234567890123456789012345678901/",
             this.urlConnection.getRealURL().getPath()
         );
         assertNull(this.urlConnection.getRealURL().getQuery());
     }
 
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuilds(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsWithLimit(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuilds(jobSource, 20);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "limit=20",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildForJob(JobSource jobSource) {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildForJob(jobSource, "fedcba9876543210fedcba9876543210");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/jobs/fedcba9876543210fedcba9876543210/build/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertNull(this.urlConnection.getRealURL().getQuery());
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByName(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1");
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=50",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(JobSource.class)
+    void testGetBuildsByNameWithLimit(JobSource jobSource) throws java.io.UnsupportedEncodingException {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String urlComponent = jobSource.name().toLowerCase();
+
+        sauceREST.getBuildsByName(jobSource, "Build name#1", 2);
+
+        assertEquals(
+            "/v2/builds/" + urlComponent + "/",
+            this.urlConnection.getRealURL().getPath()
+        );
+        assertEquals(
+            "name=Build+name%231&limit=2",
+            this.urlConnection.getRealURL().getQuery()
+        );
+    }
+
     @Test
-    void should_get_public_job_from_eu() {
+    void testGetPublicJobLinkFromEU() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU) {
             @Override
@@ -1122,7 +1139,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us() {
+    void testGetPublicJobLinkFromUS() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
@@ -1138,7 +1155,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_by_default() {
+    void testGetPublicJobLinkFromUSByDefault() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey") {
             @Override
@@ -1154,7 +1171,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_eu_with_string() {
+    void testGetPublicJobLinkFromEUWithString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "EU") {
             @Override
@@ -1170,7 +1187,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_east_with_string() {
+    void testGetPublicJobLinkFromUSEastWithString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "US_EAST") {
             @Override
@@ -1186,7 +1203,7 @@ class SauceRESTTest {
     }
 
     @Test
-    void should_get_public_job_from_us_with_invalid_string() {
+    void testGetPublicJobLinkFromUsWithInvalidString() {
         // GIVEN
         this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
             @Override
