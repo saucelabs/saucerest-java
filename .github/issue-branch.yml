@@ -1,6 +1,5 @@
 gitSafeReplacementChar: '-'
 branchName: '${issue.number}-${issue.title}'
-silent: true
 defaultBranch: 'dev'
 branches:
   - label: enhancement
