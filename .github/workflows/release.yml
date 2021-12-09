@@ -30,7 +30,7 @@ jobs:
       - name: Set up JDK 1.8
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 14
           #           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           #           gpg-passphrase: GPG_PASSPHRASE
           #           server-id: ossrh
@@ -45,7 +45,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: 8
+          java-version: 14
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_CENTRAL_PASSWORD
