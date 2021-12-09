@@ -65,7 +65,7 @@ jobs:
           git config --global user.name "Sauce Labs Publishbot"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           gpg --list-secret-keys
-          mvn -B release:clean release:prepare -DRELEASE_TYPE=${{ github.event.inputs.releaseType }} -DdryRun=${{ github.event.inputs.dryRun }} -Darguments=-Dgpg.passphrase=yErF44tnGyacIFFZ3ks$U%1Gm3bYIuHN -Dusername=${{ github.actor }} -X
+          mvn -B release:clean release:prepare -DRELEASE_TYPE=${{ github.event.inputs.releaseType }} -DdryRun=${{ github.event.inputs.dryRun }} -Dusername=${{ github.actor }} -X
 
       - name: Perform Release
         if:  ${{ github.event.inputs.releaseType == false }}
