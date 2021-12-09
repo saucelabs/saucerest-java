@@ -39,7 +39,7 @@
       <tag>saucerest-1.1.0</tag>
   </scm>
     <properties>
-        <java.version>14</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.sourceEncoding>UTF-8</project.reporting.sourceEncoding>
     </properties>
