@@ -9,44 +9,66 @@ on:
       releaseType:
         description: MAJOR, MINOR or PATCH release
         default: 'PATCH'
-      dry_run:
+      dryRun:
         description: Whether to perform a dry run instead of a full release.
-        default: false
+        default: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   release:
     name: Preparing Build Environment
-    
+
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: "Log Run"
+        run: |
+          echo "$GITHUB_ACTOR requested ${{ github.event.inputs.releaseType }} release; Dry-run: ${{ github.event.inputs.dryRun }}"
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v1.4.3
+        uses: actions/setup-java@v2
         with:
-          java-version: 1.8
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-      
-      - name: Install Maven
-        uses: aahmed-se/setup-maven@v3
-        with:
-          maven-version: 3.6.1
-      
+          java-version: 8
+          #           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          #           gpg-passphrase: GPG_PASSPHRASE
+          #           server-id: ossrh
+          distribution: temurin
+
       - uses: actions/checkout@v2
 
       - name: Build & Test
         run: mvn -B test --file pom.xml
-        
+
+      - name: Set up Maven Central Config
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 8
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: gpg_passphrase
+
+      - name: Set up Git release
+        run: |
+          git config --global user.email "support@saucelabs.com"
+          git config --global user.name "Sauce Labs Publishbot"
+
       - name: Prepare Release
         env:
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-        run: mvn -B release:clean release:prepare -DRELEASE_TYPE=$INPUT_RELEASETYPE -DdryRun=$INPUT_DRY_RUN
-      
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          git config --global user.email "support@saucelabs.com"
+          git config --global user.name "Sauce Labs Publishbot"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          gpg --list-secret-keys
+          mvn -B release:clean release:prepare -DRELEASE_TYPE=${{ github.event.inputs.releaseType }} -DdryRun=${{ github.event.inputs.dryRun }} -Darguments=-Dgpg.passphrase=yErF44tnGyacIFFZ3ks$U%1Gm3bYIuHN -Dusername=${{ github.actor }} -X
+
       - name: Perform Release
-        if:  ${{ env.INPUT_DRY_RUN == false }} 
+        if:  ${{ github.event.inputs.releaseType == false }}
         env:
           ossrc-username: ${{ secrets.ossrc_username }}
           ossrc-password: ${{ secrets.ossrc_password }}
