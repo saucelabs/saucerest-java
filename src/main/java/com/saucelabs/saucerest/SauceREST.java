@@ -91,6 +91,7 @@ public class SauceREST implements Serializable {
     private static String extraUserAgent = "";
 
     private final String server;
+    private final String apiServer;
     private final String edsServer;
     private final String appServer;
 
@@ -156,6 +157,7 @@ public class SauceREST implements Serializable {
         this.accessKey = accessKey;
         this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
+        this.apiServer = buildUrl(dataCenter.apiServer(), "SAUCE_API_ENDPOINT", "saucerest-java.base_api_url");
         this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
         this.restApiEndpoint = server + "rest/v1/";
         this.maxDuration = maxDuration;
@@ -252,7 +254,7 @@ public class SauceREST implements Serializable {
     }
 
     protected URL buildBuildUrl(JobSource source, String endpoint) {
-        return buildEndpoint(server, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
+        return buildEndpoint(apiServer, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
     }
 
     private URL buildHarUrl(String jobId) {
