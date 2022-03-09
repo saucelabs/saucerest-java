@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -997,6 +998,51 @@ class SauceRESTTest {
         );
         assertEquals("limit=500&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
 
+    }
+
+    @Test
+    void testGetJobsByIdsNoIds() {
+        String[] ids = {};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals(jsonJobs, "{}");
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsNotFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), false);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetFullJobsByIds() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getFullJobsByIds(Arrays.asList(ids));
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
     }
 
     @ParameterizedTest

@@ -37,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
@@ -998,6 +999,38 @@ public class SauceREST implements Serializable {
     public String getJobs(int limit, long to, int from) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
         return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the details for Sauce jobs.
+     *
+     * @param ids   iterable of job ids
+     * @param full  should return full jobs response
+     * @return String (in JSON format) representing the jobID for sauce jobs
+     */
+    public String getJobsByIds(Iterable<String> ids, boolean full) {
+        List<String> params = new ArrayList<String>();
+        for (String jobId: ids) {
+            params.add("id=" + jobId);
+        }
+        if (params.size() == 0) {
+            return "{}";
+        }
+        if (full) {
+            params.add("full=true");
+        }
+        URL restEndpoint = buildURL("jobs?" + String.join("&", params));
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the details for Sauce jobs.
+     *
+     * @param ids   iterable of job ids
+     * @return String (in JSON format) representing the jobID for full sauce jobs
+     */
+    public String getFullJobsByIds(Iterable<String> ids) {
+        return getJobsByIds(ids, true);
     }
 
     /**
