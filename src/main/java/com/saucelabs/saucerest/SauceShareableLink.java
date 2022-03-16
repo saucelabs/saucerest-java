@@ -16,12 +16,11 @@ public class SauceShareableLink {
      * @param username Sauce Labs username
      * @param accessKey Sauce Labs access key
      * @param sauceJobId Sauce Labs job id
-     * @param server Sauce Labs data center endpoint
-     * @return A url of the test result with an authentication token, so it can be accessed without Sauce Labs credentials.
+     * @return Auth digest for the job, so it can be accessed without SauceLabs credentials.
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
      */
-    public static String getShareableLink(String username, String accessKey, String sauceJobId, String server) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static String getJobAuthDigest(String username, String accessKey, String sauceJobId) throws NoSuchAlgorithmException, InvalidKeyException {
         String key = String.format("%s:%s", username , accessKey);
         SecretKeySpec sks = new SecretKeySpec(key.getBytes(US_ASCII), "HmacMD5");
         Mac mac = Mac.getInstance("HmacMD5");
@@ -35,7 +34,21 @@ public class SauceShareableLink {
             }
             hash.append(hex);
         }
-        String digest = hash.toString();
+        return hash.toString();
+    }
+
+    /**
+     * Based on the code from here: https://docs.saucelabs.com/test-results/sharing-test-results/index.html#example---java
+     * @param username Sauce Labs username
+     * @param accessKey Sauce Labs access key
+     * @param sauceJobId Sauce Labs job id
+     * @param server Sauce Labs data center endpoint
+     * @return A url of the test result with an authentication token, so it can be accessed without Sauce Labs credentials.
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
+    public static String getShareableLink(String username, String accessKey, String sauceJobId, String server) throws NoSuchAlgorithmException, InvalidKeyException {
+        String digest = getJobAuthDigest(username, accessKey, sauceJobId);
         return String.format("%s%s/%s?auth=%s", server, "tests", sauceJobId, digest);
     }
 }
