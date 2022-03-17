@@ -18,20 +18,6 @@
         <name>Sauce Labs</name>
         <url>http://www.saucelabs.com/</url>
     </organization>
-    <developers>
-        <developer>
-            <name>Yeh Fang</name>
-            <email>yeh.fang@saucelabs.com</email>
-            <organization>Sauce Labs</organization>
-            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
-        </developer>
-        <developer>
-            <name>Sean Enright</name>
-            <email>sean@saucelabs.com</email>
-            <organization>Sauce Labs</organization>
-            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
-        </developer>
-    </developers>
     <scm>
         <connection>scm:git:git://github.com/saucelabs/saucerest-java.git</connection>
         <developerConnection>scm:git:git@github.com:saucelabs/saucerest-java.git</developerConnection>
