@@ -32,7 +32,8 @@ jobs:
       - name: Commit version to pom
         run: |
           git config --global user.email "support@saucelabs.com"
-          git config --global user.name "jenkins.bot"
+          git config --global user.name "${{ github.actor }}"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           mvn scm:checkin -Dincludes=pom.xml -Dmessage="Prepare for saucerest-${{ github.event.inputs.releaseversion }}" -B --no-transfer-progress
 
       - name: Publish package
