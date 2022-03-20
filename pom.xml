@@ -30,7 +30,7 @@
         <connection>scm:git:git://github.com/saucelabs/saucerest-java.git</connection>
         <developerConnection>scm:git:git@github.com:saucelabs/saucerest-java.git</developerConnection>
         <url>git@github.com:saucelabs/saucerest-java.git</url>
-      <tag>saucerest-1.1.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <properties>
         <java.version>17</java.version>
@@ -153,23 +153,10 @@
                 <configuration>
                     <goals>deploy nexus-staging:release</goals>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <projectVersionPolicyId>SemverPropertyPolicy</projectVersionPolicyId>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.12.2</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>codes.dylanlacey</groupId>
-                        <artifactId>SemverPropertyPolicy</artifactId>
-                        <version>0.0.7</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
