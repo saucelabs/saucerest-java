@@ -31,9 +31,9 @@ jobs:
 
       - name: Commit version to pom
         run: |
-        git config --global user.email "support@saucelabs.com"
-        git config --global user.name "jenkins.bot"
-        mvn scm:checkin -Dincludes=pom.xml -Dmessage="Prepare for saucerest-${{ github.event.inputs.releaseversion }}" -B --no-transfer-progress
+          git config --global user.email "support@saucelabs.com"
+          git config --global user.name "jenkins.bot"
+          mvn scm:checkin -Dincludes=pom.xml -Dmessage="Prepare for saucerest-${{ github.event.inputs.releaseversion }}" -B --no-transfer-progress
 
       - name: Publish package
         run: mvn -B --no-transfer-progress clean deploy -DskipTests=true
