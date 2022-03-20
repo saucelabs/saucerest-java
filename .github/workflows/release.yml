@@ -31,7 +31,11 @@ jobs:
           git config --global user.email "support@saucelabs.com"
           git config --global user.name "${{ github.actor }}"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          mvn -B --no-transfer-progress release:clean release:prepare -Dusername=${{ github.actor }}
+          mvn -B --no-transfer-progress release:clean release:prepare -Dusername=${{ github.actor }} -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
       - name: Publish package
         run: mvn -B --no-transfer-progress clean deploy -DskipTests=true
