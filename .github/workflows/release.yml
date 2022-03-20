@@ -27,7 +27,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
 
       - name: Set projects Maven version to GitHub Action GUI set version
-        run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}" -DgenerateBackupPoms=false
+        run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}" -DgenerateBackupPoms=false -B --no-transfer-progress
 
       - name: Commit version to pom
         run: mvn scm:checkin -Dincludes=pom.xml -Dmessage="Prepare for saucerest-${{ github.event.inputs.releaseversion }}"
