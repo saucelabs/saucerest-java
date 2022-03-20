@@ -29,12 +29,12 @@ jobs:
       - name: Set projects Maven version to GitHub Action GUI set version
         run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}" -DgenerateBackupPoms=false -B --no-transfer-progress
 
-      - name: Commit version to pom
+      - name: Prepare for release
         run: |
           git config --global user.email "support@saucelabs.com"
           git config --global user.name "${{ github.actor }}"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          mvn scm:checkin -Dincludes=pom.xml -Dmessage="Prepare for saucerest-${{ github.event.inputs.releaseversion }}" -B --no-transfer-progress
+          mvn -B --no-transfer-progress release:clean release:prepare -Dusername=${{ github.actor }}
 
       - name: Publish package
         run: mvn -B --no-transfer-progress clean deploy -DskipTests=true
