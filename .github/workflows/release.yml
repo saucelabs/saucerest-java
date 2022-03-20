@@ -14,6 +14,7 @@ jobs:
     steps:
       - run: echo "Will start a Maven Central upload with version ${{ github.event.inputs.releaseversion }}"
       - uses: actions/checkout@v2
+      
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v2
         with:
@@ -24,11 +25,42 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }} # Value of the GPG private key to import
           gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+      
       - name: Set projects Maven version to GitHub Action GUI set version
         run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}"
+        
       - name: Publish package
         run: mvn -B --no-transfer-progress deploy -DskipTests=true
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}      
+      
+      - name: Generate changelog
+        id: changelog
+        uses: metcalfc/changelog-generator@v3.0.0
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.releaseversion }}
+          release_name: ${{ github.event.inputs.releaseversion }}
+          body: |
+            ```
+            <dependencies>
+            	<dependency>
+            	    <groupId>com.saucelabs</groupId>
+            	    <artifactId>saucerest</artifactId>
+            	    <version>${{ github.event.inputs.releaseversion }}</version>
+            	</dependency>
+            </dependencies>
+            ```
+            ### Changelog
+            ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
