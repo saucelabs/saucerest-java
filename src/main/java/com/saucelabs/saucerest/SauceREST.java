@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.openqa.selenium.remote.SessionId;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
@@ -118,6 +119,14 @@ public class SauceREST implements Serializable {
     private ChronoUnit chronoUnit;
     private List<Class<? extends Throwable>> throwableList;
 
+    public SauceREST() {
+        this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), US);
+    }
+
+    public SauceREST(DataCenter dataCenter) {
+        this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), dataCenter);
+    }
+
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
@@ -197,6 +206,14 @@ public class SauceREST implements Serializable {
 
     public static void setExtraUserAgent(String extraUserAgent) {
         SauceREST.extraUserAgent = extraUserAgent;
+    }
+
+    public Job getJob(SessionId sessionId) {
+        return getJob(sessionId.toString());
+    }
+
+    public Job getJob(String sessionId) {
+        return new Job(sessionId);
     }
 
     /**
@@ -1717,7 +1734,7 @@ public class SauceREST implements Serializable {
     public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
         URL restEndpoint = buildBuildUrl(
             source,
-            "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "&limit=" + limit
+            "?name=" + URLEncoder.encode(name, String.valueOf(StandardCharsets.UTF_8)) + "&limit=" + limit
         );
         return retrieveResults(restEndpoint);
     }
