@@ -1717,7 +1717,7 @@ public class SauceREST implements Serializable {
     public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
         URL restEndpoint = buildBuildUrl(
             source,
-            "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "&limit=" + limit
+            "?name=" + URLEncoder.encode(name, "UTF-8") + "&limit=" + limit
         );
         return retrieveResults(restEndpoint);
     }
