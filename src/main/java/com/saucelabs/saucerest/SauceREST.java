@@ -40,10 +40,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -97,15 +97,6 @@ public class SauceREST implements Serializable {
     private final String appServer;
 
     private final String restApiEndpoint;
-
-    private static final Map<JobSource, String> jobSourcePathComponent = Collections.unmodifiableMap(
-        new EnumMap<JobSource, String>(JobSource.class) {
-            {
-                put(JobSource.RDC, "rdc");
-                put(JobSource.VDC, "vdc");
-            }
-        }
-    );
 
     /**
      * Retry policy default values.
@@ -255,7 +246,7 @@ public class SauceREST implements Serializable {
     }
 
     protected URL buildBuildUrl(JobSource source, String endpoint) {
-        return buildEndpoint(apiServer, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
+        return buildEndpoint(apiServer, "v2/builds/" + source.name().toLowerCase(Locale.ROOT) + "/" + endpoint, "Builds URL");
     }
 
     private URL buildHarUrl(String jobId) {
