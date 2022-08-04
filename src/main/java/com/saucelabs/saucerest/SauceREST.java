@@ -114,6 +114,7 @@ public class SauceREST implements Serializable {
      *
      * @param username  The username to use when performing HTTP requests to the Sauce REST API
      * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     * @deprecated This constructor is getting deprecated because a default region can cause side-effects when used without knowing.
      */
     public SauceREST(String username, String accessKey) {
         this(username, accessKey, US);
