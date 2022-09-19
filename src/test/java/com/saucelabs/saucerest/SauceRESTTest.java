@@ -396,12 +396,13 @@ class SauceRESTTest {
     @Test
     void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
-
-        String concurencyInfo = sauceREST.getConcurrency();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "/concurrency");
+        urlConnection.setInputStream(getClass().getResource("/users_test_concurrency.json").openStream());
+        String concurrencyInfo = sauceREST.getConcurrency();
+        assertEquals("/rest/v1.2/users/" + this.sauceREST.getUsername() + "/concurrency", this.urlConnection.getRealURL().getPath());
         assertNull(this.urlConnection.getRealURL().getQuery());
-        assertEquals(concurencyInfo, "{\"timestamp\": 1447392030.111457, \"concurrency\": {\"halkeye\": {\"current\": {\"overall\": 0, \"mac\": 0, \"manual\": 0}, \"remaining\": {\"overall\": 100, \"mac\": 100, \"manual\": 5}}}}");
+
+        String expectedConcurrencyInfo = "{\"timestamp\":1447392030.111457,\"concurrency\":{\"organization\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"ca8b135d2e7e456385344811e05d84a6\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}},\"team\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"7e3beebb84bf4efaadffbbbbe780f294\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}}}}";
+        assertEquals(expectedConcurrencyInfo, concurrencyInfo);
     }
 
     @Test
