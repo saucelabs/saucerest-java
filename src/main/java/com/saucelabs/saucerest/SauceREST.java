@@ -251,6 +251,10 @@ public class SauceREST implements Serializable {
         return buildEndpoint(apiServer, "v2/builds/" + source.name().toLowerCase(Locale.ROOT) + "/" + endpoint, "Builds URL");
     }
 
+    protected URL appendToBaseURL(String endpoint, String urlDescription) {
+        return buildEndpoint(apiServer, endpoint, urlDescription);
+    }
+
     private URL buildHarUrl(String jobId) {
         return this.buildEDSURL(jobId + "/" + TestAsset.HAR.label);
     }
@@ -1584,7 +1588,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = buildURL("users/" + username + "/concurrency");
+        URL restEndpoint = appendToBaseURL("/rest/v1.2/users/" + username + "/concurrency", "Get User Concurrency");
         return retrieveResults(restEndpoint);
     }
 
