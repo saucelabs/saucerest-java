@@ -14,6 +14,7 @@ github:
 tasks:
   - name: Install Java8
     init: |
+      export sdkman_auto_answer=true
       sdk install java 8.0.345-tem
       sdk use java 8.0.345-tem
       gp sync-done java8install
