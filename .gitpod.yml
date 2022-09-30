@@ -11,11 +11,19 @@ github:
     addCheck: true
     addBadge: true
 
+vscode:
+  extensions:
+    - redhat.java
+    - vscjava.vscode-java-debug
+    - vscjava.vscode-java-pack
+    - vscjava.vscode-maven
+    - vscjava.vscode-java-dependency
+    - vscjava.vscode-java-test
+
 tasks:
   - name: Install Java8
     init: |
-      export sdkman_auto_answer=true
-      sdk install java 8.0.345-tem
+      yes | sdk install java 8.0.345-tem
       sdk use java 8.0.345-tem
       gp sync-done java8install
 
