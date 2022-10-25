@@ -118,7 +118,7 @@ class SauceRESTTest {
         }
 
         @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             if (multipleMockInputStream == null) {
                 return mockInputStream;
             } else {
@@ -237,7 +237,7 @@ class SauceRESTTest {
     @Test
     void testConfirmSerializable() {
         SauceREST original = new SauceREST(null, null, DataCenter.US);
-        SauceREST copy = (SauceREST) SerializationUtils.clone(original);
+        SauceREST copy = SerializationUtils.clone(original);
         assertEquals(original, copy);
     }
 
@@ -613,8 +613,6 @@ class SauceRESTTest {
 
     /**
      * This test is not thread/parallel safe. When run fully parallelized will fail.
-     * @param tempDir
-     * @throws IOException
      */
     @Test
     void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
