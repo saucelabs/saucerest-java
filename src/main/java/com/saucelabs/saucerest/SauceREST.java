@@ -11,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.openqa.selenium.remote.SessionId;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -41,10 +40,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -99,15 +98,6 @@ public class SauceREST implements Serializable {
 
     private final String restApiEndpoint;
 
-    private static final Map<JobSource, String> jobSourcePathComponent = Collections.unmodifiableMap(
-        new EnumMap<JobSource, String>(JobSource.class) {
-            {
-                put(JobSource.RDC, "rdc");
-                put(JobSource.VDC, "vdc");
-            }
-        }
-    );
-
     /**
      * Retry policy default values.
      */
@@ -132,7 +122,9 @@ public class SauceREST implements Serializable {
      *
      * @param username  The username to use when performing HTTP requests to the Sauce REST API
      * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     * @deprecated This constructor is getting deprecated because a default region can cause side-effects when used without knowing.
      */
+    @Deprecated
     public SauceREST(String username, String accessKey) {
         this(username, accessKey, US);
     }
@@ -272,7 +264,11 @@ public class SauceREST implements Serializable {
     }
 
     protected URL buildBuildUrl(JobSource source, String endpoint) {
-        return buildEndpoint(apiServer, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
+        return buildEndpoint(apiServer, "v2/builds/" + source.name().toLowerCase(Locale.ROOT) + "/" + endpoint, "Builds URL");
+    }
+
+    protected URL appendToBaseURL(String endpoint, String urlDescription) {
+        return buildEndpoint(apiServer, endpoint, urlDescription);
     }
 
     private URL buildHarUrl(String jobId) {
@@ -1608,7 +1604,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = buildURL("users/" + username + "/concurrency");
+        URL restEndpoint = appendToBaseURL("/rest/v1.2/users/" + username + "/concurrency", "Get User Concurrency");
         return retrieveResults(restEndpoint);
     }
 
@@ -1734,7 +1730,7 @@ public class SauceREST implements Serializable {
     public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
         URL restEndpoint = buildBuildUrl(
             source,
-            "?name=" + URLEncoder.encode(name, String.valueOf(StandardCharsets.UTF_8)) + "&limit=" + limit
+            "?name=" + URLEncoder.encode(name, "UTF-8") + "&limit=" + limit
         );
         return retrieveResults(restEndpoint);
     }
