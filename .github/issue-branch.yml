@@ -1,14 +1,3 @@
 gitSafeReplacementChar: '-'
 branchName: '${issue.number}-${issue.title}'
-defaultBranch: 'dev'
-branches:
-  - label: enhancement
-    prefix: feature/
-    name: dev
-    skip: false
-  - label: bug
-    name: staging
-    prefix: bug/
-    skip: false
-  - label: '*'
-    skip: true
+defaultBranch: 'master'
