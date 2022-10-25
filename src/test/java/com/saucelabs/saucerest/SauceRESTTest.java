@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -395,12 +396,13 @@ class SauceRESTTest {
     @Test
     void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
-
-        String concurencyInfo = sauceREST.getConcurrency();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "/concurrency");
+        urlConnection.setInputStream(getClass().getResource("/users_test_concurrency.json").openStream());
+        String concurrencyInfo = sauceREST.getConcurrency();
+        assertEquals("/rest/v1.2/users/" + this.sauceREST.getUsername() + "/concurrency", this.urlConnection.getRealURL().getPath());
         assertNull(this.urlConnection.getRealURL().getQuery());
-        assertEquals(concurencyInfo, "{\"timestamp\": 1447392030.111457, \"concurrency\": {\"halkeye\": {\"current\": {\"overall\": 0, \"mac\": 0, \"manual\": 0}, \"remaining\": {\"overall\": 100, \"mac\": 100, \"manual\": 5}}}}");
+
+        String expectedConcurrencyInfo = "{\"timestamp\":1447392030.111457,\"concurrency\":{\"organization\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"ca8b135d2e7e456385344811e05d84a6\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}},\"team\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"7e3beebb84bf4efaadffbbbbe780f294\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}}}}";
+        assertEquals(expectedConcurrencyInfo, concurrencyInfo);
     }
 
     @Test
@@ -997,6 +999,51 @@ class SauceRESTTest {
         );
         assertEquals("limit=500&from=1470689339&to=1470862161", this.urlConnection.getRealURL().getQuery());
 
+    }
+
+    @Test
+    void testGetJobsByIdsNoIds() {
+        String[] ids = {};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals(jsonJobs, "{}");
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsNotFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), false);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetFullJobsByIds() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getFullJobsByIds(Arrays.asList(ids));
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
     }
 
     @ParameterizedTest
