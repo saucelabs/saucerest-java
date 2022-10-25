@@ -2,25 +2,26 @@ package com.saucelabs.saucerest.integration;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.saucelabs.saucerest.Job;
-import com.saucelabs.saucerest.JobVisibility;
-import com.saucelabs.saucerest.SauceREST;
-import com.saucelabs.saucerest.TestAsset;
-import org.apache.commons.io.FileUtils;
+import com.saucelabs.saucerest.*;
 import org.awaitility.Awaitility;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -29,34 +30,74 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class JobTest {
-    private RemoteWebDriver driver;
-    private Job job;
+import static com.saucelabs.saucerest.DataCenter.EU;
+import static com.saucelabs.saucerest.DataCenter.US;
 
-    @BeforeEach
-    public void createDriver() throws MalformedURLException {
+@ExtendWith(AfterBeforeParameterResolver.class)
+public class JobTest {
+    private ThreadLocal<RemoteWebDriver> driver = new ThreadLocal<>();
+    private Job job;
+    @TempDir
+    private Path tempDir;
+
+    // Yes, duplicating instead of using DataCenter enum to restrict and control where these tests run.
+    enum DataCenter {
+        USWEST("https://ondemand.us-west-1.saucelabs.com/wd/hub"),
+        EU("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
+
+        public final String label;
+
+        DataCenter(String label) {
+            this.label = label;
+        }
+
+    }
+
+    public void createDriver(DataCenter param, TestInfo testInfo) throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
+        MutableCapabilities sauceOptions = new MutableCapabilities();
+
+        sauceOptions.setCapability("username", System.getenv("SAUCE_USERNAME"));
+        sauceOptions.setCapability("accessKey", System.getenv("SAUCE_ACCESS_KEY"));
+
+        if (testInfo != null) {
+            sauceOptions.setCapability("name", testInfo.getTestMethod().get().getName());
+        }
+
         options.setPlatformName("Windows 10");
-        Map<String, Object> sauceOptions = ImmutableMap.of(
-            "username", System.getenv("SAUCE_USERNAME"),
-            "accessKey", System.getenv("SAUCE_ACCESS_KEY"));
         options.setCapability("sauce:options", sauceOptions);
 
-        URL url = new URL("https://ondemand.us-west-1.saucelabs.com/wd/hub");
-        driver = new RemoteWebDriver(url, options);
-        job = new SauceREST().getJob(driver.getSessionId());
+        URL url = new URL(param.label);
+        driver.set(new RemoteWebDriver(url, options));
+
+        if (DataCenter.EU == param) {
+            job = new SauceREST(EU).getJob(EU, driver.get().getSessionId());
+        } else if (DataCenter.USWEST == param) {
+            job = new SauceREST(US).getJob(US, driver.get().getSessionId());
+        }
+    }
+
+    @BeforeEach
+    public void setup(DataCenter dataCenter, TestInfo testInfo) throws MalformedURLException {
+        // Ugly hack to allow testing for "null" as test name in the metadata part of the test result page
+        if (testInfo.getTestMethod().get().getName().equalsIgnoreCase("getDetails")) {
+            createDriver(dataCenter, null);
+        } else {
+            createDriver(dataCenter, testInfo);
+        }
     }
 
     @AfterEach
     public void quitDriver() {
         if (driver != null) {
-            driver.quit();
+            driver.get().quit();
         }
     }
 
-    @Test
-    public void getDetails() throws IOException {
-         JSONObject response = job.getDetails();
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getDetails(DataCenter param, TestInfo testInfo) throws IOException {
+        JSONObject response = job.getDetails();
 
         Map<String, Object> testDetails = response.toMap();
 
@@ -75,75 +116,85 @@ public class JobTest {
         Assertions.assertNull(testDetails.get("custom-data"));
     }
 
-    @Test
-    public void changeName() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void changeName(DataCenter param, TestInfo testInfo) throws IOException {
         String newName = "Newly Changed Name";
         JSONObject response = job.changeName(newName);
 
         Assertions.assertEquals(newName, response.get("name"));
     }
 
-    @Test
-    public void changeBuild() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void changeBuild(DataCenter param, TestInfo testInfo) throws IOException {
         String newName = "Newly Changed Build";
         JSONObject response = job.changeBuild(newName);
 
         Assertions.assertEquals(newName, response.get("build"));
     }
 
-    @Test
-    public void changeVisibility() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void changeVisibility(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeVisibility(JobVisibility.PRIVATE);
 
         Assertions.assertEquals(JobVisibility.PRIVATE.value, response.get("public"));
     }
 
-    @Test
-    public void changeResultsTrue() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void changeResultsTrue(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeResults(true);
 
         Assertions.assertEquals("passed", response.get("consolidated_status"));
     }
 
-    @Test
-    public void changeResultsFalse() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void changeResultsFalse(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeResults(false);
 
         Assertions.assertEquals("failed", response.get("consolidated_status"));
     }
 
-    @Test
-    public void passed() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void passed(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.passed();
 
         Assertions.assertEquals("passed", response.get("consolidated_status"));
     }
 
-    @Test
-    public void failed() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void failed(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.failed();
 
         Assertions.assertEquals("failed", response.get("consolidated_status"));
     }
 
-    @Test
-    public void addTags() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void addTags(DataCenter param, TestInfo testInfo) throws IOException {
         List<String> tags = ImmutableList.of("tag1", "tag2", "tag3");
         JSONObject response = job.addTags(tags);
 
         Assertions.assertEquals(tags, response.toMap().get("tags"));
     }
 
-    @Test
-    public void addCustomData() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void addCustomData(DataCenter param, TestInfo testInfo) throws IOException {
         Map<String, Object> data = ImmutableMap.of("key1", "value1", "key2", "value2");
         JSONObject response = job.addCustomData(data);
 
         Assertions.assertEquals(data, response.toMap().get("custom-data"));
     }
 
-    @Test
-    public void stop() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void stop(DataCenter param, TestInfo testInfo) throws IOException {
         driver = null;
         JSONObject response = job.stop();
 
@@ -157,17 +208,19 @@ public class JobTest {
         });
     }
 
-    @Test
-    public void delete() throws IOException {
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void delete(DataCenter param, TestInfo testInfo) throws IOException {
         job.stop();
         job.delete();
         driver = null;
         // Need to implement Job.list() to assert success
     }
 
-    @Test
-    public void listAssets() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void listAssets(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
         driver = null;
 
@@ -179,96 +232,73 @@ public class JobTest {
             .forEach(asset -> Assertions.assertTrue(TestAsset.get(asset).isPresent()));
     }
 
-    @Test
-    public void downloadAsset() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void downloadAsset(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
         driver = null;
 
-        String directory = "src/test/assets";
-        FileUtils.forceMkdir(new File(directory));
+        job.download(TestAsset.SCREENSHOTS, Paths.get(tempDir.toString()));
+        job.download(TestAsset.VIDEO, Paths.get(tempDir.toString()));
+        job.download(TestAsset.SELENIUM_LOG, Paths.get(tempDir.toString()));
+        job.download(TestAsset.SAUCE_LOG, Paths.get(tempDir.toString()));
 
-        try {
-            job.download(TestAsset.SCREENSHOTS, Paths.get(directory));
-            job.download(TestAsset.VIDEO, Paths.get(directory));
-            job.download(TestAsset.SELENIUM_LOG, Paths.get(directory));
-            job.download(TestAsset.SAUCE_LOG, Paths.get(directory));
-
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "screenshots.zip")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "log.json")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "selenium-server.log")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "video.mp4")));
-        } finally {
-            FileUtils.cleanDirectory(new File("src/test/assets/"));
-        }
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")));
     }
 
-    @Test
-    public void downloadCustomAsset() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void downloadCustomAsset(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
         driver = null;
 
-        String directory = "src/test/assets";
-        FileUtils.forceMkdir(new File(directory));
+        job.download(TestAsset.SELENIUM_LOG, Paths.get(tempDir.toString(), "customName.log"));
 
-        try {
-            job.download(TestAsset.SELENIUM_LOG, Paths.get(directory, "customName.log"));
-
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "customName.log")));
-        } finally {
-            FileUtils.cleanDirectory(new File("src/test/assets/"));
-        }
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "customName.log")));
     }
 
-    @Test
-    public void downloadAllAssets() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void downloadAllAssets(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
         driver = null;
 
-        String directory = "src/test/assets";
-        FileUtils.forceMkdir(new File(directory));
+        job.downloadAllAssets(tempDir);
 
-        try {
-            job.downloadAllAssets(Paths.get(directory));
-
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "screenshots.zip")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "log.json")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "selenium-server.log")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, "video.mp4")));
-        } finally {
-            FileUtils.cleanDirectory(new File("src/test/assets/"));
-        }
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")));
     }
 
-    @Test
-    public void downloadAndPrependAllAssets() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void downloadAndPrependAllAssets(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
 
-        String currentDefault = driver.getSessionId() + "_" +
+        String currentDefault = driver.get().getSessionId() + "_" +
             (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()) + "_";
         driver = null;
 
-        String directory = "src/test/assets";
-        FileUtils.forceMkdir(new File(directory));
+        job.downloadAllAssets(tempDir, currentDefault);
 
-        try {
-            job.downloadAllAssets(Paths.get(directory), currentDefault);
-
-            Assertions.assertTrue(Files.exists(Paths.get(directory, currentDefault + "screenshots.zip")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, currentDefault + "log.json")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, currentDefault + "selenium-server.log")));
-            Assertions.assertTrue(Files.exists(Paths.get(directory, currentDefault + "video.mp4")));
-        } finally {
-            FileUtils.cleanDirectory(new File("src/test/assets/"));
-        }
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "screenshots.zip")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "log.json")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "selenium-server.log")));
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "video.mp4")));
     }
 
-    @Test
-    public void deleteAllAssets() throws IOException {
-        driver.get("https://www.saucedemo.com");
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void deleteAllAssets(DataCenter param, TestInfo testInfo) throws IOException {
+        driver.get().get("https://www.saucedemo.com");
         job.stop();
         driver = null;
 
