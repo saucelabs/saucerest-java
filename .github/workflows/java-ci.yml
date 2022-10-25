@@ -33,6 +33,9 @@ jobs:
           distribution: 'temurin'
       - name: Build with Maven
         run: mvn clean install -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
+        env:
+          SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
+          SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
       - name: Upload to Codecov
         uses: codecov/codecov-action@v1
         with:
