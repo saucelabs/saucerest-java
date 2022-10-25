@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest;
 
+import java.util.Arrays;
+import java.util.Optional;
 public enum TestAsset {
     SAUCE_LOG("log.json"),
     VIDEO("video.mp4"),
@@ -17,5 +19,11 @@ public enum TestAsset {
 
     TestAsset(String label) {
         this.label = label;
+    }
+
+    public static Optional<TestAsset> get(String label) {
+        return Arrays.stream(TestAsset.values())
+            .filter(asset -> asset.label.equals(label))
+            .findFirst();
     }
 }
