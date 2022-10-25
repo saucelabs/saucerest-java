@@ -12,15 +12,16 @@ import java.io.IOException;
 import java.util.Map;
 
 public abstract class AbstractEndpoint {
-    protected final String baseURL = "https://api.us-west-1.saucelabs.com";
+    protected final String baseURL;
     protected final String username;
     protected final String accessKey;
     protected final String credentials;
 
-    public AbstractEndpoint() {
+    public AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
         this.credentials = Credentials.basic(username, accessKey);
+        this.baseURL = dataCenter.apiServer;
     }
 
     public JSONObject getResponseObject(String url) throws IOException {
