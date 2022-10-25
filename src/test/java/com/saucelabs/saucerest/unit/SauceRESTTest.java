@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,7 +118,7 @@ class SauceRESTTest {
         }
 
         @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             if (multipleMockInputStream == null) {
                 return mockInputStream;
             } else {
@@ -183,7 +182,7 @@ class SauceRESTTest {
     @BeforeEach
     void setUp() throws Exception {
         urlConnection = new MockHttpURLConnection();
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -202,7 +201,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -213,7 +212,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnWrite() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockOutputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -237,8 +236,8 @@ class SauceRESTTest {
 
     @Test
     void testConfirmSerializable() {
-        SauceREST original = new SauceREST(null, null);
-        SauceREST copy = (SauceREST) SerializationUtils.clone(original);
+        SauceREST original = new SauceREST(null, null, DataCenter.US);
+        SauceREST copy = SerializationUtils.clone(original);
         assertEquals(original, copy);
     }
 
@@ -614,8 +613,6 @@ class SauceRESTTest {
 
     /**
      * This test is not thread/parallel safe. When run fully parallelized will fail.
-     * @param tempDir
-     * @throws IOException
      */
     @Test
     void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
@@ -1200,7 +1197,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUSByDefault() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1248,7 +1245,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUsWithInvalidString() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);

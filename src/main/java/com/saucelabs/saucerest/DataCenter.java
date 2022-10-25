@@ -33,6 +33,6 @@ public enum DataCenter {
     }
 
     public static DataCenter fromString(String dataCenter) {
-        return Stream.of(values()).filter(dc -> dc.name().equalsIgnoreCase(dataCenter)).findFirst().orElse(US);
+        return Stream.of(values()).filter(dc -> dc.name().equalsIgnoreCase(dataCenter)).findFirst().orElse(null);
     }
 }

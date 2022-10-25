@@ -17,7 +17,6 @@ class DataCenterTests
         "Eu,      EU",
         "US_EAST, US_EAST",
         "us_EaSt, US_EAST",
-        "unknown, US",
     })
 
     @ParameterizedTest
