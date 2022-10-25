@@ -6,25 +6,19 @@ import okio.BufferedSource;
 import okio.Okio;
 import org.awaitility.Awaitility;
 import org.json.JSONObject;
-import org.openqa.selenium.remote.SessionId;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Job extends AbstractEndpoint {
     private final String jobID;
 
-    public Job(String sessionId) {
-        super();
+    public Job(DataCenter dataCenter, String sessionId) {
+        super(dataCenter);
         this.jobID = sessionId;
     }
 
