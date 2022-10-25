@@ -109,24 +109,12 @@ public class SauceREST implements Serializable {
     private ChronoUnit chronoUnit;
     private List<Class<? extends Throwable>> throwableList;
 
-    public SauceREST() {
-        this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), US);
-    }
-
+    /**
+     * Constructs a new instance of the SauceREST class.
+     * @param dataCenter
+     */
     public SauceREST(DataCenter dataCenter) {
         this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), dataCenter);
-    }
-
-    /**
-     * Constructs a new instance of the SauceREST class, uses US as the default data center
-     *
-     * @param username  The username to use when performing HTTP requests to the Sauce REST API
-     * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
-     * @deprecated This constructor is getting deprecated because a default region can cause side-effects when used without knowing.
-     */
-    @Deprecated
-    public SauceREST(String username, String accessKey) {
-        this(username, accessKey, US);
     }
 
     /**
