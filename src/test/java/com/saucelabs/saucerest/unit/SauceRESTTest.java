@@ -1,5 +1,6 @@
-package com.saucelabs.saucerest;
+package com.saucelabs.saucerest.unit;
 
+import com.saucelabs.saucerest.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hamcrest.CoreMatchers;
@@ -9,23 +10,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,13 +29,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
+@Execution(ExecutionMode.SAME_THREAD)
 class SauceRESTTest {
 
     private SauceREST sauceREST;
@@ -621,6 +611,11 @@ class SauceRESTTest {
         assertThrows(FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
     }
 
+    /**
+     * This test is not thread/parallel safe. When run fully parallelized will fail.
+     * @param tempDir
+     * @throws IOException
+     */
     @Test
     void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
         List<InputStream> inputStreamList = Arrays.asList(

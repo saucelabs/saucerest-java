@@ -184,6 +184,10 @@ public class SauceREST implements Serializable {
         return envVar != null ? envVar : System.getProperty(systemPropertyName, defaultUrl);
     }
 
+    public String getApiServer() {
+        return apiServer;
+    }
+
     private RetryPolicy<Object> getRetryPolicy() {
         return new RetryPolicy<>()
             .handle(this.throwableList)
@@ -200,12 +204,12 @@ public class SauceREST implements Serializable {
         SauceREST.extraUserAgent = extraUserAgent;
     }
 
-    public Job getJob(SessionId sessionId) {
-        return getJob(sessionId.toString());
+    public Job getJob(DataCenter dataCenter, SessionId sessionId) {
+        return getJob(dataCenter, sessionId.toString());
     }
 
-    public Job getJob(String sessionId) {
-        return new Job(sessionId);
+    public Job getJob(DataCenter dataCenter, String sessionId) {
+        return new Job(dataCenter, sessionId);
     }
 
     /**
@@ -294,7 +298,7 @@ public class SauceREST implements Serializable {
         }
     }
 
-    protected String getUserAgent() {
+    public String getUserAgent() {
         String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
         if (!"".equals(getExtraUserAgent())) {
             userAgent = userAgent + " " + getExtraUserAgent();
