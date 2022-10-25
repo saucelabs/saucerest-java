@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
+import org.openqa.selenium.remote.SessionId;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -37,12 +37,13 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -91,19 +92,11 @@ public class SauceREST implements Serializable {
     private static String extraUserAgent = "";
 
     private final String server;
+    private final String apiServer;
     private final String edsServer;
     private final String appServer;
 
     private final String restApiEndpoint;
-
-    private static final Map<JobSource, String> jobSourcePathComponent = Collections.unmodifiableMap(
-        new EnumMap<JobSource, String>(JobSource.class) {
-            {
-                put(JobSource.RDC, "rdc");
-                put(JobSource.VDC, "vdc");
-            }
-        }
-    );
 
     /**
      * Retry policy default values.
@@ -116,12 +109,22 @@ public class SauceREST implements Serializable {
     private ChronoUnit chronoUnit;
     private List<Class<? extends Throwable>> throwableList;
 
+    public SauceREST() {
+        this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), US);
+    }
+
+    public SauceREST(DataCenter dataCenter) {
+        this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), dataCenter);
+    }
+
     /**
      * Constructs a new instance of the SauceREST class, uses US as the default data center
      *
      * @param username  The username to use when performing HTTP requests to the Sauce REST API
      * @param accessKey The access key to use when performing HTTP requests to the Sauce REST API
+     * @deprecated This constructor is getting deprecated because a default region can cause side-effects when used without knowing.
      */
+    @Deprecated
     public SauceREST(String username, String accessKey) {
         this(username, accessKey, US);
     }
@@ -156,6 +159,7 @@ public class SauceREST implements Serializable {
         this.accessKey = accessKey;
         this.server = buildUrl(dataCenter.server(), "SAUCE_REST_ENDPOINT", "saucerest-java.base_url");
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
+        this.apiServer = buildUrl(dataCenter.apiServer(), "SAUCE_API_ENDPOINT", "saucerest-java.base_api_url");
         this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
         this.restApiEndpoint = server + "rest/v1/";
         this.maxDuration = maxDuration;
@@ -194,6 +198,14 @@ public class SauceREST implements Serializable {
 
     public static void setExtraUserAgent(String extraUserAgent) {
         SauceREST.extraUserAgent = extraUserAgent;
+    }
+
+    public Job getJob(SessionId sessionId) {
+        return getJob(sessionId.toString());
+    }
+
+    public Job getJob(String sessionId) {
+        return new Job(sessionId);
     }
 
     /**
@@ -252,7 +264,11 @@ public class SauceREST implements Serializable {
     }
 
     protected URL buildBuildUrl(JobSource source, String endpoint) {
-        return buildEndpoint(server, "v2/builds/" + jobSourcePathComponent.get(source) + "/" + endpoint, "Builds URL");
+        return buildEndpoint(apiServer, "v2/builds/" + source.name().toLowerCase(Locale.ROOT) + "/" + endpoint, "Builds URL");
+    }
+
+    protected URL appendToBaseURL(String endpoint, String urlDescription) {
+        return buildEndpoint(apiServer, endpoint, urlDescription);
     }
 
     private URL buildHarUrl(String jobId) {
@@ -999,6 +1015,38 @@ public class SauceREST implements Serializable {
     }
 
     /**
+     * Returns a String (in JSON format) representing the details for Sauce jobs.
+     *
+     * @param ids   iterable of job ids
+     * @param full  should return full jobs response
+     * @return String (in JSON format) representing the jobID for sauce jobs
+     */
+    public String getJobsByIds(Iterable<String> ids, boolean full) {
+        List<String> params = new ArrayList<String>();
+        for (String jobId: ids) {
+            params.add("id=" + jobId);
+        }
+        if (params.size() == 0) {
+            return "{}";
+        }
+        if (full) {
+            params.add("full=true");
+        }
+        URL restEndpoint = buildURL("jobs?" + String.join("&", params));
+        return retrieveResults(restEndpoint);
+    }
+
+    /**
+     * Returns a String (in JSON format) representing the details for Sauce jobs.
+     *
+     * @param ids   iterable of job ids
+     * @return String (in JSON format) representing the jobID for full sauce jobs
+     */
+    public String getFullJobsByIds(Iterable<String> ids) {
+        return getJobsByIds(ids, true);
+    }
+
+    /**
      * @param restEndpoint the URL to perform a HTTP GET
      * @return Returns the response from invoking a HTTP GET for the restEndpoint
      */
@@ -1556,7 +1604,7 @@ public class SauceREST implements Serializable {
      * @return String (in JSON format) representing the concurrency information
      */
     public String getConcurrency() {
-        URL restEndpoint = buildURL("users/" + username + "/concurrency");
+        URL restEndpoint = appendToBaseURL("/rest/v1.2/users/" + username + "/concurrency", "Get User Concurrency");
         return retrieveResults(restEndpoint);
     }
 
@@ -1682,7 +1730,7 @@ public class SauceREST implements Serializable {
     public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {
         URL restEndpoint = buildBuildUrl(
             source,
-            "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) + "&limit=" + limit
+            "?name=" + URLEncoder.encode(name, "UTF-8") + "&limit=" + limit
         );
         return retrieveResults(restEndpoint);
     }

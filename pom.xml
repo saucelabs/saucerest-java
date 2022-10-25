@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.saucelabs</groupId>
     <artifactId>saucerest</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.6-SNAPSHOT</version>
     <name>saucerest</name>
     <description>Java library which provides helper methods for invoking the Sauce Labs REST API</description>
     <url>https://saucelabs.com</url>
@@ -18,11 +18,19 @@
         <name>Sauce Labs</name>
         <url>http://www.saucelabs.com/</url>
     </organization>
+    <developers>
+        <developer>
+            <name>Yi Min Yang</name>
+            <email>yi-min.yang@saucelabs.com</email>
+            <organization>Sauce Labs</organization>
+            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
+        </developer>
+    </developers>
     <scm>
         <connection>scm:git:git://github.com/saucelabs/saucerest-java.git</connection>
         <developerConnection>scm:git:git@github.com:saucelabs/saucerest-java.git</developerConnection>
         <url>git@github.com:saucelabs/saucerest-java.git</url>
-      <tag>saucerest-1.1.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <properties>
         <java.version>8</java.version>
@@ -46,7 +54,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.8.2</version>
+                <version>5.9.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -61,7 +69,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20211205</version>
+            <version>20220924</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -74,14 +82,13 @@
             <version>2.4.4</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.1.2</version>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>2.2</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -89,6 +96,21 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -117,7 +139,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -128,7 +150,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -141,37 +163,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M6</version>
                 <configuration>
                     <goals>deploy nexus-staging:release</goals>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <projectVersionPolicyId>SemverPropertyPolicy</projectVersionPolicyId>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.12.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>codes.dylanlacey</groupId>
-                        <artifactId>SemverPropertyPolicy</artifactId>
-                        <version>0.0.7</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-plugin</artifactId>
-                <version>1.12.0</version>
+                <version>1.13.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>3.0.1</version>
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -185,7 +200,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
                 <executions>
                     <execution>
                         <goals>
@@ -217,7 +232,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <encoding>UTF-8</encoding>
@@ -234,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
