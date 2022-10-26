@@ -56,7 +56,7 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
-    if: ${{ github.event.repository.name == 'saucelabs/saucerest-java' }}
+    if: github.event.pull_request.head.repo.name == github.repository
 
     steps:
       - uses: actions/checkout@v3
