@@ -51,8 +51,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static com.saucelabs.saucerest.DataCenter.US;
-
 /**
  * Simple Java API that invokes the Sauce REST API.  The full list of the Sauce REST API
  * functionality is available from
