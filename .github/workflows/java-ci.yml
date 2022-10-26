@@ -42,6 +42,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
       - name: Build with Maven
         run: mvn clean test -Dtest="com.saucelabs.saucerest.unit.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
       - name: Upload to Codecov
@@ -54,6 +55,8 @@ jobs:
     needs: main_job
     name: Integration Tests
     runs-on: ubuntu-latest
+    # Only run integration tests if the code is coming from this repo and not forks
+    if: ${{ github.event.repository.name == 'saucelabs/saucerest-java' }}
 
     steps:
       - uses: actions/checkout@v3
@@ -62,5 +65,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
       - name: Build with Maven
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V

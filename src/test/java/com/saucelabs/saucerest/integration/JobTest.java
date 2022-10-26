@@ -71,11 +71,11 @@ public class JobTest {
         driver.set(new RemoteWebDriver(url, options));
 
         if (DataCenter.EU == param) {
-            job = new SauceREST(EU).getJob(EU, driver.get().getSessionId());
+            job = new SauceREST(EU).getJob(EU, driver.get().getSessionId().toString());
         } else if (DataCenter.USWEST == param) {
-            job = new SauceREST(US).getJob(US, driver.get().getSessionId());
+            job = new SauceREST(US).getJob(US, driver.get().getSessionId().toString());
         } else if (DataCenter.APAC == param) {
-            job = new SauceREST(APAC_SOUTHEAST).getJob(APAC_SOUTHEAST, driver.get().getSessionId());
+            job = new SauceREST(APAC_SOUTHEAST).getJob(APAC_SOUTHEAST, driver.get().getSessionId().toString());
         }
     }
 
