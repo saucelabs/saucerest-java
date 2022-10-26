@@ -30,8 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.saucelabs.saucerest.DataCenter.EU;
-import static com.saucelabs.saucerest.DataCenter.US;
+import static com.saucelabs.saucerest.DataCenter.*;
 
 @ExtendWith(AfterBeforeParameterResolver.class)
 public class JobTest {
@@ -43,7 +42,8 @@ public class JobTest {
     // Yes, duplicating instead of using DataCenter enum to restrict and control where these tests run.
     enum DataCenter {
         USWEST("https://ondemand.us-west-1.saucelabs.com/wd/hub"),
-        EU("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
+        EU("https://ondemand.eu-central-1.saucelabs.com/wd/hub"),
+        APAC("https://ondemand.apac-southeast-1.saucelabs.com/wd/hub");
 
         public final String label;
 
@@ -74,6 +74,8 @@ public class JobTest {
             job = new SauceREST(EU).getJob(EU, driver.get().getSessionId().toString());
         } else if (DataCenter.USWEST == param) {
             job = new SauceREST(US).getJob(US, driver.get().getSessionId().toString());
+        } else if (DataCenter.APAC == param) {
+            job = new SauceREST(APAC_SOUTHEAST).getJob(APAC_SOUTHEAST, driver.get().getSessionId().toString());
         }
     }
 

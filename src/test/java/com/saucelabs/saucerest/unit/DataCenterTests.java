@@ -1,15 +1,16 @@
 package com.saucelabs.saucerest.unit;
 
 import com.saucelabs.saucerest.DataCenter;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DataCenterTests
 {
+    @ParameterizedTest
     @CsvSource({
         "US,      US",
         "us,      US",
@@ -17,12 +18,17 @@ class DataCenterTests
         "Eu,      EU",
         "US_EAST, US_EAST",
         "us_EaSt, US_EAST",
+        "APAC_SOUTHEAST,    APAC_SOUTHEAST",
+        "apac_southeast,    APAC_SOUTHEAST",
     })
-
-    @ParameterizedTest
     void testFromString(String input, DataCenter expected)
     {
         assertEquals(expected, DataCenter.fromString(input));
+    }
+
+    @Test
+    void testInvalidString() {
+        assertNull(DataCenter.fromString("unknown"));
     }
 
     @ParameterizedTest
