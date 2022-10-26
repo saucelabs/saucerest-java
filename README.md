@@ -22,11 +22,11 @@ SauceREST sauce = new SauceREST("username", "access-key", Datacenter.US);
 ```
 Paramaters:
 
-| Name        | Type                            | Details                  |
-| ----------- |---------------------------------|--------------------------|
-| username    | String (required)               | your sauce labs username |
-| access-key  | String (required)               | your sauce labs accesskey |
-| data_center  | String or DataCenter (required) | one of US, US_EAST, EU  |
+| Name        | Type                            | Details                                |
+|-------------|---------------------------------|----------------------------------------|
+| username    | String (required)               | your sauce labs username               |
+| access-key  | String (required)               | your sauce labs accesskey              |
+| data_center | String or DataCenter (required) | one of US, US_EAST, EU, APAC_SOUTHEAST |
 
 
 
