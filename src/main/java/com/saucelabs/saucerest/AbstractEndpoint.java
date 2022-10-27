@@ -1,11 +1,6 @@
 package com.saucelabs.saucerest;
 
-import okhttp3.Credentials;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -24,8 +19,38 @@ public abstract class AbstractEndpoint {
         this.baseURL = dataCenter.apiServer;
     }
 
+    public AbstractEndpoint(String apiServer) {
+        this.username = System.getenv("SAUCE_USERNAME");
+        this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
+        this.credentials = Credentials.basic(username, accessKey);
+        this.baseURL = apiServer;
+    }
+
     public JSONObject getResponseObject(String url) throws IOException {
         Response response = getResponse(url);
+        return new JSONObject(response.body().string());
+    }
+
+    /**
+     * Make a GET request with query parameters.
+     * @param url Sauce Labs API endpoint
+     * @param params query parameters for GET request
+     * @return
+     * @throws IOException
+     */
+    public JSONObject getResponseObject(String url, Map<String, Object> params) throws IOException {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            urlBuilder.addQueryParameter(param.getKey(), param.getValue().toString());
+        }
+
+        Request request = new Request.Builder()
+            .header("Authorization", credentials)
+            .url(urlBuilder.build().toString())
+            .build();
+
+        Response response = makeRequest(request);
         return new JSONObject(response.body().string());
     }
 
@@ -33,6 +58,25 @@ public abstract class AbstractEndpoint {
         Response response = getResponse(url);
         return response.body().source();
     }
+
+    public JSONObject postResponse(String url, Map<String, Object> payload) throws IOException {
+        return postResponse(url, payload, MediaType.parse("application/json"));
+    }
+
+    public JSONObject postResponse(String url, Map<String, Object> payload, MediaType mediaType) throws IOException {
+        String json = new JSONObject(payload).toString();
+
+        Request request = new Request.Builder()
+            .header("Authorization", credentials)
+            .url(url)
+            .post(RequestBody.create(json, mediaType))
+            .build();
+
+        Response response = makeRequest(request);
+        return new JSONObject(response.body().string());
+    }
+
+
 
     public JSONObject putResponse(String url, Map<String, Object> payload) throws IOException {
         String json = new JSONObject(payload).toString();
@@ -65,7 +109,7 @@ public abstract class AbstractEndpoint {
         return makeRequest(request);
     }
 
-    private Response makeRequest(Request request) throws IOException {
+    Response makeRequest(Request request) throws IOException {
         Response response = new OkHttpClient().newCall(request).execute();
         if (!response.isSuccessful()) {
             throw new RuntimeException("Unexpected code " + response);

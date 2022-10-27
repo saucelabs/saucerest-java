@@ -39,20 +39,6 @@ public class JobTest {
     @TempDir
     private Path tempDir;
 
-    // Yes, duplicating instead of using DataCenter enum to restrict and control where these tests run.
-    enum DataCenter {
-        USWEST("https://ondemand.us-west-1.saucelabs.com/wd/hub"),
-        EU("https://ondemand.eu-central-1.saucelabs.com/wd/hub"),
-        APAC("https://ondemand.apac-southeast-1.saucelabs.com/wd/hub");
-
-        public final String label;
-
-        DataCenter(String label) {
-            this.label = label;
-        }
-
-    }
-
     public void createDriver(DataCenter param, TestInfo testInfo) throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
         MutableCapabilities sauceOptions = new MutableCapabilities();
@@ -71,11 +57,11 @@ public class JobTest {
         driver.set(new RemoteWebDriver(url, options));
 
         if (DataCenter.EU == param) {
-            job = new SauceREST(EU).getJob(EU, driver.get().getSessionId().toString());
+            job = new SauceREST(EU).getJob(driver.get().getSessionId().toString());
         } else if (DataCenter.USWEST == param) {
-            job = new SauceREST(US).getJob(US, driver.get().getSessionId().toString());
+            job = new SauceREST(US).getJob(driver.get().getSessionId().toString());
         } else if (DataCenter.APAC == param) {
-            job = new SauceREST(APAC_SOUTHEAST).getJob(APAC_SOUTHEAST, driver.get().getSessionId().toString());
+            job = new SauceREST(APAC_SOUTHEAST).getJob(driver.get().getSessionId().toString());
         }
     }
 

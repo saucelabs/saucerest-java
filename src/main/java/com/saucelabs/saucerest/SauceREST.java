@@ -189,6 +189,18 @@ public class SauceREST implements Serializable {
         return new Job(dataCenter, sessionId);
     }
 
+    public Job getJob(String sessionId) {
+        return new Job(this.apiServer, sessionId);
+    }
+
+    public Storage getStorage(DataCenter dataCenter) {
+        return new Storage(dataCenter);
+    }
+
+    public Storage getStorage() {
+        return new Storage(this.apiServer);
+    }
+
     /**
      * Returns username assigned to this interface
      *
@@ -342,6 +354,7 @@ public class SauceREST implements Serializable {
      * Marks a Sauce job as 'passed'.
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @deprecated
      */
     public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -353,6 +366,7 @@ public class SauceREST implements Serializable {
      * Marks a Sauce job as 'failed'.
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @deprecated
      */
     public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -365,6 +379,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param tags  the tags to be added to the job, provided as a list of strings
+     * @deprecated
      */
     public void addTags(String jobId, List<String> tags) {
         Map<String, Object> updates = new HashMap<>();
@@ -934,6 +949,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId the Sauce job ID to retrieve
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getJobInfo(String jobId) {
         URL restEndpoint = buildURL(username + "/jobs/" + jobId);
@@ -944,6 +960,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getFullJobs() {
         return getFullJobs(20);
@@ -954,6 +971,7 @@ public class SauceREST implements Serializable {
      *
      * @param limit Number of jobs to return
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getFullJobs(int limit) {
         URL restEndpoint = buildURL(username + "/jobs?full=true&limit=" + limit);
@@ -964,6 +982,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs() {
         URL restEndpoint = buildURL(username + "/jobs");
@@ -976,6 +995,7 @@ public class SauceREST implements Serializable {
      *
      * @param limit Number of jobs to return(max of 500)
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs(int limit) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit);
@@ -989,6 +1009,7 @@ public class SauceREST implements Serializable {
      * @param to    value in Epoch time format denoting the time to end the job list search
      * @param from  value in Epoch time format denoting the time to start the search
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs(int limit, long to, int from) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
@@ -1001,6 +1022,7 @@ public class SauceREST implements Serializable {
      * @param ids   iterable of job ids
      * @param full  should return full jobs response
      * @return String (in JSON format) representing the jobID for sauce jobs
+     * @deprecated
      */
     public String getJobsByIds(Iterable<String> ids, boolean full) {
         List<String> params = new ArrayList<String>();
@@ -1022,6 +1044,7 @@ public class SauceREST implements Serializable {
      *
      * @param ids   iterable of job ids
      * @return String (in JSON format) representing the jobID for full sauce jobs
+     * @deprecated
      */
     public String getFullJobsByIds(Iterable<String> ids) {
         return getJobsByIds(ids, true);
@@ -1290,6 +1313,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId   the Sauce job ID to update
      * @param updates Map of attributes to update
+     * @deprecated
      */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
@@ -1308,6 +1332,7 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to stop a running job.
      *
      * @param jobId the Sauce job ID
+     * @deprecated
      */
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1328,6 +1353,7 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to delete a completed job from Sauce.
      *
      * @param jobId the Sauce job ID
+     * @deprecated
      */
     public void deleteJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1411,44 +1437,48 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Uploads a file to Sauce storage.
+     * Uploads an app file to Sauce Labs Mobile App Storage.
+     * Supported file types are *.apk, *.aab, *.ipa, or *.zip.
+     * Maximum file size is up to 4GB.
      *
-     * @param file the file to upload -param fileName uses file.getName() to store in sauce -param
-     *             overwrite set to true
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
+     * @param file the mobile app file to be uploaded
+     * @return ?
+     * @throws IOException ?
+     * @see <a href="https://docs.saucelabs.com/mobile-apps/app-storage/">https://docs.saucelabs.com/mobile-apps/app-storage/</a>
+     * @deprecated
      */
     public String uploadFile(File file) throws IOException {
         return uploadFile(file, file.getName());
     }
 
     /**
-     * Uploads a file to Sauce storage.
+     * Uploads an app file to Sauce Labs Mobile App Storage.
+     * Supported file types are *.apk, *.aab, *.ipa, or *.zip.
+     * Maximum file size is up to 4GB.
      *
-     * @param file     the file to upload
-     * @param fileName name of the file in sauce storage -param overwrite set to true
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
+     * @param file     the mobile app file to be uploaded
+     * @param fileName the filename including its extension
+     * @return ?
+     * @throws IOException ?
+     * @see <a href="https://docs.saucelabs.com/mobile-apps/app-storage/">https://docs.saucelabs.com/mobile-apps/app-storage/</a>
+     * @deprecated
      */
     public String uploadFile(File file, String fileName) throws IOException {
-        return uploadFile(file, fileName, true);
+        return uploadFile(file, fileName, null);
     }
 
     /**
-     * Uploads a file to Sauce storage.
      *
-     * @param file      the file to upload
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
+     * @param file
+     * @param fileName
+     * @param description
+     * @return
+     * @throws IOException
+     * @deprecated
      */
-    public String uploadFile(File file, String fileName, boolean overwrite) throws IOException {
-        try (FileInputStream is = new FileInputStream(file)) {
-            return uploadFile(is, fileName, overwrite);
+    public String uploadFile(File file, String fileName, String description) throws IOException {
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            return uploadFile(fileInputStream, fileName, description);
         }
     }
 
@@ -1461,10 +1491,11 @@ public class SauceREST implements Serializable {
      * @return the md5 hash returned by sauce of the file
      * @throws IOException can be thrown when server returns an error (tcp or http status not in the
      *                     200 range)
+     * @deprecated
      */
-    public String uploadFile(InputStream is, String fileName, boolean overwrite) throws IOException {
+    public String uploadFile(InputStream is, String fileName, String description) throws IOException {
         try {
-            URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
+            URL restEndpoint = buildURL("v1/storage/upload");
 
             HttpURLConnection connection = openConnection(HttpMethod.POST, restEndpoint);
 
@@ -1603,6 +1634,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the stored files list
      *
      * @return String (in JSON format) representing the stored files list
+     * @deprecated
      */
     public String getStoredFiles() {
         URL restEndpoint = buildURL("storage/" + username);

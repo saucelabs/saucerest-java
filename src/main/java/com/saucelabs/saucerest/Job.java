@@ -22,6 +22,11 @@ public class Job extends AbstractEndpoint {
         this.jobID = sessionId;
     }
 
+    public Job(String apiServer, String sessionId) {
+        super(apiServer);
+        this.jobID = sessionId;
+    }
+
     public JSONObject getDetails() throws IOException {
         return getResponseObject(getBaseEndpoint());
     }
