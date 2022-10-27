@@ -1,5 +1,6 @@
-package com.saucelabs.saucerest;
+package com.saucelabs.saucerest.unit;
 
+import com.saucelabs.saucerest.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.hamcrest.CoreMatchers;
@@ -9,17 +10,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,13 +29,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
+@Execution(ExecutionMode.SAME_THREAD)
 class SauceRESTTest {
 
     private SauceREST sauceREST;
@@ -127,7 +118,7 @@ class SauceRESTTest {
         }
 
         @Override
-        public InputStream getInputStream() throws IOException {
+        public InputStream getInputStream() {
             if (multipleMockInputStream == null) {
                 return mockInputStream;
             } else {
@@ -191,7 +182,7 @@ class SauceRESTTest {
     @BeforeEach
     void setUp() throws Exception {
         urlConnection = new MockHttpURLConnection();
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -210,7 +201,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -221,7 +212,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnWrite() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockOutputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -245,8 +236,8 @@ class SauceRESTTest {
 
     @Test
     void testConfirmSerializable() {
-        SauceREST original = new SauceREST(null, null);
-        SauceREST copy = (SauceREST) SerializationUtils.clone(original);
+        SauceREST original = new SauceREST(null, null, DataCenter.US);
+        SauceREST copy = SerializationUtils.clone(original);
         assertEquals(original, copy);
     }
 
@@ -395,12 +386,13 @@ class SauceRESTTest {
     @Test
     void testGetConcurrency() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/users_halkeye_concurrency.json").openStream());
-
-        String concurencyInfo = sauceREST.getConcurrency();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/users/" + this.sauceREST.getUsername() + "/concurrency");
+        urlConnection.setInputStream(getClass().getResource("/users_test_concurrency.json").openStream());
+        String concurrencyInfo = sauceREST.getConcurrency();
+        assertEquals("/rest/v1.2/users/" + this.sauceREST.getUsername() + "/concurrency", this.urlConnection.getRealURL().getPath());
         assertNull(this.urlConnection.getRealURL().getQuery());
-        assertEquals(concurencyInfo, "{\"timestamp\": 1447392030.111457, \"concurrency\": {\"halkeye\": {\"current\": {\"overall\": 0, \"mac\": 0, \"manual\": 0}, \"remaining\": {\"overall\": 100, \"mac\": 100, \"manual\": 5}}}}");
+
+        String expectedConcurrencyInfo = "{\"timestamp\":1447392030.111457,\"concurrency\":{\"organization\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"ca8b135d2e7e456385344811e05d84a6\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}},\"team\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"7e3beebb84bf4efaadffbbbbe780f294\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}}}}";
+        assertEquals(expectedConcurrencyInfo, concurrencyInfo);
     }
 
     @Test
@@ -619,6 +611,9 @@ class SauceRESTTest {
         assertThrows(FileNotFoundException.class, () -> sauceREST.getAvailableAssets("1234"));
     }
 
+    /**
+     * This test is not thread/parallel safe. When run fully parallelized will fail.
+     */
     @Test
     void testDownloadAllAssets(@TempDir Path tempDir) throws IOException {
         List<InputStream> inputStreamList = Arrays.asList(
@@ -999,6 +994,51 @@ class SauceRESTTest {
 
     }
 
+    @Test
+    void testGetJobsByIdsNoIds() {
+        String[] ids = {};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals(jsonJobs, "{}");
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsNotFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), false);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetJobsByIdsMultipleIdsFull() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getJobsByIds(Arrays.asList(ids), true);
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
+    }
+
+    @Test
+    void testGetFullJobsByIds() {
+        urlConnection.setResponseCode(200);
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
+        String[] ids = {"123", "456", "789"};
+
+        String jsonJobs = sauceREST.getFullJobsByIds(Arrays.asList(ids));
+
+        assertEquals("/rest/v1/jobs", this.urlConnection.getRealURL().getPath());
+        assertEquals("id=123&id=456&id=789&full=true", this.urlConnection.getRealURL().getQuery());
+    }
+
     @ParameterizedTest
     @EnumSource(JobSource.class)
     void testBuildJobs(JobSource jobSource) {
@@ -1157,7 +1197,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUSByDefault() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1205,7 +1245,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUsWithInvalidString() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", "Antarctica") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);

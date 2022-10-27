@@ -22,11 +22,11 @@ SauceREST sauce = new SauceREST("username", "access-key", Datacenter.US);
 ```
 Paramaters:
 
-| Name        | Type              | Details       |
-| ----------- | ----------------- | ------------- |
-| username    | String (required) | your sauce labs username  |
-| access-key  | String (required) | your sauce labs accesskey  |
-| data_center  | String (optional) | one of US, US_EAST, EU (Default US)  |
+| Name        | Type                            | Details                                |
+|-------------|---------------------------------|----------------------------------------|
+| username    | String (required)               | your sauce labs username               |
+| access-key  | String (required)               | your sauce labs accesskey              |
+| data_center | String or DataCenter (required) | one of US, US_EAST, EU, APAC_SOUTHEAST |
 
 
 
@@ -130,5 +130,11 @@ String tunnels = sauce.getTunnels();
 
 For latest version please check the following link: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.saucelabs%22%20AND%20a%3A%22saucerest%22.
 
-# Contributing
-Check out our contribution guide [Here](https://github.com/saucelabs/saucerest-java/blob/master/CONTRIBUTING.md).
+
+## Contributing
+Check out our contribution guide [Here](CONTRIBUTING.md) for details.
+
+Want a fast, setup dev environment?  [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/saucelabs/saucerest-java).
+
+### Hacktoberfest
+Here for [Hacktoberfest?](https://hacktoberfest.com/).  Check out [Our Hacktoberfest Issues](https://github.com/saucelabs/saucerest-java/issues?q=is%3Aissue+is%3Aopen+label%3Ahacktoberfest), or visit [https://opensource.saucelabs.com/hacktoberfest/](https://opensource.saucelabs.com/hacktoberfest/) to see all our Hacktoberfest projects!
