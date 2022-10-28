@@ -51,20 +51,13 @@ jobs:
         with:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
-      - name: Print repo name
-        env:
-          PR_HEAD_REPO_FULL_NAME: ${{ github.event.pull_request.head.repo.full_name }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: |
-          echo "$PR_HEAD_REPO_FULL_NAME"
-          echo "$GITHUB_REPOSITORY"
 
   Integration:
     needs: main_job
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ (github.event.pull_request.head.repo.full_name == github.repository) || (github.event.push.head.repo.full_name == github.repository) }}
 
     steps:
       - uses: actions/checkout@v3
