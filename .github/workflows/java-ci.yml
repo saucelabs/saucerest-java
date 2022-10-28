@@ -64,6 +64,7 @@ jobs:
           echo "github.event.pull_request.head.repo.full_name: ${{github.event.pull_request.head.repo.full_name}}"
           echo "github.event.push.head.repo.full_name: ${{github.event.push.head.repo.full_name}}"
           echo "github.event.push.repository: ${{github.event.push.repository}}"
+          echo "github.event.push: ${{github.event.push}}"
 
   Integration:
     needs: main_job
