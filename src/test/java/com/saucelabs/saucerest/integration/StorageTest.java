@@ -6,12 +6,12 @@ import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.Storage;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -27,11 +27,20 @@ public class StorageTest {
         storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorage());
     }
 
+    @BeforeAll
+    public static void uploadAppFiles() throws IOException {
+        for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
+            File file = new StorageTestHelper().getAppFile(appFile);
+            new SauceREST(DataCenter.EU).getStorage().uploadFile(file);
+            new SauceREST(DataCenter.US).getStorage().uploadFile(file);
+        }
+    }
+
     @ParameterizedTest
     @EnumSource(Region.class)
     public void uploadAppFileTest(Region region) throws IOException {
         setup(region);
-        File file = new File(Objects.requireNonNull(getClass().getResource("/AppFiles/iOS-Real-Device-MyRNDemoApp.ipa")).getFile());
+        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
         JSONObject response = storage.get().uploadFile(file);
 
         Assertions.assertEquals(file.getName(), response.getJSONObject("item").getString("name"));
@@ -42,7 +51,7 @@ public class StorageTest {
     @EnumSource(Region.class)
     public void uploadAppFileWithFileNameTest(Region region) throws IOException {
         setup(region);
-        File file = new File(Objects.requireNonNull(getClass().getResource("/AppFiles/iOS-Real-Device-MyRNDemoApp.ipa")).getFile());
+        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
         JSONObject response = storage.get().uploadFile(file, "test-file-name.ipa");
 
         Assertions.assertEquals("test-file-name.ipa", response.getJSONObject("item").getString("name"));
@@ -53,7 +62,7 @@ public class StorageTest {
     @EnumSource(Region.class)
     public void uploadAppFileWithFileNameAndDescriptionTest(Region region) throws IOException {
         setup(region);
-        File file = new File(Objects.requireNonNull(getClass().getResource("/AppFiles/iOS-Real-Device-MyRNDemoApp.ipa")).getFile());
+        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
         JSONObject response = storage.get().uploadFile(file, "test-file-name.ipa", "My App File Description");
 
         Assertions.assertEquals("test-file-name.ipa", response.getJSONObject("item").getString("name"));
