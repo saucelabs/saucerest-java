@@ -64,7 +64,7 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
-    if: env.NOT_FROM_FORK == 'true'
+    if: "${{ env.NOT_FROM_FORK }}" == 'true'
 
     steps:
       - uses: actions/checkout@v3
