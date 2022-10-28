@@ -12,6 +12,7 @@ permissions:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
+  NOT_FROM_FORK: ${{ (github.repository == 'saucelabs/saucerest-java') && ((github.event.pull_request.head.repo.full_name == github.repository) || (github.event.push.head.repo.full_name == github.repository)) }}
 
 jobs:
   pre_job:
@@ -29,6 +30,9 @@ jobs:
           skip_after_successful_duplicate: 'true'
           paths_ignore: '["**/README.md", "**/docs/**"]'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+      - name: Not from fork?
+        run: |
+          echo "$NOT_FROM_FORK"
 
   main_job:
     needs: pre_job
@@ -51,22 +55,13 @@ jobs:
         with:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
-      - name: Test
-        env:
-          PR_NAME: ${{ github.event.pull_request.head.repo.full_name }}
-          PUSH_NAME: ${{ github.event.push.head.repo.full_name }}
-          COMMIT: ${{ github.event.push.repository }}
-        run: |
-          echo "$PR_NAME"
-          echo "$PUSH_NAME"
-          echo "$COMMIT"
 
   Integration:
     needs: main_job
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
-    if: ${{ (github.event.pull_request.head.repo.full_name == github.repository) || (github.event.push.head.repo.full_name == github.repository) }}
+    if: env.NOT_FROM_FORK == 'true'
 
     steps:
       - uses: actions/checkout@v3
