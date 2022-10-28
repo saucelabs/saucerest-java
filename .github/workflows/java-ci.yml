@@ -3,6 +3,7 @@ name: Java CI
 on:
   push:
   pull_request:
+    types: [opened, reopened]
   workflow_dispatch:
 
 permissions:
