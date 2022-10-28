@@ -55,9 +55,11 @@ jobs:
         env:
           PR_NAME: ${{ github.event.pull_request.head.repo.full_name }}
           PUSH_NAME: ${{ github.event.push.head.repo.full_name }}
+          COMMIT: ${{ github.event.push.repository }}
         run: |
           echo "$PR_NAME"
           echo "$PUSH_NAME"
+          echo "$COMMIT"
 
   Integration:
     needs: main_job
