@@ -91,14 +91,30 @@ public abstract class AbstractEndpoint {
         return new JSONObject(response.body().string());
     }
 
-    public void deleteResponse(String url) throws IOException {
+    public JSONObject putResponse(String url, String payload) throws IOException {
+        String json = new JSONObject(payload).toString();
+
+        Request request = new Request.Builder()
+            .header("Authorization", credentials)
+            .url(url)
+            .put(RequestBody.create(json, MediaType.parse("application/json")))
+            .build();
+
+        Response response = makeRequest(request);
+        return new JSONObject(response.body().string());
+    }
+
+
+
+    public JSONObject deleteResponse(String url) throws IOException {
         Request request = new Request.Builder()
             .header("Authorization", credentials)
             .url(url)
             .delete()
             .build();
 
-        makeRequest(request);
+        Response response = makeRequest(request);
+        return new JSONObject(response.body().string());
     }
 
     private Response getResponse(String url) throws IOException {

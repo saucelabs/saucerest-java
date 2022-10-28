@@ -7,14 +7,20 @@ import com.saucelabs.saucerest.Storage;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
+    @TempDir
+    private Path tempDir;
 
     /**
      * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
@@ -33,10 +39,16 @@ public class StorageTest {
 
     @BeforeAll
     public static void uploadAppFiles() throws IOException {
-        for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
-            File file = new StorageTestHelper().getAppFile(appFile);
-            new SauceREST(DataCenter.EU).getStorage().uploadFile(file);
-            new SauceREST(DataCenter.US).getStorage().uploadFile(file);
+        Storage storageEU = new SauceREST(DataCenter.EU).getStorage();
+        Storage storageUS = new SauceREST(DataCenter.US).getStorage();
+
+        if (storageEU.getFiles(ImmutableMap.of("q", "DemoApp")).length() <= 3 ||
+            storageUS.getFiles(ImmutableMap.of("q", "DemoApp")).length() <= 3) {
+            for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
+                File file = new StorageTestHelper().getAppFile(appFile);
+                new SauceREST(DataCenter.EU).getStorage().uploadFile(file);
+                new SauceREST(DataCenter.US).getStorage().uploadFile(file);
+            }
         }
     }
 
@@ -117,6 +129,22 @@ public class StorageTest {
 
     @ParameterizedTest
     @EnumSource(Region.class)
+    public void updateAppGroupSettings(Region region) throws IOException {
+        setup(region);
+
+        // Call getGroups() to get the group ID first
+        JSONObject getGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
+        int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
+        String jsonBody = "{\"settings\":{\"resigning\":{\"image_injection\":false}}}";
+
+        JSONObject response = storage.get().updateAppStorageGroupSettings(groupId, jsonBody);
+
+        Assertions.assertFalse(response.isEmpty());
+        Assertions.assertFalse(response.getJSONObject("settings").getJSONObject("resigning").getBoolean("image_injection"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
     public void getAppGroupSettingsTest(Region region) throws IOException {
         setup(region);
 
@@ -128,5 +156,67 @@ public class StorageTest {
 
         Assertions.assertFalse(response.isEmpty());
         Assertions.assertTrue(response.toMap().size() > 0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void downloadAppTest(Region region) throws IOException {
+        setup(region);
+
+        // Call getFiles() to get a file ID so we can use it as a parameter
+        JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
+
+        storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
+
+        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "iOS.ipa")));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void updateAppFileDescription(Region region) throws IOException {
+        setup(region);
+
+        // Call getFiles() to get a file ID so we can use it as a parameter
+        JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
+
+        storage.get().updateFileDescription(fileId, "Updated through Integration Test");
+
+        JSONObject file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+
+        Assertions.assertEquals("Updated through Integration Test", file.getJSONArray("items").getJSONObject(0).getString("description"));
+
+        storage.get().updateFileDescription(fileId, "");
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void deleteAppFile(Region region) throws IOException {
+        setup(region);
+
+        // Upload app file, save file ID
+        JSONObject uploadResponse = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
+        String fileId = uploadResponse.getJSONObject("item").getString("id");
+        Assertions.assertNotNull(fileId);
+
+        JSONObject deleteResponse = storage.get().deleteFile(fileId);
+        String fileIdOfDeletedApp = deleteResponse.getJSONObject("item").getString("id");
+        Assertions.assertEquals(fileIdOfDeletedApp, fileId);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void deleteAppGroup(Region region) throws IOException {
+        setup(region);
+
+        // Upload app file, save file ID
+        JSONObject uploadResponse = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
+        int groupId = uploadResponse.getJSONObject("item").getInt("group_id");
+        Assertions.assertNotNull(groupId);
+
+        JSONObject deleteResponse = storage.get().deleteFileGroup(groupId);
+        int groupIdOfDeletedGroup = deleteResponse.getJSONObject("item").getInt("id");
+        Assertions.assertEquals(groupIdOfDeletedGroup, groupId);
     }
 }

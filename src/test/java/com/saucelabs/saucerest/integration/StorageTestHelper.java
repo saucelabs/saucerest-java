@@ -7,7 +7,9 @@ public class StorageTestHelper {
     enum AppFile {
         IPA("iOS-Real-Device-MyRNDemoApp.ipa"),
         ZIP("iOS-Simulator-MyRNDemoApp.zip"),
-        APK("Android-MyDemoAppRN.apk");
+        APK("Android-MyDemoAppRN.apk"),
+        IPA_NATIVE("iOS-Real-Device-MyNativeDemoApp.ipa"),
+        APK_NATIVE("Android-MyDemoAppNative.apk");
 
         public final String fileName;
 
