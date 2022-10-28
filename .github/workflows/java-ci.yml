@@ -51,6 +51,13 @@ jobs:
         with:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
+      - name: Test
+        env:
+          PR_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+          PUSH_NAME: ${{ github.event.push.head.repo.full_name }}
+        run: |
+          echo "PR_NAME"
+          echo "PUSH_NAME"
 
   Integration:
     needs: main_job
