@@ -16,6 +16,10 @@ import java.io.IOException;
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
 
+    /**
+     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
+     * app files yet.
+     */
     enum Region {
         EU(), US();
 
