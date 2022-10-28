@@ -12,7 +12,6 @@ permissions:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-  NOT_FROM_FORK: ${{ (github.repository == 'saucelabs/saucerest-java') && ((github.event.pull_request.head.repo.full_name == github.repository) || (github.event.push.head.repo.full_name == github.repository)) }}
 
 jobs:
   pre_job:
@@ -55,6 +54,9 @@ jobs:
         with:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
+      - name: Setup
+        run: |
+          echo "NOT_FROM_FORK=${{ (github.repository == 'saucelabs/saucerest-java') && ((github.event.pull_request.head.repo.full_name == github.repository) || (github.event.push.head.repo.full_name == github.repository)) }}" >> $NOT_FROM_FORK
 
   Integration:
     needs: main_job
