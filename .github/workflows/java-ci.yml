@@ -57,7 +57,7 @@ jobs:
       - name: Setup
         run: |
           if [[ $github.repository == 'saucelabs/saucerest-java' && (($github.event.pull_request.head.repo.full_name == $github.repository) || ($github.event.push.head.repo.full_name == $github.repository)) ]]; then
-            echo "NOT_FROM_FORK=true" >> "$GITHUB_ENV"
+            echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
           fi
           echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
           echo "github.repository: ${{github.repository}}"
