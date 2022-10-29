@@ -104,8 +104,6 @@ public abstract class AbstractEndpoint {
         return new JSONObject(response.body().string());
     }
 
-
-
     public JSONObject deleteResponse(String url) throws IOException {
         Request request = new Request.Builder()
             .header("Authorization", credentials)
