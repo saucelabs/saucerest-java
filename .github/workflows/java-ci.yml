@@ -73,6 +73,9 @@ jobs:
     # Only run integration tests if the code is coming from this repo and not forks
 
     steps:
+      - name: Print var
+        run: |
+          echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
       - uses: actions/checkout@v3
         if: ${{env.NOT_FROM_FORK}} == 'true'
       - name: Set up JDK 17
