@@ -54,10 +54,6 @@ jobs:
         with:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
-      - name: Set env var for Integration Tests
-        if: ${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }}
-        run: |
-          echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
 
   Integration:
     needs: main_job
@@ -66,18 +62,20 @@ jobs:
     # Only run integration tests if the code is coming from this repo and not forks
 
     steps:
-      - name: Print var
+      - name: Set env var for Integration Tests
+        if: ${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }}
         run: |
+          echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
           echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
       - uses: actions/checkout@v3
-        if: ${{env.NOT_FROM_FORK}} == 'true'
+        if: ${{ env.NOT_FROM_FORK }} == 'true'
       - name: Set up JDK 17
         uses: actions/setup-java@v3
-        if: ${{env.NOT_FROM_FORK}} == 'true'
+        if: ${{ env.NOT_FROM_FORK }} == 'true'
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
       - name: Build with Maven
-        if: ${{env.NOT_FROM_FORK}} == 'true'
+        if: ${{ env.NOT_FROM_FORK }} == 'true'
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
