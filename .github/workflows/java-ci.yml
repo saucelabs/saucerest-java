@@ -66,6 +66,8 @@ jobs:
         if: ${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }}
         run: |
           echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
+      - name: Print env var
+        run: |
           echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
       - uses: actions/checkout@v3
         if: ${{ env.NOT_FROM_FORK }} == 'true'
