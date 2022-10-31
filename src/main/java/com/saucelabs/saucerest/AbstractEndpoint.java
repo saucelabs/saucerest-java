@@ -1,6 +1,8 @@
 package com.saucelabs.saucerest;
 
 import okhttp3.*;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -112,7 +114,19 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        return new JSONObject(response.body().string());
+        //return new JSONObject(response.body().string());
+        return getJSONObject(response.body().string());
+    }
+
+    protected JSONObject getJSONObject(String responseBody) {
+        try {
+            new JSONObject(responseBody);
+        } catch (JSONException exception) {
+            if (exception.getMessage().startsWith("A JSONObject text must begin with '{'")) {
+                return new JSONObject().put("response", new JSONArray(responseBody));
+            }
+        }
+        return new JSONObject(responseBody);
     }
 
     private Response getResponse(String url) throws IOException {
