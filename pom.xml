@@ -287,6 +287,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <reportFormat>plain</reportFormat>
                     <consoleOutputReporter>
                         <disable>true</disable>
