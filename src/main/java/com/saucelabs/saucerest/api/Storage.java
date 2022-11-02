@@ -1,6 +1,11 @@
-package com.saucelabs.saucerest;
+package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
+import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.model.storage.getappfiles.GetAppStorageFilesResponse;
+import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroupsResponse;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -10,7 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class Storage extends AbstractEndpoint{
+public class Storage extends AbstractEndpoint {
     public Storage(DataCenter dataCenter) {
         super(dataCenter);
     }
@@ -19,38 +24,54 @@ public class Storage extends AbstractEndpoint{
         super(apiServer);
     }
 
-    public JSONObject getFiles() throws IOException {
+    public String toJson(GetAppStorageFilesResponse getAppStorageFilesResponse) {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<GetAppStorageFilesResponse> storageJsonAdapter = moshi.adapter(GetAppStorageFilesResponse.class);
+        String json = storageJsonAdapter.toJson(getAppStorageFilesResponse);
+        return json;
+    }
+
+    public GetAppStorageFilesResponse getFiles() throws IOException {
         String url = getBaseEndpoint() + "/files";
-        return getResponseObject(url);
+
+        return getResponseClass(url, GetAppStorageFilesResponse.class);
     }
 
     /**
      * Use parameter names from here
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-files">https://docs.saucelabs.com/dev/api/storage/#get-app-storage-files</a>
+     *
      * @param params query parameters for this request
      * @return
      * @throws IOException
      */
-    public JSONObject getFiles(ImmutableMap<String, Object> params) throws IOException {
+    public GetAppStorageFilesResponse getFiles(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
-        return getResponseObject(url, params);
+
+        //return getResponseObject(url, params);
+        return getResponseClass(url, params, GetAppStorageFilesResponse.class);
     }
 
-    public JSONObject getGroups() throws IOException {
+    public GetAppStorageGroupsResponse getGroups() throws IOException {
         String url = getBaseEndpoint() + "/groups";
-        return getResponseObject(url);
+
+        //return getResponseObject(url);
+        return getResponseClass(url, GetAppStorageGroupsResponse.class);
     }
 
     /**
      * Use parameter names from here
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-groups">https://docs.saucelabs.com/dev/api/storage/#get-app-storage-groups</a>
+     *
      * @param params
      * @return
      * @throws IOException
      */
-    public JSONObject getGroups(ImmutableMap<String, Object> params) throws IOException {
+    public GetAppStorageGroupsResponse getGroups(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/groups";
-        return getResponseObject(url, params);
+
+        //return getResponseObject(url, params);
+        return getResponseClass(url, params, GetAppStorageGroupsResponse.class);
     }
 
     public JSONObject getGroupSettings(int groupId) throws IOException {

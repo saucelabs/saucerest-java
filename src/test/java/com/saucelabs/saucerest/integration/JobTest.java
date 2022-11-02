@@ -2,7 +2,11 @@ package com.saucelabs.saucerest.integration;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.saucelabs.saucerest.*;
+import com.saucelabs.saucerest.AfterBeforeParameterResolver;
+import com.saucelabs.saucerest.JobVisibility;
+import com.saucelabs.saucerest.SauceREST;
+import com.saucelabs.saucerest.TestAsset;
+import com.saucelabs.saucerest.api.Job;
 import org.awaitility.Awaitility;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;

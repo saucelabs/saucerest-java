@@ -1,6 +1,9 @@
-package com.saucelabs.saucerest;
+package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
+import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.JobVisibility;
+import com.saucelabs.saucerest.TestAsset;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;

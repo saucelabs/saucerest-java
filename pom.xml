@@ -66,6 +66,7 @@
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
         </dependency>
+        <!-- Remove org.json:json in favor of Moshi when migration done -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -123,6 +124,11 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi</artifactId>
+            <version>1.14.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -231,8 +237,8 @@
                     <includes>
                         <include>com.saucelabs.saucerest.DataCenter.class</include>
                         <include>com.saucelabs.saucerest.SauceREST.class</include>
-                        <include>com.saucelabs.saucerest.Storage.class</include>
-                        <include>com.saucelabs.saucerest.Job.class</include>
+                        <include>com.saucelabs.saucerest.api.Storage.class</include>
+                        <include>com.saucelabs.saucerest.api.Job.class</include>
                     </includes>
                 </configuration>
             </plugin>

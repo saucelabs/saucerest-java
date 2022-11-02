@@ -3,7 +3,9 @@ package com.saucelabs.saucerest.integration;
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
-import com.saucelabs.saucerest.Storage;
+import com.saucelabs.saucerest.api.Storage;
+import com.saucelabs.saucerest.model.storage.getappfiles.GetAppStorageFilesResponse;
+import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroupsResponse;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -42,8 +45,8 @@ public class StorageTest {
         Storage storageEU = new SauceREST(DataCenter.EU).getStorage();
         Storage storageUS = new SauceREST(DataCenter.US).getStorage();
 
-        if (storageEU.getFiles(ImmutableMap.of("q", "DemoApp")).length() <= 3 ||
-            storageUS.getFiles(ImmutableMap.of("q", "DemoApp")).length() <= 3) {
+        if (storageEU.getFiles(ImmutableMap.of("q", "DemoApp")).items.size() <= 3 ||
+            storageUS.getFiles(ImmutableMap.of("q", "DemoApp")).items.size() <= 3) {
             for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
                 File file = new StorageTestHelper().getAppFile(appFile);
                 new SauceREST(DataCenter.EU).getStorage().uploadFile(file);
@@ -89,9 +92,10 @@ public class StorageTest {
     @EnumSource(Region.class)
     public void getAppFilesTest(Region region) throws IOException {
         setup(region);
-        JSONObject response = storage.get().getFiles();
+        GetAppStorageFilesResponse getAppStorageFilesResponse = storage.get().getFiles();
 
-        Assertions.assertFalse(response.isEmpty());
+        //Assertions.assertFalse(response.isEmpty());
+        Assertions.assertNotNull(getAppStorageFilesResponse);
     }
 
     @ParameterizedTest
@@ -99,21 +103,24 @@ public class StorageTest {
     public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        JSONObject response = storage.get().getFiles(queryParameters);
+        //JSONObject response = storage.get().getFiles(queryParameters);
+        GetAppStorageFilesResponse getAppStorageFilesResponse = storage.get().getFiles(queryParameters);
 
-        Assertions.assertFalse(response.isEmpty());
-        Assertions.assertEquals(5, (int) response.toMap().get("per_page"));
-        Assertions.assertTrue(response.toMap().get("links").toString().contains("DemoApp"));
+        Assertions.assertNotNull(getAppStorageFilesResponse);
+        Assertions.assertEquals(5, getAppStorageFilesResponse.perPage);
+        Assertions.assertTrue(getAppStorageFilesResponse.links.self.contains("DemoApp"));
     }
 
     @ParameterizedTest
     @EnumSource(Region.class)
     public void getAppGroupsTest(Region region) throws IOException {
         setup(region);
-        JSONObject response = storage.get().getGroups();
+        //JSONObject response = storage.get().getGroups();
+        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
 
-        Assertions.assertFalse(response.isEmpty());
-        Assertions.assertTrue(response.toMap().size() > 0);
+        Assertions.assertNotNull(getAppStorageGroupsResponse);
+        //Assertions.assertTrue(response.toMap().size() > 0);
+        Assertions.assertTrue(getAppStorageGroupsResponse.items.size() > 0);
     }
 
     @ParameterizedTest
@@ -121,10 +128,10 @@ public class StorageTest {
     public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        JSONObject response = storage.get().getGroups(queryParameters);
+        //JSONObject response = storage.get().getGroups(queryParameters);
+        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(queryParameters);
 
-        Assertions.assertFalse(response.isEmpty());
-        Assertions.assertTrue(response.toMap().size() > 0);
+        Assertions.assertNotNull(getAppStorageGroupsResponse);
     }
 
     @ParameterizedTest
@@ -133,9 +140,13 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        JSONObject getGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
-        int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
-        String jsonBody = "{\"settings\":{\"resigning\":{\"image_injection\":false}}}";
+        //JSONObject getGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
+        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
+        //int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
+        int groupId = getAppStorageGroupsResponse.items.get(0).id;
+        //String jsonBody = "{\"settings\":{\"resigning\":{\"image_injection\":false}}}";
+        Map<String, Object> rawData = ImmutableMap.of("settings", ImmutableMap.of("resigning", ImmutableMap.of("image_injection", false)));
+        String jsonBody = new JSONObject(rawData).toString();
 
         JSONObject response = storage.get().updateAppStorageGroupSettings(groupId, jsonBody);
 
@@ -149,8 +160,10 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        JSONObject getGroupsResponse = storage.get().getGroups();
-        int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
+        //JSONObject getGroupsResponse = storage.get().getGroups();
+        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
+        //int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
+        int groupId = getAppStorageGroupsResponse.items.get(0).id;
 
         JSONObject response = storage.get().getGroupSettings(groupId);
 
@@ -164,8 +177,9 @@ public class StorageTest {
         setup(region);
 
         // Call getFiles() to get a file ID so we can use it as a parameter
-        JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
-        String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
+        GetAppStorageFilesResponse getAppStorageFilesResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        //String fileId = getAppStorageFilesResponse.getJSONArray("items").getJSONObject(0).getString("id");
+        String fileId = getAppStorageFilesResponse.items.get(0).id;
 
         storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
 
@@ -178,14 +192,18 @@ public class StorageTest {
         setup(region);
 
         // Call getFiles() to get a file ID so we can use it as a parameter
-        JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
-        String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
+        //JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        //String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
+        GetAppStorageFilesResponse getAppStorageFilesResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        String fileId = getAppStorageFilesResponse.items.get(0).id;
 
         storage.get().updateFileDescription(fileId, "Updated through Integration Test");
 
-        JSONObject file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+        //JSONObject file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+        GetAppStorageFilesResponse file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
 
-        Assertions.assertEquals("Updated through Integration Test", file.getJSONArray("items").getJSONObject(0).getString("description"));
+        //Assertions.assertEquals("Updated through Integration Test", file.getJSONArray("items").getJSONObject(0).getString("description"));
+        Assertions.assertEquals("Updated through Integration Test", file.items.get(0).description);
 
         storage.get().updateFileDescription(fileId, "");
     }

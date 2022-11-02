@@ -1,5 +1,9 @@
-package com.saucelabs.saucerest;
+package com.saucelabs.saucerest.api;
 
+import com.saucelabs.saucerest.BuildUtils;
+import com.saucelabs.saucerest.DataCenter;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +13,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public abstract class AbstractEndpoint {
+    protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
     protected final String accessKey;
@@ -35,7 +40,8 @@ public abstract class AbstractEndpoint {
 
     /**
      * Make a GET request with query parameters.
-     * @param url Sauce Labs API endpoint
+     *
+     * @param url    Sauce Labs API endpoint
      * @param params query parameters for GET request
      * @return
      * @throws IOException
@@ -49,6 +55,7 @@ public abstract class AbstractEndpoint {
 
         Request request = new Request.Builder()
             .header("Authorization", credentials)
+            .header("User-Agent", userAgent)
             .url(urlBuilder.build().toString())
             .build();
 
@@ -70,6 +77,7 @@ public abstract class AbstractEndpoint {
 
         Request request = new Request.Builder()
             .header("Authorization", credentials)
+            .header("User-Agent", userAgent)
             .url(url)
             .post(RequestBody.create(json, mediaType))
             .build();
@@ -77,8 +85,6 @@ public abstract class AbstractEndpoint {
         Response response = makeRequest(request);
         return new JSONObject(response.body().string());
     }
-
-
 
     public JSONObject putResponse(String url, Map<String, Object> payload) throws IOException {
         String json = new JSONObject(payload).toString();
@@ -143,5 +149,36 @@ public abstract class AbstractEndpoint {
             throw new RuntimeException("Unexpected code " + response);
         }
         return response;
+    }
+
+    /**
+     * Transforms a JSON response into the appropriate model.
+     *
+     * @param url
+     * @param clazz
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    protected <T> T getResponseClass(String url, Class<T> clazz) throws IOException {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
+        return jsonAdapter.fromJson(getResponseObject(url).toString());
+    }
+
+    /**
+     * Transforms a JSON response into the appropriate model.
+     *
+     * @param url
+     * @param params
+     * @param clazz
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    protected <T> T getResponseClass(String url, Map<String, Object> params, Class<T> clazz) throws IOException {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
+        return jsonAdapter.fromJson(getResponseObject(url, params).toString());
     }
 }
