@@ -2,7 +2,6 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.storage.deleteappfile.DeleteAppFile;
 import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
 import com.saucelabs.saucerest.model.storage.editappgroupsettings.EditAppGroupSettings;
@@ -32,7 +31,6 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles() throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        //return getResponseClass(url, GetAppStorageFilesResponse.class, HttpMethod.GET);
         return getResponseClass(getResponseObject(url), GetAppFiles.class);
     }
 
@@ -47,16 +45,12 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        //return getResponseObject(url, params);
-        //return getResponseClass(url, params, GetAppStorageFilesResponse.class, HttpMethod.GET);
         return getResponseClass(getResponseObject(url, params), GetAppFiles.class);
     }
 
     public GetAppStorageGroupsResponse getGroups() throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        //return getResponseObject(url);
-        //return getResponseClass(url, GetAppStorageGroupsResponse.class, HttpMethod.GET);
         return getResponseClass(getResponseObject(url), GetAppStorageGroupsResponse.class);
     }
 
@@ -71,16 +65,12 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroupsResponse getGroups(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        //return getResponseObject(url, params);
-        //return getResponseClass(url, params, GetAppStorageGroupsResponse.class, HttpMethod.GET);
         return getResponseClass(getResponseObject(url, params), GetAppStorageGroupsResponse.class);
     }
 
     public GetAppStorageGroupSettings getGroupSettings(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
-        //return getResponseObject(url);
 
-        //return getResponseClass(url, GetAppStorageGroupSettings.class, HttpMethod.GET);
         return getResponseClass(getResponseObject(url), GetAppStorageGroupSettings.class);
     }
 
@@ -95,8 +85,8 @@ public class Storage extends AbstractEndpoint {
      */
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
-        //return putResponse(url, jsonBody);
-        return getResponseClass(url, jsonBody, EditAppGroupSettings.class, HttpMethod.PUT);
+
+        return getResponseClass(putResponse(url, jsonBody), EditAppGroupSettings.class);
     }
 
     public UploadFileApp uploadFile(File file) throws IOException {
@@ -110,7 +100,6 @@ public class Storage extends AbstractEndpoint {
     public UploadFileApp uploadFile(File file, String fileName, String description) throws IOException {
         String url = getBaseEndpoint() + "/upload";
 
-        //return postMultipartResponse(url, file, fileName, description);
         return getResponseClass(postMultipartResponse(url, file, fileName, description), UploadFileApp.class);
     }
 
@@ -133,21 +122,18 @@ public class Storage extends AbstractEndpoint {
 
         JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
 
-        //return putResponse(url, json.toString());
         return getResponseClass(putResponse(url, json.toString()), EditFileDescription.class);
     }
 
     public DeleteAppFile deleteFile(String fileId) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
-        //return deleteResponse(url);
         return getResponseClass(deleteResponse(url), DeleteAppFile.class);
     }
 
     public DeleteAppGroupFiles deleteFileGroup(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId;
 
-        //return deleteResponse(url);
         return getResponseClass(deleteResponse(url), DeleteAppGroupFiles.class);
     }
 

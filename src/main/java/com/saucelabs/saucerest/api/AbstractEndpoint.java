@@ -2,12 +2,9 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.HttpMethod;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import okhttp3.*;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -61,7 +58,7 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        //return new JSONObject(response.body().string());
+
         return response.body().string();
     }
 
@@ -85,7 +82,7 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        //return new JSONObject(response.body().string());
+
         return response.body().string();
     }
 
@@ -99,7 +96,7 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        //return new JSONObject(response.body().string());
+
         return response.body().string();
     }
 
@@ -113,7 +110,7 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        //return new JSONObject(response.body().string());
+
         return response.body().string();
     }
 
@@ -125,20 +122,8 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        //return new JSONObject(response.body().string());
-        //return getJSONObject(response.body().string());
-        return response.body().string();
-    }
 
-    protected JSONObject getJSONObject(String responseBody) {
-        try {
-            new JSONObject(responseBody);
-        } catch (JSONException exception) {
-            if (exception.getMessage().startsWith("A JSONObject text must begin with '{'")) {
-                return new JSONObject().put("response", new JSONArray(responseBody));
-            }
-        }
-        return new JSONObject(responseBody);
+        return response.body().string();
     }
 
     private Response getResponse(String url) throws IOException {
@@ -158,88 +143,11 @@ public abstract class AbstractEndpoint {
         return response;
     }
 
-    /**
-     * Transforms a JSON response into the appropriate model.
-     *
-     * @param url
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws IOException
-     */
-    protected <T> T getResponseClass(String url, Class<T> clazz, HttpMethod httpMethod) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-
-        switch (httpMethod) {
-            case GET:
-                return jsonAdapter.fromJson(getResponseObject(url).toString());
-            case DELETE:
-                return jsonAdapter.fromJson(deleteResponse(url).toString());
-            case PUT:
-            case POST:
-            case PATCH:
-            case HEAD:
-            case OPTIONS:
-                return null;
-        }
-        return null;
-    }
-
-    /**
-     * Transforms a JSON response into the appropriate model.
-     *
-     * @param url
-     * @param params
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws IOException
-     */
-    protected <T> T getResponseClass(String url, Map<String, Object> params, Class<T> clazz, HttpMethod httpMethod) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-
-        switch (httpMethod) {
-            case GET:
-                return jsonAdapter.fromJson(getResponseObject(url, params).toString());
-            case POST:
-                return jsonAdapter.fromJson(postResponse(url, params).toString());
-            case PUT:
-                return jsonAdapter.fromJson(putResponse(url, params).toString());
-            case DELETE:
-                return jsonAdapter.fromJson(deleteResponse(url).toString());
-            case PATCH:
-            case HEAD:
-            case OPTIONS:
-                return null;
-        }
-        return null;
-    }
-
-    protected <T> T getResponseClass(String url, String payload, Class<T> clazz, HttpMethod httpMethod) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-
-        switch (httpMethod) {
-            case PUT:
-                return jsonAdapter.fromJson(putResponse(url, payload).toString());
-            case GET:
-            case POST:
-            case DELETE:
-            case PATCH:
-            case HEAD:
-            case OPTIONS:
-                return null;
-        }
-        return null;
-    }
-
-    protected <T> T getResponseClass(String jsonRespone, Class<T> clazz) throws IOException {
+    protected <T> T getResponseClass(String jsonResponse, Class<T> clazz) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
         // failOnUnknown() will make sure that API changes in SL are caught ASAP so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
-        return jsonAdapter.fromJson(jsonRespone);
+        return jsonAdapter.fromJson(jsonResponse);
     }
 
     /**

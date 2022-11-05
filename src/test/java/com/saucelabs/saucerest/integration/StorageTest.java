@@ -69,8 +69,6 @@ public class StorageTest {
 
         Assertions.assertEquals(file.getName(), uploadFileApp.item.name);
         Assertions.assertEquals("", uploadFileApp.item.description);
-        //Assertions.assertEquals(file.getName(), response.getJSONObject("item").getString("name"));
-        //Assertions.assertEquals("", response.getJSONObject("item").getString("description"));
     }
 
     @ParameterizedTest
@@ -101,17 +99,6 @@ public class StorageTest {
         setup(region);
         GetAppFiles getAppFiles = storage.get().getFiles();
 
-        //Assertions.assertFalse(response.isEmpty());
-        Assertions.assertNotNull(getAppFiles);
-    }
-
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void toAppFile(Region region) throws IOException {
-        setup(region);
-        GetAppFiles getAppFiles = storage.get().getFiles();
-
-        //Assertions.assertFalse(response.isEmpty());
         Assertions.assertNotNull(getAppFiles);
     }
 
@@ -120,23 +107,30 @@ public class StorageTest {
     public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        //JSONObject response = storage.get().getFiles(queryParameters);
         GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
         Assertions.assertNotNull(getAppFiles);
         Assertions.assertEquals(5, getAppFiles.perPage);
         Assertions.assertTrue(getAppFiles.links.self.contains("DemoApp"));
+
+        queryParameters = ImmutableMap.of("kind", "android");
+        getAppFiles = storage.get().getFiles(queryParameters);
+
+        getAppFiles.items.forEach(item -> Assertions.assertEquals("android", item.kind));
+
+        queryParameters = ImmutableMap.of("kind", "ios");
+        getAppFiles = storage.get().getFiles(queryParameters);
+
+        getAppFiles.items.forEach(item -> Assertions.assertEquals("ios", item.kind));
     }
 
     @ParameterizedTest
     @EnumSource(Region.class)
     public void getAppGroupsTest(Region region) throws IOException {
         setup(region);
-        //JSONObject response = storage.get().getGroups();
         GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
 
         Assertions.assertNotNull(getAppStorageGroupsResponse);
-        //Assertions.assertTrue(response.toMap().size() > 0);
         Assertions.assertTrue(getAppStorageGroupsResponse.items.size() > 0);
     }
 
@@ -145,7 +139,6 @@ public class StorageTest {
     public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        //JSONObject response = storage.get().getGroups(queryParameters);
         GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(queryParameters);
 
         Assertions.assertNotNull(getAppStorageGroupsResponse);
@@ -157,15 +150,11 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        //JSONObject getGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
         GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
-        //int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
         int groupId = getAppStorageGroupsResponse.items.get(0).id;
-        //String jsonBody = "{\"settings\":{\"resigning\":{\"image_injection\":false}}}";
         Map<String, Object> rawData = ImmutableMap.of("settings", ImmutableMap.of("resigning", ImmutableMap.of("image_injection", false)));
         String jsonBody = new JSONObject(rawData).toString();
 
-        //JSONObject response = storage.get().updateAppStorageGroupSettings(groupId, jsonBody);
         EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, jsonBody);
 
         Assertions.assertNotNull(editAppGroupSettings);
@@ -178,16 +167,11 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        //JSONObject getGroupsResponse = storage.get().getGroups();
         GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
-        //int groupId = getGroupsResponse.getJSONArray("items").getJSONObject(0).getInt("id");
         int groupId = getAppStorageGroupsResponse.items.get(0).id;
 
-        //JSONObject response = storage.get().getGroupSettings(groupId);
         GetAppStorageGroupSettings getGroupSettings = storage.get().getGroupSettings(groupId);
 
-        //Assertions.assertFalse(response.isEmpty());
-        //Assertions.assertTrue(response.toMap().size() > 0);
         Assertions.assertNotNull(getGroupSettings);
     }
 
@@ -198,7 +182,6 @@ public class StorageTest {
 
         // Call getFiles() to get a file ID so we can use it as a parameter
         GetAppFiles getAppFiles = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
-        //String fileId = getAppStorageFilesResponse.getJSONArray("items").getJSONObject(0).getString("id");
         String fileId = getAppFiles.items.get(0).id;
 
         storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
@@ -212,17 +195,13 @@ public class StorageTest {
         setup(region);
 
         // Call getFiles() to get a file ID so we can use it as a parameter
-        //JSONObject fileIdResponse = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
-        //String fileId = fileIdResponse.getJSONArray("items").getJSONObject(0).getString("id");
         GetAppFiles getAppFiles = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
         String fileId = getAppFiles.items.get(0).id;
 
         storage.get().updateFileDescription(fileId, "Updated through Integration Test");
 
-        //JSONObject file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
         GetAppFiles file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
 
-        //Assertions.assertEquals("Updated through Integration Test", file.getJSONArray("items").getJSONObject(0).getString("description"));
         Assertions.assertEquals("Updated through Integration Test", file.items.get(0).description);
 
         storage.get().updateFileDescription(fileId, "");
@@ -234,15 +213,13 @@ public class StorageTest {
         setup(region);
 
         // Upload app file, save file ID
-        //JSONObject uploadResponse = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
         UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
         String fileId = uploadFileApp.item.id;
         Assertions.assertNotNull(fileId);
 
-        //JSONObject deleteResponse = storage.get().deleteFile(fileId);
         DeleteAppFile deleteAppFile = storage.get().deleteFile(fileId);
         String fileIdOfDeletedApp = deleteAppFile.item.id;
-        //String fileIdOfDeletedApp = deleteResponse.getJSONObject("item").getString("id");
+
         Assertions.assertEquals(fileIdOfDeletedApp, fileId);
     }
 
@@ -252,12 +229,10 @@ public class StorageTest {
         setup(region);
 
         // Upload app file, save file ID
-        //JSONObject uploadResponse = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
         UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
         int groupId = uploadFileApp.item.groupId;
         Assertions.assertNotNull(groupId);
 
-        //JSONObject deleteResponse = storage.get().deleteFileGroup(groupId);
         DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
         int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
         Assertions.assertEquals(groupIdOfDeletedGroup, groupId);
