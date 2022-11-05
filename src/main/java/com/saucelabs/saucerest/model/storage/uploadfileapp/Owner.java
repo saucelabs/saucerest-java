@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappfiles;
+package com.saucelabs.saucerest.model.storage.uploadfileapp;
 
 import com.squareup.moshi.Json;
 
@@ -12,13 +12,11 @@ public class Owner {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public Owner() {
     }
 
     /**
-     *
      * @param id
      * @param orgId
      */

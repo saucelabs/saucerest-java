@@ -5,7 +5,7 @@ import com.squareup.moshi.Json;
 
 import java.util.List;
 
-public class GetAppStorageFilesResponse {
+public class GetAppFiles {
 
     @Json(name = "items")
     public List<Item> items = null;
@@ -21,17 +21,18 @@ public class GetAppStorageFilesResponse {
     /**
      * No args constructor for use in serialization
      */
-    public GetAppStorageFilesResponse() {
+    public GetAppFiles() {
     }
 
     /**
+     *
      * @param totalItems
      * @param perPage
      * @param links
      * @param page
      * @param items
      */
-    public GetAppStorageFilesResponse(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems) {
+    public GetAppFiles(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems) {
         super();
         this.items = items;
         this.links = links;
@@ -39,4 +40,5 @@ public class GetAppStorageFilesResponse {
         this.perPage = perPage;
         this.totalItems = totalItems;
     }
+
 }

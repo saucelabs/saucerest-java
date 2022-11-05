@@ -17,6 +17,8 @@ public class GetAppStorageGroupsResponse {
     public Integer perPage;
     @Json(name = "total_items")
     public Integer totalItems;
+    @Json(name = "is_simulator")
+    public Boolean isSimulator;
 
     /**
      * No args constructor for use in serialization
@@ -30,14 +32,16 @@ public class GetAppStorageGroupsResponse {
      * @param links
      * @param page
      * @param items
+     * @param isSimulator
      */
-    public GetAppStorageGroupsResponse(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems) {
+    public GetAppStorageGroupsResponse(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
         super();
         this.items = items;
         this.links = links;
         this.page = page;
         this.perPage = perPage;
         this.totalItems = totalItems;
+        this.isSimulator = isSimulator;
     }
 
 }

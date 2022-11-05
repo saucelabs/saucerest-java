@@ -2,10 +2,15 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.model.storage.getappfiles.GetAppStorageFilesResponse;
+import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.model.storage.deleteappfile.DeleteAppFile;
+import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
+import com.saucelabs.saucerest.model.storage.editappgroupsettings.EditAppGroupSettings;
+import com.saucelabs.saucerest.model.storage.editfiledescription.EditFileDescription;
+import com.saucelabs.saucerest.model.storage.getappfiles.GetAppFiles;
 import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroupsResponse;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
+import com.saucelabs.saucerest.model.storage.getappgroupsettings.GetAppStorageGroupSettings;
+import com.saucelabs.saucerest.model.storage.uploadfileapp.UploadFileApp;
 import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -24,17 +29,11 @@ public class Storage extends AbstractEndpoint {
         super(apiServer);
     }
 
-    public String toJson(GetAppStorageFilesResponse getAppStorageFilesResponse) {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<GetAppStorageFilesResponse> storageJsonAdapter = moshi.adapter(GetAppStorageFilesResponse.class);
-        String json = storageJsonAdapter.toJson(getAppStorageFilesResponse);
-        return json;
-    }
-
-    public GetAppStorageFilesResponse getFiles() throws IOException {
+    public GetAppFiles getFiles() throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        return getResponseClass(url, GetAppStorageFilesResponse.class);
+        //return getResponseClass(url, GetAppStorageFilesResponse.class, HttpMethod.GET);
+        return getResponseClass(getResponseObject(url), GetAppFiles.class);
     }
 
     /**
@@ -45,18 +44,20 @@ public class Storage extends AbstractEndpoint {
      * @return
      * @throws IOException
      */
-    public GetAppStorageFilesResponse getFiles(ImmutableMap<String, Object> params) throws IOException {
+    public GetAppFiles getFiles(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
 
         //return getResponseObject(url, params);
-        return getResponseClass(url, params, GetAppStorageFilesResponse.class);
+        //return getResponseClass(url, params, GetAppStorageFilesResponse.class, HttpMethod.GET);
+        return getResponseClass(getResponseObject(url, params), GetAppFiles.class);
     }
 
     public GetAppStorageGroupsResponse getGroups() throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
         //return getResponseObject(url);
-        return getResponseClass(url, GetAppStorageGroupsResponse.class);
+        //return getResponseClass(url, GetAppStorageGroupsResponse.class, HttpMethod.GET);
+        return getResponseClass(getResponseObject(url), GetAppStorageGroupsResponse.class);
     }
 
     /**
@@ -71,39 +72,46 @@ public class Storage extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/groups";
 
         //return getResponseObject(url, params);
-        return getResponseClass(url, params, GetAppStorageGroupsResponse.class);
+        //return getResponseClass(url, params, GetAppStorageGroupsResponse.class, HttpMethod.GET);
+        return getResponseClass(getResponseObject(url, params), GetAppStorageGroupsResponse.class);
     }
 
-    public JSONObject getGroupSettings(int groupId) throws IOException {
+    public GetAppStorageGroupSettings getGroupSettings(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
-        return getResponseObject(url);
+        //return getResponseObject(url);
+
+        //return getResponseClass(url, GetAppStorageGroupSettings.class, HttpMethod.GET);
+        return getResponseClass(getResponseObject(url), GetAppStorageGroupSettings.class);
     }
 
     /**
      * Use parameter names from here
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-group-settings">https://docs.saucelabs.com/dev/api/storage/#get-app-storage-group-settings</a>
+     *
      * @param groupId
      * @param jsonBody
      * @return
      * @throws IOException
      */
-    public JSONObject updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
+    public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
-        return putResponse(url, jsonBody);
+        //return putResponse(url, jsonBody);
+        return getResponseClass(url, jsonBody, EditAppGroupSettings.class, HttpMethod.PUT);
     }
 
-    public JSONObject uploadFile(File file) throws IOException {
+    public UploadFileApp uploadFile(File file) throws IOException {
         return uploadFile(file, "", "");
     }
 
-    public JSONObject uploadFile(File file, String fileName) throws IOException {
+    public UploadFileApp uploadFile(File file, String fileName) throws IOException {
         return uploadFile(file, fileName, "");
     }
 
-    public JSONObject uploadFile(File file, String fileName, String description) throws IOException {
+    public UploadFileApp uploadFile(File file, String fileName, String description) throws IOException {
         String url = getBaseEndpoint() + "/upload";
 
-        return postMultipartResponse(url, file, fileName, description);
+        //return postMultipartResponse(url, file, fileName, description);
+        return getResponseClass(postMultipartResponse(url, file, fileName, description), UploadFileApp.class);
     }
 
     /**
@@ -120,24 +128,27 @@ public class Storage extends AbstractEndpoint {
         }
     }
 
-    public JSONObject updateFileDescription(String fileId, String description) throws IOException {
+    public EditFileDescription updateFileDescription(String fileId, String description) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
         JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
 
-        return putResponse(url, json.toString());
+        //return putResponse(url, json.toString());
+        return getResponseClass(putResponse(url, json.toString()), EditFileDescription.class);
     }
 
-    public JSONObject deleteFile(String fileId) throws IOException {
+    public DeleteAppFile deleteFile(String fileId) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
-        return deleteResponse(url);
+        //return deleteResponse(url);
+        return getResponseClass(deleteResponse(url), DeleteAppFile.class);
     }
 
-    public JSONObject deleteFileGroup(int groupId) throws IOException {
+    public DeleteAppGroupFiles deleteFileGroup(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId;
 
-        return deleteResponse(url);
+        //return deleteResponse(url);
+        return getResponseClass(deleteResponse(url), DeleteAppGroupFiles.class);
     }
 
     private String getBaseEndpoint() {
@@ -146,12 +157,13 @@ public class Storage extends AbstractEndpoint {
 
     /**
      * Need a upload-specific post method for the additional parameters.
-     * @param url Sauce Labs API endpoint
+     *
+     * @param url  Sauce Labs API endpoint
      * @param file mobile app file
      * @return
      * @throws IOException
      */
-    private JSONObject postMultipartResponse(String url, File file, String fileName, String description) throws IOException {
+    private String postMultipartResponse(String url, File file, String fileName, String description) throws IOException {
         RequestBody requestBody = new MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("name", fileName)
@@ -171,7 +183,8 @@ public class Storage extends AbstractEndpoint {
                 System.out.println(response.body().toString());
                 throw new IOException("Unexpected code" + response);
             }
-            return new JSONObject(response.body().string());
+            //return new JSONObject(response.body().string());
+            return response.body().string();
         }
     }
 

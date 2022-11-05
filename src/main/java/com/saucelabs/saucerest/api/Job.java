@@ -31,7 +31,7 @@ public class Job extends AbstractEndpoint {
     }
 
     public JSONObject getDetails() throws IOException {
-        return getResponseObject(getBaseEndpoint());
+        return new JSONObject(getResponseObject(getBaseEndpoint()));
     }
 
     // Change Details
@@ -71,7 +71,8 @@ public class Job extends AbstractEndpoint {
     public JSONObject stop() throws IOException {
         String url = getBaseEndpoint() + "/stop";
 
-        return putResponse(url, new HashMap<>());
+        //return putResponse(url, new HashMap<>());
+        return new JSONObject(putResponse(url, new HashMap<>()));
     }
 
     // Note: This works, but docs indicate it should be /rest/v1.1/jobs/{job_id} which doesn't work
@@ -84,7 +85,7 @@ public class Job extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/assets";
 
         waitForFinishedTest();
-        return getResponseObject(url);
+        return new JSONObject(getResponseObject(url));
     }
 
     public boolean isAssetAvailable(TestAsset asset) throws IOException {
@@ -122,7 +123,7 @@ public class Job extends AbstractEndpoint {
     }
 
     private JSONObject updateDetails(Map<String, Object> updates) throws IOException {
-        return putResponse(getBaseEndpoint(), updates);
+        return new JSONObject(putResponse(getBaseEndpoint(), updates));
     }
 
     private String getBaseEndpoint() {

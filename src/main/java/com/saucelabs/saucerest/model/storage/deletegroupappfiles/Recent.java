@@ -1,9 +1,9 @@
 
-package com.saucelabs.saucerest.model.storage.getappfiles;
+package com.saucelabs.saucerest.model.storage.deletegroupappfiles;
 
 import com.squareup.moshi.Json;
 
-public class Item {
+public class Recent {
 
     @Json(name = "id")
     public String id;
@@ -32,13 +32,11 @@ public class Item {
 
     /**
      * No args constructor for use in serialization
-     *
      */
-    public Item() {
+    public Recent() {
     }
 
     /**
-     *
      * @param owner
      * @param metadata
      * @param access
@@ -52,7 +50,7 @@ public class Item {
      * @param etag
      * @param id
      */
-    public Item(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, Object description, Metadata metadata, Access access, String sha256) {
+    public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, Object description, Metadata metadata, Access access, String sha256) {
         super();
         this.id = id;
         this.owner = owner;

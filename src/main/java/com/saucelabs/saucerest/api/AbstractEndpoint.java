@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import okhttp3.*;
@@ -33,9 +34,9 @@ public abstract class AbstractEndpoint {
         this.baseURL = apiServer;
     }
 
-    public JSONObject getResponseObject(String url) throws IOException {
+    public String getResponseObject(String url) throws IOException {
         Response response = getResponse(url);
-        return new JSONObject(response.body().string());
+        return response.body().string();
     }
 
     /**
@@ -46,7 +47,7 @@ public abstract class AbstractEndpoint {
      * @return
      * @throws IOException
      */
-    public JSONObject getResponseObject(String url, Map<String, Object> params) throws IOException {
+    public String getResponseObject(String url, Map<String, Object> params) throws IOException {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
         for (Map.Entry<String, Object> param : params.entrySet()) {
@@ -60,7 +61,8 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        return new JSONObject(response.body().string());
+        //return new JSONObject(response.body().string());
+        return response.body().string();
     }
 
     public okio.BufferedSource getStream(String url) throws IOException {
@@ -68,11 +70,11 @@ public abstract class AbstractEndpoint {
         return response.body().source();
     }
 
-    public JSONObject postResponse(String url, Map<String, Object> payload) throws IOException {
+    public String postResponse(String url, Map<String, Object> payload) throws IOException {
         return postResponse(url, payload, MediaType.parse("application/json"));
     }
 
-    public JSONObject postResponse(String url, Map<String, Object> payload, MediaType mediaType) throws IOException {
+    public String postResponse(String url, Map<String, Object> payload, MediaType mediaType) throws IOException {
         String json = new JSONObject(payload).toString();
 
         Request request = new Request.Builder()
@@ -83,10 +85,11 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        return new JSONObject(response.body().string());
+        //return new JSONObject(response.body().string());
+        return response.body().string();
     }
 
-    public JSONObject putResponse(String url, Map<String, Object> payload) throws IOException {
+    public String putResponse(String url, Map<String, Object> payload) throws IOException {
         String json = new JSONObject(payload).toString();
 
         Request request = new Request.Builder()
@@ -96,10 +99,11 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        return new JSONObject(response.body().string());
+        //return new JSONObject(response.body().string());
+        return response.body().string();
     }
 
-    public JSONObject putResponse(String url, String payload) throws IOException {
+    public String putResponse(String url, String payload) throws IOException {
         String json = new JSONObject(payload).toString();
 
         Request request = new Request.Builder()
@@ -109,10 +113,11 @@ public abstract class AbstractEndpoint {
             .build();
 
         Response response = makeRequest(request);
-        return new JSONObject(response.body().string());
+        //return new JSONObject(response.body().string());
+        return response.body().string();
     }
 
-    public JSONObject deleteResponse(String url) throws IOException {
+    public String deleteResponse(String url) throws IOException {
         Request request = new Request.Builder()
             .header("Authorization", credentials)
             .url(url)
@@ -121,7 +126,8 @@ public abstract class AbstractEndpoint {
 
         Response response = makeRequest(request);
         //return new JSONObject(response.body().string());
-        return getJSONObject(response.body().string());
+        //return getJSONObject(response.body().string());
+        return response.body().string();
     }
 
     protected JSONObject getJSONObject(String responseBody) {
@@ -140,6 +146,7 @@ public abstract class AbstractEndpoint {
             .header("Authorization", credentials)
             .url(url)
             .build();
+
         return makeRequest(request);
     }
 
@@ -160,10 +167,23 @@ public abstract class AbstractEndpoint {
      * @return
      * @throws IOException
      */
-    protected <T> T getResponseClass(String url, Class<T> clazz) throws IOException {
+    protected <T> T getResponseClass(String url, Class<T> clazz, HttpMethod httpMethod) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-        return jsonAdapter.fromJson(getResponseObject(url).toString());
+
+        switch (httpMethod) {
+            case GET:
+                return jsonAdapter.fromJson(getResponseObject(url).toString());
+            case DELETE:
+                return jsonAdapter.fromJson(deleteResponse(url).toString());
+            case PUT:
+            case POST:
+            case PATCH:
+            case HEAD:
+            case OPTIONS:
+                return null;
+        }
+        return null;
     }
 
     /**
@@ -176,9 +196,62 @@ public abstract class AbstractEndpoint {
      * @return
      * @throws IOException
      */
-    protected <T> T getResponseClass(String url, Map<String, Object> params, Class<T> clazz) throws IOException {
+    protected <T> T getResponseClass(String url, Map<String, Object> params, Class<T> clazz, HttpMethod httpMethod) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-        return jsonAdapter.fromJson(getResponseObject(url, params).toString());
+
+        switch (httpMethod) {
+            case GET:
+                return jsonAdapter.fromJson(getResponseObject(url, params).toString());
+            case POST:
+                return jsonAdapter.fromJson(postResponse(url, params).toString());
+            case PUT:
+                return jsonAdapter.fromJson(putResponse(url, params).toString());
+            case DELETE:
+                return jsonAdapter.fromJson(deleteResponse(url).toString());
+            case PATCH:
+            case HEAD:
+            case OPTIONS:
+                return null;
+        }
+        return null;
+    }
+
+    protected <T> T getResponseClass(String url, String payload, Class<T> clazz, HttpMethod httpMethod) throws IOException {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
+
+        switch (httpMethod) {
+            case PUT:
+                return jsonAdapter.fromJson(putResponse(url, payload).toString());
+            case GET:
+            case POST:
+            case DELETE:
+            case PATCH:
+            case HEAD:
+            case OPTIONS:
+                return null;
+        }
+        return null;
+    }
+
+    protected <T> T getResponseClass(String jsonRespone, Class<T> clazz) throws IOException {
+        Moshi moshi = new Moshi.Builder().build();
+        // failOnUnknown() will make sure that API changes in SL are caught ASAP so we can update SauceREST
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
+        return jsonAdapter.fromJson(jsonRespone);
+    }
+
+    /**
+     * Transform a model class into JSON.
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    protected <T> String toJson(Class<T> clazz) {
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
+        return jsonAdapter.toJson((T) clazz);
     }
 }

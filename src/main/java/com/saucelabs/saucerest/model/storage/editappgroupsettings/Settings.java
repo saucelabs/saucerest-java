@@ -1,7 +1,5 @@
+package com.saucelabs.saucerest.model.storage.editappgroupsettings;
 
-package com.saucelabs.saucerest.model.storage.getappgroups;
-
-import com.saucelabs.saucerest.model.storage.deletegroupappfiles.Resigning;
 import com.squareup.moshi.Json;
 
 public class Settings {
@@ -20,12 +18,12 @@ public class Settings {
     public Boolean instrumentationEnabled;
     @Json(name = "instrumentation")
     public Instrumentation instrumentation;
-    @Json(name = "setup_device_lock")
-    public Boolean setupDeviceLock;
     @Json(name = "resigning_enabled")
     public Boolean resigningEnabled;
     @Json(name = "resigning")
     public Resigning resigning;
+    @Json(name = "setup_device_lock")
+    public Boolean setupDeviceLock;
 
     /**
      * No args constructor for use in serialization
@@ -40,12 +38,12 @@ public class Settings {
      * @param orientation
      * @param instrumentationEnabled
      * @param setupDeviceLock
-     * @param instrumentation
-     * @param lang
      * @param resigningEnabled
      * @param resigning
+     * @param instrumentation
+     * @param lang
      */
-    public Settings(Proxy proxy, Boolean audioCapture, Boolean proxyEnabled, String lang, Object orientation, Boolean instrumentationEnabled, Instrumentation instrumentation, Boolean setupDeviceLock, Boolean resigningEnabled, Resigning resigning) {
+    public Settings(Proxy proxy, Boolean audioCapture, Boolean proxyEnabled, String lang, Object orientation, Boolean instrumentationEnabled, Instrumentation instrumentation, Boolean resigningEnabled, Resigning resigning, Boolean setupDeviceLock) {
         super();
         this.proxy = proxy;
         this.audioCapture = audioCapture;
@@ -54,9 +52,9 @@ public class Settings {
         this.orientation = orientation;
         this.instrumentationEnabled = instrumentationEnabled;
         this.instrumentation = instrumentation;
-        this.setupDeviceLock = setupDeviceLock;
         this.resigningEnabled = resigningEnabled;
         this.resigning = resigning;
+        this.setupDeviceLock = setupDeviceLock;
     }
 
 }

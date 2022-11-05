@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappgroups;
+package com.saucelabs.saucerest.model.storage.editfiledescription;
 
 import com.squareup.moshi.Json;
 
@@ -46,19 +46,20 @@ public class Metadata {
 
     /**
      * @param identifier
+     * @param shortVersion
+     * @param minOs
+     * @param icon
+     * @param targetSdk
+     * @param deviceFamily
+     * @param version
+     * @param versionCode
+     * @param testRunnerPluginPath
      * @param isTestRunner
      * @param minSdk
      * @param testRunnerClass
      * @param name
-     * @param icon
-     * @param targetSdk
-     * @param version
-     * @param versionCode
-     * @param shortVersion
-     * @param isSimulator
-     * @param minOs
      * @param targetOs
-     * @param testRunnerPluginPath
+     * @param isSimulator
      */
     public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily) {
         super();

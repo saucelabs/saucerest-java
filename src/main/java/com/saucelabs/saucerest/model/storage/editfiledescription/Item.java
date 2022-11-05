@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappfiles;
+package com.saucelabs.saucerest.model.storage.editfiledescription;
 
 import com.squareup.moshi.Json;
 
@@ -22,7 +22,7 @@ public class Item {
     @Json(name = "size")
     public Integer size;
     @Json(name = "description")
-    public Object description;
+    public String description;
     @Json(name = "metadata")
     public Metadata metadata;
     @Json(name = "access")
@@ -32,13 +32,11 @@ public class Item {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public Item() {
     }
 
     /**
-     *
      * @param owner
      * @param metadata
      * @param access
@@ -52,7 +50,7 @@ public class Item {
      * @param etag
      * @param id
      */
-    public Item(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, Object description, Metadata metadata, Access access, String sha256) {
+    public Item(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, String description, Metadata metadata, Access access, String sha256) {
         super();
         this.id = id;
         this.owner = owner;

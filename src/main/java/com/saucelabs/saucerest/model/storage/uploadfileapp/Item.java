@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappfiles;
+package com.saucelabs.saucerest.model.storage.uploadfileapp;
 
 import com.squareup.moshi.Json;
 
@@ -32,13 +32,11 @@ public class Item {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public Item() {
     }
 
     /**
-     *
      * @param owner
      * @param metadata
      * @param access

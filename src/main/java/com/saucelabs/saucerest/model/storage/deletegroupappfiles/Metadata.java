@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappgroups;
+package com.saucelabs.saucerest.model.storage.deletegroupappfiles;
 
 import com.squareup.moshi.Json;
 
@@ -17,14 +17,6 @@ public class Metadata {
     public Boolean isTestRunner;
     @Json(name = "icon")
     public String icon;
-    @Json(name = "version_code")
-    public Integer versionCode;
-    @Json(name = "min_sdk")
-    public Integer minSdk;
-    @Json(name = "target_sdk")
-    public Integer targetSdk;
-    @Json(name = "test_runner_class")
-    public Object testRunnerClass;
     @Json(name = "short_version")
     public String shortVersion;
     @Json(name = "is_simulator")
@@ -37,6 +29,14 @@ public class Metadata {
     public Object testRunnerPluginPath;
     @Json(name = "device_family")
     public List<String> deviceFamily = null;
+    @Json(name = "version_code")
+    public Integer versionCode;
+    @Json(name = "min_sdk")
+    public Integer minSdk;
+    @Json(name = "target_sdk")
+    public Integer targetSdk;
+    @Json(name = "test_runner_class")
+    public Object testRunnerClass;
 
     /**
      * No args constructor for use in serialization
@@ -46,37 +46,38 @@ public class Metadata {
 
     /**
      * @param identifier
+     * @param shortVersion
+     * @param minOs
+     * @param icon
+     * @param targetSdk
+     * @param deviceFamily
+     * @param version
+     * @param versionCode
+     * @param testRunnerPluginPath
      * @param isTestRunner
      * @param minSdk
      * @param testRunnerClass
      * @param name
-     * @param icon
-     * @param targetSdk
-     * @param version
-     * @param versionCode
-     * @param shortVersion
-     * @param isSimulator
-     * @param minOs
      * @param targetOs
-     * @param testRunnerPluginPath
+     * @param isSimulator
      */
-    public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily) {
+    public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass) {
         super();
         this.identifier = identifier;
         this.name = name;
         this.version = version;
         this.isTestRunner = isTestRunner;
         this.icon = icon;
-        this.versionCode = versionCode;
-        this.minSdk = minSdk;
-        this.targetSdk = targetSdk;
-        this.testRunnerClass = testRunnerClass;
         this.shortVersion = shortVersion;
         this.isSimulator = isSimulator;
         this.minOs = minOs;
         this.targetOs = targetOs;
         this.testRunnerPluginPath = testRunnerPluginPath;
         this.deviceFamily = deviceFamily;
+        this.versionCode = versionCode;
+        this.minSdk = minSdk;
+        this.targetSdk = targetSdk;
+        this.testRunnerClass = testRunnerClass;
     }
 
 }
