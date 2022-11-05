@@ -169,7 +169,7 @@ public class Storage extends AbstractEndpoint {
                 System.out.println(response.body().toString());
                 throw new IOException("Unexpected code" + response);
             }
-            //return new JSONObject(response.body().string());
+
             return response.body().string();
         }
     }

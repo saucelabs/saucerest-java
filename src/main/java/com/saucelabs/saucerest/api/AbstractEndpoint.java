@@ -33,6 +33,7 @@ public abstract class AbstractEndpoint {
 
     public String getResponseObject(String url) throws IOException {
         Response response = getResponse(url);
+
         return response.body().string();
     }
 
@@ -57,9 +58,9 @@ public abstract class AbstractEndpoint {
             .url(urlBuilder.build().toString())
             .build();
 
-        Response response = makeRequest(request);
-
-        return response.body().string();
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
     }
 
     public okio.BufferedSource getStream(String url) throws IOException {
@@ -81,9 +82,9 @@ public abstract class AbstractEndpoint {
             .post(RequestBody.create(json, mediaType))
             .build();
 
-        Response response = makeRequest(request);
-
-        return response.body().string();
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
     }
 
     public String putResponse(String url, Map<String, Object> payload) throws IOException {
@@ -95,9 +96,9 @@ public abstract class AbstractEndpoint {
             .put(RequestBody.create(json, MediaType.parse("application/json")))
             .build();
 
-        Response response = makeRequest(request);
-
-        return response.body().string();
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
     }
 
     public String putResponse(String url, String payload) throws IOException {
@@ -109,9 +110,9 @@ public abstract class AbstractEndpoint {
             .put(RequestBody.create(json, MediaType.parse("application/json")))
             .build();
 
-        Response response = makeRequest(request);
-
-        return response.body().string();
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
     }
 
     public String deleteResponse(String url) throws IOException {
@@ -121,9 +122,9 @@ public abstract class AbstractEndpoint {
             .delete()
             .build();
 
-        Response response = makeRequest(request);
-
-        return response.body().string();
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
     }
 
     private Response getResponse(String url) throws IOException {
