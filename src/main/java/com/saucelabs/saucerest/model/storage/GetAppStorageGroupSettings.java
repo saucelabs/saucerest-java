@@ -1,9 +1,9 @@
-package com.saucelabs.saucerest.model.storage.editappgroupsettings;
 
-import com.saucelabs.saucerest.model.storage.Settings;
+package com.saucelabs.saucerest.model.storage;
+
 import com.squareup.moshi.Json;
 
-public class EditAppGroupSettings {
+public class GetAppStorageGroupSettings {
 
     @Json(name = "settings")
     public Settings settings;
@@ -15,7 +15,7 @@ public class EditAppGroupSettings {
     /**
      * No args constructor for use in serialization
      */
-    public EditAppGroupSettings() {
+    public GetAppStorageGroupSettings() {
     }
 
     /**
@@ -23,7 +23,7 @@ public class EditAppGroupSettings {
      * @param identifier
      * @param kind
      */
-    public EditAppGroupSettings(Settings settings, String kind, String identifier) {
+    public GetAppStorageGroupSettings(Settings settings, String kind, String identifier) {
         super();
         this.settings = settings;
         this.kind = kind;

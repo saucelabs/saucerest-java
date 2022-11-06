@@ -1,7 +1,6 @@
 
-package com.saucelabs.saucerest.model.storage.getappfiles;
+package com.saucelabs.saucerest.model.storage;
 
-import com.saucelabs.saucerest.model.storage.Links;
 import com.squareup.moshi.Json;
 
 import java.util.List;

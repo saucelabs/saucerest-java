@@ -2,14 +2,9 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.model.storage.deleteappfile.DeleteAppFile;
+import com.saucelabs.saucerest.model.storage.*;
 import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
-import com.saucelabs.saucerest.model.storage.editappgroupsettings.EditAppGroupSettings;
-import com.saucelabs.saucerest.model.storage.editfiledescription.EditFileDescription;
-import com.saucelabs.saucerest.model.storage.getappfiles.GetAppFiles;
 import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroups;
-import com.saucelabs.saucerest.model.storage.getappgroupsettings.GetAppStorageGroupSettings;
-import com.saucelabs.saucerest.model.storage.uploadfileapp.UploadFileApp;
 import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
