@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -52,22 +52,29 @@ public class StorageTest {
 
     @BeforeAll
     public static void uploadAppFiles() {
+        long startTime = System.nanoTime();
         for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
-            new Thread(() -> {
+            Thread t = new Thread(() -> {
                 File file = new StorageTestHelper().getAppFile(appFile);
                 try {
+                    System.out.println("Uploading: " + file.getName());
                     storageEU.uploadFile(file);
                     storageUS.uploadFile(file);
                 } catch (IOException ignored) {
                 }
-            }).start();
+            });
+            t.start();
         }
 
         Awaitility.await()
-            .atMost(Duration.ofSeconds(600))
+            .atMost(5, TimeUnit.MINUTES)
             .until(() ->
                 storageEU.getGroups().items.size() == 4 &&
                     storageUS.getGroups().items.size() == 4);
+
+        long stopTime = System.nanoTime();
+        long convert = TimeUnit.SECONDS.convert(stopTime - startTime, TimeUnit.NANOSECONDS);
+        System.out.println("Finished uploading in " + convert + " seconds");
     }
 
     @ParameterizedTest

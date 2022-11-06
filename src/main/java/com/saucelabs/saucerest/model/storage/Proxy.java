@@ -1,5 +1,5 @@
 
-package com.saucelabs.saucerest.model.storage.getappgroupsettings;
+package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
 

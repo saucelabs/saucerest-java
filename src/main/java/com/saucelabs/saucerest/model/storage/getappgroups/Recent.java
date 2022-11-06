@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest.model.storage.getappgroups;
 
+import com.saucelabs.saucerest.model.storage.Access;
+import com.saucelabs.saucerest.model.storage.Owner;
 import com.squareup.moshi.Json;
 
 public class Recent {

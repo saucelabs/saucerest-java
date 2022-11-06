@@ -1,5 +1,8 @@
 package com.saucelabs.saucerest.model.storage.editappgroupsettings;
 
+import com.saucelabs.saucerest.model.storage.Instrumentation;
+import com.saucelabs.saucerest.model.storage.Proxy;
+import com.saucelabs.saucerest.model.storage.Resigning;
 import com.squareup.moshi.Json;
 
 public class Settings {

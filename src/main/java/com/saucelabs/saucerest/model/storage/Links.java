@@ -1,19 +1,20 @@
 
-package com.saucelabs.saucerest.model.storage.getappgroups;
+package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
 
 public class Links {
 
     @Json(name = "prev")
-    public Object prev;
+    public String prev;
     @Json(name = "next")
-    public Object next;
+    public String next;
     @Json(name = "self")
     public String self;
 
     /**
      * No args constructor for use in serialization
+     *
      */
     public Links() {
     }
@@ -23,7 +24,7 @@ public class Links {
      * @param prev
      * @param self
      */
-    public Links(Object prev, Object next, String self) {
+    public Links(String prev, String next, String self) {
         super();
         this.prev = prev;
         this.next = next;

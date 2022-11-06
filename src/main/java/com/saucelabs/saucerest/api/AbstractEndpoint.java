@@ -137,12 +137,11 @@ public abstract class AbstractEndpoint {
     }
 
     Response makeRequest(Request request) throws IOException {
-        try (Response response = new OkHttpClient().newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new RuntimeException("Unexpected code " + response);
-            }
-            return response;
+        Response response = new OkHttpClient().newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new RuntimeException("Unexpected code " + response);
         }
+        return response;
     }
 
     protected <T> T getResponseClass(String jsonResponse, Class<T> clazz) throws IOException {

@@ -1,6 +1,7 @@
 
 package com.saucelabs.saucerest.model.storage.deletegroupappfiles;
 
+import com.saucelabs.saucerest.model.storage.Access;
 import com.squareup.moshi.Json;
 
 public class Item {
