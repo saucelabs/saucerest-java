@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractEndpoint {
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
@@ -137,7 +138,14 @@ public abstract class AbstractEndpoint {
     }
 
     Response makeRequest(Request request) throws IOException {
-        Response response = new OkHttpClient().newCall(request).execute();
+        OkHttpClient client;
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(30, TimeUnit.SECONDS);
+        builder.readTimeout(30, TimeUnit.SECONDS);
+        builder.writeTimeout(30, TimeUnit.SECONDS);
+        client = builder.build();
+        Response response = client.newCall(request).execute();
+
         if (!response.isSuccessful()) {
             throw new RuntimeException("Unexpected code " + response);
         }
