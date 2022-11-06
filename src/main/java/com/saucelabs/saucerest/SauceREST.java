@@ -5,7 +5,6 @@ import com.saucelabs.saucerest.api.Storage;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.FailsafeException;
 import net.jodah.failsafe.RetryPolicy;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -23,6 +22,16 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -1440,7 +1449,7 @@ public class SauceREST implements Serializable {
      */
     protected String encodeAuthentication() {
         String auth = username + ":" + accessKey;
-        auth = "Basic " + Base64.encodeBase64String(auth.getBytes());
+        auth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
         return auth;
     }
 
