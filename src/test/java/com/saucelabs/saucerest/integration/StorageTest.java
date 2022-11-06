@@ -46,12 +46,10 @@ public class StorageTest {
 
     @BeforeAll
     public static void uploadAppFiles() {
-        long startTime = System.nanoTime();
         for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
             Thread t = new Thread(() -> {
                 File file = new StorageTestHelper().getAppFile(appFile);
                 try {
-                    System.out.println("Uploading: " + file.getName());
                     storageEU.uploadFile(file);
                     storageUS.uploadFile(file);
                 } catch (IOException ignored) {
@@ -65,42 +63,60 @@ public class StorageTest {
             .until(() ->
                 storageEU.getGroups().items.size() == 4 &&
                     storageUS.getGroups().items.size() == 4);
-
-        long stopTime = System.nanoTime();
-        long convert = TimeUnit.SECONDS.convert(stopTime - startTime, TimeUnit.NANOSECONDS);
-        System.out.println("Finished uploading in " + convert + " seconds");
     }
 
     @ParameterizedTest
     @EnumSource(Region.class)
     public void uploadAppFileTest(Region region) throws IOException {
         setup(region);
-        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(file);
+        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile);
 
-        Assertions.assertEquals(file.getName(), uploadFileApp.item.name);
+        Assertions.assertEquals(ipaFile.getName(), uploadFileApp.item.name);
         Assertions.assertEquals("", uploadFileApp.item.description);
+        Assertions.assertEquals("ios", uploadFileApp.item.kind);
+
+        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+        uploadFileApp = storage.get().uploadFile(apkFile);
+
+        Assertions.assertEquals(apkFile.getName(), uploadFileApp.item.name);
+        Assertions.assertEquals("", uploadFileApp.item.description);
+        Assertions.assertEquals("android", uploadFileApp.item.kind);
     }
 
     @ParameterizedTest
     @EnumSource(Region.class)
     public void uploadAppFileWithFileNameTest(Region region) throws IOException {
         setup(region);
-        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(file, "test-file-name.ipa");
+        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa");
 
         Assertions.assertEquals("test-file-name.ipa", uploadFileApp.item.name);
         Assertions.assertEquals("", uploadFileApp.item.description);
+        Assertions.assertEquals("ios", uploadFileApp.item.kind);
+
+        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk");
+
+        Assertions.assertEquals("test-file-name.apk", uploadFileApp.item.name);
+        Assertions.assertEquals("", uploadFileApp.item.description);
+        Assertions.assertEquals("android", uploadFileApp.item.kind);
     }
 
     @ParameterizedTest
     @EnumSource(Region.class)
     public void uploadAppFileWithFileNameAndDescriptionTest(Region region) throws IOException {
         setup(region);
-        File file = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(file, "test-file-name.ipa", "My App File Description");
+        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa", "My App File Description");
 
         Assertions.assertEquals("test-file-name.ipa", uploadFileApp.item.name);
+        Assertions.assertEquals("My App File Description", uploadFileApp.item.description);
+
+        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk", "My App File Description");
+
+        Assertions.assertEquals("test-file-name.apk", uploadFileApp.item.name);
         Assertions.assertEquals("My App File Description", uploadFileApp.item.description);
     }
 
@@ -110,7 +126,8 @@ public class StorageTest {
         setup(region);
         GetAppFiles getAppFiles = storage.get().getFiles();
 
-        Assertions.assertNotNull(getAppFiles);
+        Assertions.assertNotNull(getAppFiles.items);
+        Assertions.assertNotNull(getAppFiles.totalItems);
     }
 
     @ParameterizedTest
