@@ -61,11 +61,6 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
-        </dependency>
         <!-- Remove org.json:json in favor of Moshi when migration done -->
         <dependency>
             <groupId>org.json</groupId>
