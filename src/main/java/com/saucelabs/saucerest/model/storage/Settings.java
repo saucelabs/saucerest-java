@@ -25,23 +25,9 @@ public class Settings {
     @Json(name = "instrumentation_enabled")
     public Boolean instrumentationEnabled;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Settings() {
     }
 
-    /**
-     * @param proxy
-     * @param audioCapture
-     * @param proxyEnabled
-     * @param orientation
-     * @param setupDeviceLock
-     * @param resigningEnabled
-     * @param resigning
-     * @param instrumentation
-     * @param lang
-     */
     public Settings(Proxy proxy, Boolean audioCapture, Boolean proxyEnabled, String lang, Object orientation, Boolean resigningEnabled, Resigning resigning, Instrumentation instrumentation, Boolean setupDeviceLock, Boolean instrumentationEnabled) {
         super();
         this.proxy = proxy;

@@ -9,16 +9,9 @@ public class Proxy {
     @Json(name = "port")
     public Integer port;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Proxy() {
     }
 
-    /**
-     * @param port
-     * @param host
-     */
     public Proxy(String host, Integer port) {
         super();
         this.host = host;

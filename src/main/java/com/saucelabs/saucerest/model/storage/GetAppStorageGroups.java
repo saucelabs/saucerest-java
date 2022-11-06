@@ -19,20 +19,9 @@ public class GetAppStorageGroups {
     @Json(name = "is_simulator")
     public Boolean isSimulator;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public GetAppStorageGroups() {
     }
 
-    /**
-     * @param totalItems
-     * @param perPage
-     * @param links
-     * @param page
-     * @param items
-     * @param isSimulator
-     */
     public GetAppStorageGroups(List<ItemInteger> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
         super();
         this.items = items;

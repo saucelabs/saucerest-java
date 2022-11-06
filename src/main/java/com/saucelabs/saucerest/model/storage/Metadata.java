@@ -37,29 +37,9 @@ public class Metadata {
     @Json(name = "test_runner_class")
     public Object testRunnerClass;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Metadata() {
     }
 
-    /**
-     * @param identifier
-     * @param shortVersion
-     * @param minOs
-     * @param icon
-     * @param targetSdk
-     * @param deviceFamily
-     * @param version
-     * @param versionCode
-     * @param testRunnerPluginPath
-     * @param isTestRunner
-     * @param minSdk
-     * @param testRunnerClass
-     * @param name
-     * @param targetOs
-     * @param isSimulator
-     */
     public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass) {
         super();
         this.identifier = identifier;

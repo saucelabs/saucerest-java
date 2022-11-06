@@ -15,19 +15,9 @@ public class Resigning {
     @Json(name = "network_capture")
     public Boolean networkCapture;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Resigning() {
     }
 
-    /**
-     * @param biometrics
-     * @param sysAlertsDelay
-     * @param imageInjection
-     * @param groupDirectory
-     * @param networkCapture
-     */
     public Resigning(Boolean imageInjection, Boolean groupDirectory, Boolean biometrics, Boolean sysAlertsDelay, Boolean networkCapture) {
         super();
         this.imageInjection = imageInjection;

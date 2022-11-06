@@ -11,17 +11,9 @@ public class GetAppStorageGroupSettings {
     @Json(name = "identifier")
     public String identifier;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public GetAppStorageGroupSettings() {
     }
 
-    /**
-     * @param settings
-     * @param identifier
-     * @param kind
-     */
     public GetAppStorageGroupSettings(Settings settings, String kind, String identifier) {
         super();
         this.settings = settings;

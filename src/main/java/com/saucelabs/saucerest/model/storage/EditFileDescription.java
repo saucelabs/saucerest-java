@@ -9,16 +9,9 @@ public class EditFileDescription {
     @Json(name = "changed")
     public Boolean changed;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public EditFileDescription() {
     }
 
-    /**
-     * @param item
-     * @param changed
-     */
     public EditFileDescription(Item item, Boolean changed) {
         super();
         this.item = item;

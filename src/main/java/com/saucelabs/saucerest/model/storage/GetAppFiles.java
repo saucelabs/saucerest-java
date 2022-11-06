@@ -17,19 +17,9 @@ public class GetAppFiles {
     @Json(name = "total_items")
     public Integer totalItems;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public GetAppFiles() {
     }
 
-    /**
-     * @param totalItems
-     * @param perPage
-     * @param links
-     * @param page
-     * @param items
-     */
     public GetAppFiles(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems) {
         super();
         this.items = items;

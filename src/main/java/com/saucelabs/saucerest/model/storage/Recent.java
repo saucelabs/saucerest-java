@@ -29,26 +29,9 @@ public class Recent {
     @Json(name = "sha256")
     public String sha256;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Recent() {
     }
 
-    /**
-     * @param owner
-     * @param metadata
-     * @param access
-     * @param size
-     * @param sha256
-     * @param uploadTimestamp
-     * @param kind
-     * @param groupId
-     * @param name
-     * @param description
-     * @param etag
-     * @param id
-     */
     public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, String description, Metadata metadata, Access access, String sha256) {
         super();
         this.id = id;

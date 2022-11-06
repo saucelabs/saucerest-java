@@ -9,16 +9,9 @@ public class Owner {
     @Json(name = "org_id")
     public String orgId;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Owner() {
     }
 
-    /**
-     * @param id
-     * @param orgId
-     */
     public Owner(String id, String orgId) {
         super();
         this.id = id;

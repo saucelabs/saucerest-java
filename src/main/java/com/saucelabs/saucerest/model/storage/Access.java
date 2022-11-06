@@ -11,16 +11,9 @@ public class Access {
     @Json(name = "org_ids")
     public List<String> orgIds = null;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Access() {
     }
 
-    /**
-     * @param orgIds
-     * @param teamIds
-     */
     public Access(List<String> teamIds, List<String> orgIds) {
         super();
         this.teamIds = teamIds;

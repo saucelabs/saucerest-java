@@ -13,18 +13,9 @@ public class Instrumentation {
     @Json(name = "network_capture")
     public Boolean networkCapture;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Instrumentation() {
     }
 
-    /**
-     * @param biometrics
-     * @param bypassScreenshotRestriction
-     * @param imageInjection
-     * @param networkCapture
-     */
     public Instrumentation(Boolean imageInjection, Boolean bypassScreenshotRestriction, Boolean biometrics, Boolean networkCapture) {
         super();
         this.imageInjection = imageInjection;

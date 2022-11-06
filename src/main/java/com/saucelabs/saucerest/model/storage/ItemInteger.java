@@ -20,20 +20,9 @@ public class ItemInteger {
     @Json(name = "settings")
     public Settings settings;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public ItemInteger() {
     }
 
-    /**
-     * @param settings
-     * @param access
-     * @param name
-     * @param count
-     * @param id
-     * @param recent
-     */
     public ItemInteger(Integer id, String name, Recent recent, Integer count, Access access, Settings settings) {
         super();
         this.id = id;
