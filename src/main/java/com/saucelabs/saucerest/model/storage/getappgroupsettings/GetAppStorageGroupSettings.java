@@ -1,6 +1,7 @@
 
 package com.saucelabs.saucerest.model.storage.getappgroupsettings;
 
+import com.saucelabs.saucerest.model.storage.Settings;
 import com.squareup.moshi.Json;
 
 public class GetAppStorageGroupSettings {

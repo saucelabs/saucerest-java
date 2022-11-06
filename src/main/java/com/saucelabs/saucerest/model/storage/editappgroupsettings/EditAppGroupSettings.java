@@ -1,5 +1,6 @@
 package com.saucelabs.saucerest.model.storage.editappgroupsettings;
 
+import com.saucelabs.saucerest.model.storage.Settings;
 import com.squareup.moshi.Json;
 
 public class EditAppGroupSettings {
