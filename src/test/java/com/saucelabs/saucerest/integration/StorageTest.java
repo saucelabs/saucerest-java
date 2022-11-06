@@ -219,12 +219,14 @@ public class StorageTest {
         String fileId = getAppFiles.items.get(0).id;
 
         storage.get().updateFileDescription(fileId, "Updated through Integration Test");
-
         GetAppFiles file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
 
         Assertions.assertEquals("Updated through Integration Test", file.items.get(0).description);
 
         storage.get().updateFileDescription(fileId, "");
+        file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+
+        Assertions.assertEquals("", file.items.get(0).description);
     }
 
     @ParameterizedTest
