@@ -1,7 +1,6 @@
-package com.saucelabs.saucerest.model.storage.getappgroups;
 
-import com.saucelabs.saucerest.model.storage.Access;
-import com.saucelabs.saucerest.model.storage.Owner;
+package com.saucelabs.saucerest.model.storage;
+
 import com.squareup.moshi.Json;
 
 public class Recent {
@@ -23,7 +22,7 @@ public class Recent {
     @Json(name = "size")
     public Integer size;
     @Json(name = "description")
-    public Object description;
+    public String description;
     @Json(name = "metadata")
     public Metadata metadata;
     @Json(name = "access")
@@ -51,7 +50,7 @@ public class Recent {
      * @param etag
      * @param id
      */
-    public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, Object description, Metadata metadata, Access access, String sha256) {
+    public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, String description, Metadata metadata, Access access, String sha256) {
         super();
         this.id = id;
         this.owner = owner;

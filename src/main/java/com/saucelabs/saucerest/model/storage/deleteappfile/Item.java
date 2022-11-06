@@ -2,6 +2,7 @@
 package com.saucelabs.saucerest.model.storage.deleteappfile;
 
 import com.saucelabs.saucerest.model.storage.Access;
+import com.saucelabs.saucerest.model.storage.Metadata;
 import com.saucelabs.saucerest.model.storage.Owner;
 import com.squareup.moshi.Json;
 

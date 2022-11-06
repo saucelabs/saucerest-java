@@ -2,6 +2,7 @@
 package com.saucelabs.saucerest.model.storage.getappgroups;
 
 import com.saucelabs.saucerest.model.storage.Access;
+import com.saucelabs.saucerest.model.storage.Recent;
 import com.squareup.moshi.Json;
 
 public class Item {
