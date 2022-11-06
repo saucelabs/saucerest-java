@@ -25,5 +25,4 @@ public class EditFileDescription {
         this.item = item;
         this.changed = changed;
     }
-
 }

@@ -26,5 +26,4 @@ public class Access {
         this.teamIds = teamIds;
         this.orgIds = orgIds;
     }
-
 }

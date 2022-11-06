@@ -5,8 +5,6 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.Storage;
 import com.saucelabs.saucerest.model.storage.*;
-import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
-import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroups;
 import org.awaitility.Awaitility;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;

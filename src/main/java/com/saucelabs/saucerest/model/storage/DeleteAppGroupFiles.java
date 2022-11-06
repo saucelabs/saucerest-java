@@ -1,12 +1,12 @@
 
-package com.saucelabs.saucerest.model.storage.deletegroupappfiles;
+package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
 
 public class DeleteAppGroupFiles {
 
     @Json(name = "item")
-    public Item item;
+    public ItemInteger item;
 
     /**
      * No args constructor for use in serialization
@@ -17,9 +17,8 @@ public class DeleteAppGroupFiles {
     /**
      * @param item
      */
-    public DeleteAppGroupFiles(Item item) {
+    public DeleteAppGroupFiles(ItemInteger item) {
         super();
         this.item = item;
     }
-
 }

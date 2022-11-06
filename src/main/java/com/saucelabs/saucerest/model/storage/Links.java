@@ -30,5 +30,4 @@ public class Links {
         this.next = next;
         this.self = self;
     }
-
 }

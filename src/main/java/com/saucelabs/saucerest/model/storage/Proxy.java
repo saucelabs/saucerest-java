@@ -25,5 +25,4 @@ public class Proxy {
         this.host = host;
         this.port = port;
     }
-
 }

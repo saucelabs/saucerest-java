@@ -28,5 +28,4 @@ public class EditAppGroupSettings {
         this.kind = kind;
         this.identifier = identifier;
     }
-
 }

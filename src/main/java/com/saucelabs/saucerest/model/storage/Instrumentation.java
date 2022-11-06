@@ -33,5 +33,4 @@ public class Instrumentation {
         this.biometrics = biometrics;
         this.networkCapture = networkCapture;
     }
-
 }

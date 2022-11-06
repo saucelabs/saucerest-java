@@ -1,12 +1,11 @@
+package com.saucelabs.saucerest.model.storage;
 
-package com.saucelabs.saucerest.model.storage.deletegroupappfiles;
-
-import com.saucelabs.saucerest.model.storage.Access;
-import com.saucelabs.saucerest.model.storage.Recent;
-import com.saucelabs.saucerest.model.storage.Settings;
 import com.squareup.moshi.Json;
 
-public class Item {
+/**
+ * 2 endpoints return ID as an Int instead of String.
+ */
+public class ItemInteger {
 
     @Json(name = "id")
     public Integer id;
@@ -24,7 +23,7 @@ public class Item {
     /**
      * No args constructor for use in serialization
      */
-    public Item() {
+    public ItemInteger() {
     }
 
     /**
@@ -35,7 +34,7 @@ public class Item {
      * @param id
      * @param recent
      */
-    public Item(Integer id, String name, Recent recent, Integer count, Access access, Settings settings) {
+    public ItemInteger(Integer id, String name, Recent recent, Integer count, Access access, Settings settings) {
         super();
         this.id = id;
         this.name = name;
@@ -44,5 +43,4 @@ public class Item {
         this.access = access;
         this.settings = settings;
     }
-
 }

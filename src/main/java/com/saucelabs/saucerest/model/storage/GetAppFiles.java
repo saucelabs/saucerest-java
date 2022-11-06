@@ -40,5 +40,4 @@ public class GetAppFiles {
         this.perPage = perPage;
         this.totalItems = totalItems;
     }
-
 }

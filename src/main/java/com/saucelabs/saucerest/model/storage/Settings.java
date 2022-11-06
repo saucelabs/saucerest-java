@@ -56,5 +56,4 @@ public class Settings {
         this.setupDeviceLock = setupDeviceLock;
         this.instrumentationEnabled = instrumentationEnabled;
     }
-
 }

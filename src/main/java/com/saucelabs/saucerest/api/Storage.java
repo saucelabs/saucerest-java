@@ -3,8 +3,6 @@ package com.saucelabs.saucerest.api;
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.model.storage.*;
-import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
-import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroups;
 import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;

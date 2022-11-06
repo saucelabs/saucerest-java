@@ -65,5 +65,4 @@ public class Recent {
         this.access = access;
         this.sha256 = sha256;
     }
-
 }

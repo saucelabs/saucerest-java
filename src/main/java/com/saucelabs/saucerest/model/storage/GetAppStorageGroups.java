@@ -1,7 +1,6 @@
 
-package com.saucelabs.saucerest.model.storage.getappgroups;
+package com.saucelabs.saucerest.model.storage;
 
-import com.saucelabs.saucerest.model.storage.Links;
 import com.squareup.moshi.Json;
 
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class GetAppStorageGroups {
 
     @Json(name = "items")
-    public List<Item> items = null;
+    public List<ItemInteger> items = null;
     @Json(name = "links")
     public Links links;
     @Json(name = "page")
@@ -35,7 +34,7 @@ public class GetAppStorageGroups {
      * @param items
      * @param isSimulator
      */
-    public GetAppStorageGroups(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
+    public GetAppStorageGroups(List<ItemInteger> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
         super();
         this.items = items;
         this.links = links;
@@ -44,5 +43,4 @@ public class GetAppStorageGroups {
         this.totalItems = totalItems;
         this.isSimulator = isSimulator;
     }
-
 }

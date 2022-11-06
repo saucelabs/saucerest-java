@@ -29,5 +29,4 @@ public class GetAppStorageGroupSettings {
         this.kind = kind;
         this.identifier = identifier;
     }
-
 }

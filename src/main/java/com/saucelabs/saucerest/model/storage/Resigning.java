@@ -37,5 +37,4 @@ public class Resigning {
         this.sysAlertsDelay = sysAlertsDelay;
         this.networkCapture = networkCapture;
     }
-
 }

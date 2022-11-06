@@ -65,5 +65,4 @@ public class Item {
         this.access = access;
         this.sha256 = sha256;
     }
-
 }
