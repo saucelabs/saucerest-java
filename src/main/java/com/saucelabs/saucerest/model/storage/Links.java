@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
@@ -14,7 +13,6 @@ public class Links {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public Links() {
     }

@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
@@ -25,7 +24,6 @@ public class GetAppFiles {
     }
 
     /**
-     *
      * @param totalItems
      * @param perPage
      * @param links

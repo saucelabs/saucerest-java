@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.storage;
 
 import com.squareup.moshi.Json;
