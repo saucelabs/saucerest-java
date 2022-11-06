@@ -8,9 +8,10 @@ import com.saucelabs.saucerest.model.storage.deleteappfile.DeleteAppFile;
 import com.saucelabs.saucerest.model.storage.deletegroupappfiles.DeleteAppGroupFiles;
 import com.saucelabs.saucerest.model.storage.editappgroupsettings.EditAppGroupSettings;
 import com.saucelabs.saucerest.model.storage.getappfiles.GetAppFiles;
-import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroupsResponse;
+import com.saucelabs.saucerest.model.storage.getappgroups.GetAppStorageGroups;
 import com.saucelabs.saucerest.model.storage.getappgroupsettings.GetAppStorageGroupSettings;
 import com.saucelabs.saucerest.model.storage.uploadfileapp.UploadFileApp;
+import org.awaitility.Awaitility;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,10 +24,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Map;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
+
+    private static final Storage storageEU = new SauceREST(DataCenter.EU).getStorage();
+    private static final Storage storageUS = new SauceREST(DataCenter.US).getStorage();
     @TempDir
     private Path tempDir;
 
@@ -46,18 +51,23 @@ public class StorageTest {
     }
 
     @BeforeAll
-    public static void uploadAppFiles() throws IOException {
-        Storage storageEU = new SauceREST(DataCenter.EU).getStorage();
-        Storage storageUS = new SauceREST(DataCenter.US).getStorage();
-
-        if (storageEU.getFiles(ImmutableMap.of("q", "DemoApp")).items.size() <= 3 ||
-            storageUS.getFiles(ImmutableMap.of("q", "DemoApp")).items.size() <= 3) {
-            for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
+    public static void uploadAppFiles() {
+        for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
+            new Thread(() -> {
                 File file = new StorageTestHelper().getAppFile(appFile);
-                new SauceREST(DataCenter.EU).getStorage().uploadFile(file);
-                new SauceREST(DataCenter.US).getStorage().uploadFile(file);
-            }
+                try {
+                    storageEU.uploadFile(file);
+                    storageUS.uploadFile(file);
+                } catch (IOException ignored) {
+                }
+            }).start();
         }
+
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(600))
+            .until(() ->
+                storageEU.getGroups().items.size() == 4 &&
+                    storageUS.getGroups().items.size() == 4);
     }
 
     @ParameterizedTest
@@ -126,12 +136,22 @@ public class StorageTest {
 
     @ParameterizedTest
     @EnumSource(Region.class)
+    public void getAppFilesWithQueryParametersTest_404(Region region) throws IOException {
+        setup(region);
+        ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "abc123");
+        GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
+
+        Assertions.assertEquals(0, getAppFiles.items.size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
     public void getAppGroupsTest(Region region) throws IOException {
         setup(region);
-        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
 
-        Assertions.assertNotNull(getAppStorageGroupsResponse);
-        Assertions.assertTrue(getAppStorageGroupsResponse.items.size() > 0);
+        Assertions.assertNotNull(getAppStorageGroups);
+        Assertions.assertTrue(getAppStorageGroups.items.size() > 0);
     }
 
     @ParameterizedTest
@@ -139,9 +159,9 @@ public class StorageTest {
     public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(queryParameters);
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(queryParameters);
 
-        Assertions.assertNotNull(getAppStorageGroupsResponse);
+        Assertions.assertNotNull(getAppStorageGroups);
     }
 
     @ParameterizedTest
@@ -150,8 +170,8 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
-        int groupId = getAppStorageGroupsResponse.items.get(0).id;
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
+        int groupId = getAppStorageGroups.items.get(0).id;
         Map<String, Object> rawData = ImmutableMap.of("settings", ImmutableMap.of("resigning", ImmutableMap.of("image_injection", false)));
         String jsonBody = new JSONObject(rawData).toString();
 
@@ -167,8 +187,8 @@ public class StorageTest {
         setup(region);
 
         // Call getGroups() to get the group ID first
-        GetAppStorageGroupsResponse getAppStorageGroupsResponse = storage.get().getGroups();
-        int groupId = getAppStorageGroupsResponse.items.get(0).id;
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
+        int groupId = getAppStorageGroups.items.get(0).id;
 
         GetAppStorageGroupSettings getGroupSettings = storage.get().getGroupSettings(groupId);
 
@@ -231,7 +251,6 @@ public class StorageTest {
         // Upload app file, save file ID
         UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
         int groupId = uploadFileApp.item.groupId;
-        Assertions.assertNotNull(groupId);
 
         DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
         int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;

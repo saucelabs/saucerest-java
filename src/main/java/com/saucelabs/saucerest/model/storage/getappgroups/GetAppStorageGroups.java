@@ -5,7 +5,7 @@ import com.squareup.moshi.Json;
 
 import java.util.List;
 
-public class GetAppStorageGroupsResponse {
+public class GetAppStorageGroups {
 
     @Json(name = "items")
     public List<Item> items = null;
@@ -23,7 +23,7 @@ public class GetAppStorageGroupsResponse {
     /**
      * No args constructor for use in serialization
      */
-    public GetAppStorageGroupsResponse() {
+    public GetAppStorageGroups() {
     }
 
     /**
@@ -34,7 +34,7 @@ public class GetAppStorageGroupsResponse {
      * @param items
      * @param isSimulator
      */
-    public GetAppStorageGroupsResponse(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
+    public GetAppStorageGroups(List<Item> items, Links links, Integer page, Integer perPage, Integer totalItems, boolean isSimulator) {
         super();
         this.items = items;
         this.links = links;
