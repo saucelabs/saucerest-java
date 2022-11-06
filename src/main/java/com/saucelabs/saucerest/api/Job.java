@@ -71,7 +71,6 @@ public class Job extends AbstractEndpoint {
     public JSONObject stop() throws IOException {
         String url = getBaseEndpoint() + "/stop";
 
-        //return putResponse(url, new HashMap<>());
         return new JSONObject(putResponse(url, new HashMap<>()));
     }
 
