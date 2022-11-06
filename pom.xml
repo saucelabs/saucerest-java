@@ -61,6 +61,7 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <!-- Remove org.json:json in favor of Moshi when migration done -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -118,6 +119,11 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi</artifactId>
+            <version>1.14.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -222,6 +228,14 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <includes>
+                        <include>com.saucelabs.saucerest.DataCenter.class</include>
+                        <include>com.saucelabs.saucerest.SauceREST.class</include>
+                        <include>com.saucelabs.saucerest.api.Storage.class</include>
+                        <include>com.saucelabs.saucerest.api.Job.class</include>
+                    </includes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -263,8 +277,25 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>me.fabriciorby</groupId>
+                        <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+                        <version>1.1.0</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <reportFormat>plain</reportFormat>
+                    <consoleOutputReporter>
+                        <disable>true</disable>
+                    </consoleOutputReporter>
+                    <statelessTestsetInfoReporter
+                        implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter"/>
+                </configuration>
             </plugin>
         </plugins>
         <extensions>

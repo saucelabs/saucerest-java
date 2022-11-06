@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest;
 
+import com.saucelabs.saucerest.api.Job;
+import com.saucelabs.saucerest.api.Storage;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.FailsafeException;
 import net.jodah.failsafe.RetryPolicy;
@@ -9,26 +11,11 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.Proxy;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.rmi.UnexpectedException;
 import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -187,6 +175,18 @@ public class SauceREST implements Serializable {
 
     public Job getJob(DataCenter dataCenter, String sessionId) {
         return new Job(dataCenter, sessionId);
+    }
+
+    public Job getJob(String sessionId) {
+        return new Job(this.apiServer, sessionId);
+    }
+
+    public Storage getStorage(DataCenter dataCenter) {
+        return new Storage(dataCenter);
+    }
+
+    public Storage getStorage() {
+        return new Storage(this.apiServer);
     }
 
     /**
@@ -342,6 +342,7 @@ public class SauceREST implements Serializable {
      * Marks a Sauce job as 'passed'.
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @deprecated
      */
     public void jobPassed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -353,6 +354,7 @@ public class SauceREST implements Serializable {
      * Marks a Sauce job as 'failed'.
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @deprecated
      */
     public void jobFailed(String jobId) {
         Map<String, Object> updates = new HashMap<>();
@@ -365,6 +367,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @param tags  the tags to be added to the job, provided as a list of strings
+     * @deprecated
      */
     public void addTags(String jobId, List<String> tags) {
         Map<String, Object> updates = new HashMap<>();
@@ -934,6 +937,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId the Sauce job ID to retrieve
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getJobInfo(String jobId) {
         URL restEndpoint = buildURL(username + "/jobs/" + jobId);
@@ -944,6 +948,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getFullJobs() {
         return getFullJobs(20);
@@ -954,6 +959,7 @@ public class SauceREST implements Serializable {
      *
      * @param limit Number of jobs to return
      * @return String (in JSON format) representing the details for a Sauce job
+     * @deprecated
      */
     public String getFullJobs(int limit) {
         URL restEndpoint = buildURL(username + "/jobs?full=true&limit=" + limit);
@@ -964,6 +970,7 @@ public class SauceREST implements Serializable {
      * Returns a String (in JSON format) representing the details for a Sauce job.
      *
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs() {
         URL restEndpoint = buildURL(username + "/jobs");
@@ -976,6 +983,7 @@ public class SauceREST implements Serializable {
      *
      * @param limit Number of jobs to return(max of 500)
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs(int limit) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit);
@@ -989,6 +997,7 @@ public class SauceREST implements Serializable {
      * @param to    value in Epoch time format denoting the time to end the job list search
      * @param from  value in Epoch time format denoting the time to start the search
      * @return String (in JSON format) representing the jobID for a sauce job
+     * @deprecated
      */
     public String getJobs(int limit, long to, int from) {
         URL restEndpoint = buildURL(username + "/jobs?limit=" + limit + "&from=" + to + "&to=" + from);
@@ -1001,6 +1010,7 @@ public class SauceREST implements Serializable {
      * @param ids   iterable of job ids
      * @param full  should return full jobs response
      * @return String (in JSON format) representing the jobID for sauce jobs
+     * @deprecated
      */
     public String getJobsByIds(Iterable<String> ids, boolean full) {
         List<String> params = new ArrayList<String>();
@@ -1022,6 +1032,7 @@ public class SauceREST implements Serializable {
      *
      * @param ids   iterable of job ids
      * @return String (in JSON format) representing the jobID for full sauce jobs
+     * @deprecated
      */
     public String getFullJobsByIds(Iterable<String> ids) {
         return getJobsByIds(ids, true);
@@ -1290,6 +1301,7 @@ public class SauceREST implements Serializable {
      *
      * @param jobId   the Sauce job ID to update
      * @param updates Map of attributes to update
+     * @deprecated
      */
     public void updateJobInfo(String jobId, Map<String, Object> updates) {
         HttpURLConnection postBack = null;
@@ -1308,6 +1320,7 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to stop a running job.
      *
      * @param jobId the Sauce job ID
+     * @deprecated
      */
     public void stopJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1328,6 +1341,7 @@ public class SauceREST implements Serializable {
      * Invokes the Sauce REST API to delete a completed job from Sauce.
      *
      * @param jobId the Sauce job ID
+     * @deprecated
      */
     public void deleteJob(String jobId) {
         HttpURLConnection postBack = null;
@@ -1408,98 +1422,6 @@ public class SauceREST implements Serializable {
         connection.setDoOutput(true);
         addAuthenticationProperty(connection);
         return connection;
-    }
-
-    /**
-     * Uploads a file to Sauce storage.
-     *
-     * @param file the file to upload -param fileName uses file.getName() to store in sauce -param
-     *             overwrite set to true
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     */
-    public String uploadFile(File file) throws IOException {
-        return uploadFile(file, file.getName());
-    }
-
-    /**
-     * Uploads a file to Sauce storage.
-     *
-     * @param file     the file to upload
-     * @param fileName name of the file in sauce storage -param overwrite set to true
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     */
-    public String uploadFile(File file, String fileName) throws IOException {
-        return uploadFile(file, fileName, true);
-    }
-
-    /**
-     * Uploads a file to Sauce storage.
-     *
-     * @param file      the file to upload
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     */
-    public String uploadFile(File file, String fileName, boolean overwrite) throws IOException {
-        try (FileInputStream is = new FileInputStream(file)) {
-            return uploadFile(is, fileName, overwrite);
-        }
-    }
-
-    /**
-     * Uploads a file to Sauce storage.
-     *
-     * @param is        Input stream of the file to be uploaded
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     */
-    public String uploadFile(InputStream is, String fileName, boolean overwrite) throws IOException {
-        try {
-            URL restEndpoint = buildURL("storage/" + username + "/" + fileName + "?overwrite=" + overwrite);
-
-            HttpURLConnection connection = openConnection(HttpMethod.POST, restEndpoint);
-
-            if (connection instanceof HttpsURLConnection) {
-                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
-                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
-            }
-
-            connection.setUseCaches(false);
-            connection.setRequestProperty("Connection", "Keep-Alive");
-            connection.setRequestProperty("Cache-Control", "no-cache");
-            connection.setRequestProperty("Content-Type", "application/octet-stream");
-
-            try (DataOutputStream oos = new DataOutputStream(connection.getOutputStream())) {
-                IOUtils.copy(is, oos);
-            }
-
-            String result;
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                result = IOUtils.toString(rd);
-            }
-
-            JSONObject sauceUploadResponse = new JSONObject(result);
-            if (sauceUploadResponse.has("error")) {
-                throw new UnexpectedException("Failed to upload to sauce-storage: "
-                    + sauceUploadResponse.getString("error"));
-            }
-            return sauceUploadResponse.getString("md5");
-        } catch (JSONException e) {
-            throw new UnexpectedException("Failed to parse json response.", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnexpectedException("Failed to get algorithm.", e);
-        } catch (KeyManagementException e) {
-            throw new UnexpectedException("Failed to get key management.", e);
-        }
     }
 
     /**
@@ -1596,16 +1518,6 @@ public class SauceREST implements Serializable {
      */
     public String getActivity() {
         URL restEndpoint = buildURL(username + "/activity");
-        return retrieveResults(restEndpoint);
-    }
-
-    /**
-     * Returns a String (in JSON format) representing the stored files list
-     *
-     * @return String (in JSON format) representing the stored files list
-     */
-    public String getStoredFiles() {
-        URL restEndpoint = buildURL("storage/" + username);
         return retrieveResults(restEndpoint);
     }
 
