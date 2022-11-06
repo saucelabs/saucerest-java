@@ -17,7 +17,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.rmi.UnexpectedException;
 import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -1417,103 +1416,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Uploads an app file to Sauce Labs Mobile App Storage.
-     * Supported file types are *.apk, *.aab, *.ipa, or *.zip.
-     * Maximum file size is up to 4GB.
-     *
-     * @param file the mobile app file to be uploaded
-     * @return ?
-     * @throws IOException ?
-     * @see <a href="https://docs.saucelabs.com/mobile-apps/app-storage/">https://docs.saucelabs.com/mobile-apps/app-storage/</a>
-     * @deprecated
-     */
-    public String uploadFile(File file) throws IOException {
-        return uploadFile(file, file.getName());
-    }
-
-    /**
-     * Uploads an app file to Sauce Labs Mobile App Storage.
-     * Supported file types are *.apk, *.aab, *.ipa, or *.zip.
-     * Maximum file size is up to 4GB.
-     *
-     * @param file     the mobile app file to be uploaded
-     * @param fileName the filename including its extension
-     * @return ?
-     * @throws IOException ?
-     * @see <a href="https://docs.saucelabs.com/mobile-apps/app-storage/">https://docs.saucelabs.com/mobile-apps/app-storage/</a>
-     * @deprecated
-     */
-    public String uploadFile(File file, String fileName) throws IOException {
-        return uploadFile(file, fileName, null);
-    }
-
-    /**
-     *
-     * @param file
-     * @param fileName
-     * @param description
-     * @return
-     * @throws IOException
-     * @deprecated
-     */
-    public String uploadFile(File file, String fileName, String description) throws IOException {
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            return uploadFile(fileInputStream, fileName, description);
-        }
-    }
-
-    /**
-     * Uploads a file to Sauce storage.
-     *
-     * @param is        Input stream of the file to be uploaded
-     * @param fileName  name of the file in sauce storage
-     * @param overwrite boolean flag to overwrite file in sauce storage if it exists
-     * @return the md5 hash returned by sauce of the file
-     * @throws IOException can be thrown when server returns an error (tcp or http status not in the
-     *                     200 range)
-     * @deprecated
-     */
-    public String uploadFile(InputStream is, String fileName, String description) throws IOException {
-        try {
-            URL restEndpoint = buildURL("v1/storage/upload");
-
-            HttpURLConnection connection = openConnection(HttpMethod.POST, restEndpoint);
-
-            if (connection instanceof HttpsURLConnection) {
-                SauceSSLSocketFactory factory = new SauceSSLSocketFactory();
-                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
-            }
-
-            connection.setUseCaches(false);
-            connection.setRequestProperty("Connection", "Keep-Alive");
-            connection.setRequestProperty("Cache-Control", "no-cache");
-            connection.setRequestProperty("Content-Type", "application/octet-stream");
-
-            try (DataOutputStream oos = new DataOutputStream(connection.getOutputStream())) {
-                IOUtils.copy(is, oos);
-            }
-
-            String result;
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                result = IOUtils.toString(rd);
-            }
-
-            JSONObject sauceUploadResponse = new JSONObject(result);
-            if (sauceUploadResponse.has("error")) {
-                throw new UnexpectedException("Failed to upload to sauce-storage: "
-                    + sauceUploadResponse.getString("error"));
-            }
-            return sauceUploadResponse.getString("md5");
-        } catch (JSONException e) {
-            throw new UnexpectedException("Failed to parse json response.", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnexpectedException("Failed to get algorithm.", e);
-        } catch (KeyManagementException e) {
-            throw new UnexpectedException("Failed to get key management.", e);
-        }
-    }
-
-    /**
      * Generates a link to the job page on Saucelabs.com, which can be accessed without the user's
      * credentials. Auth token is HMAC/MD5 of the job ID with the key &lt;username&gt;:&lt;api key&gt;
      * (see <a href="http://saucelabs.com/docs/integration#public-job-links">http://saucelabs.com/docs/integration#public-job-links</a>).
@@ -1607,17 +1509,6 @@ public class SauceREST implements Serializable {
      */
     public String getActivity() {
         URL restEndpoint = buildURL(username + "/activity");
-        return retrieveResults(restEndpoint);
-    }
-
-    /**
-     * Returns a String (in JSON format) representing the stored files list
-     *
-     * @return String (in JSON format) representing the stored files list
-     * @deprecated
-     */
-    public String getStoredFiles() {
-        URL restEndpoint = buildURL("storage/" + username);
         return retrieveResults(restEndpoint);
     }
 

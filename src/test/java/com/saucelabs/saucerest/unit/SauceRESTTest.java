@@ -290,16 +290,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testGetStoredFiles() {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream(
-            "[]".getBytes(StandardCharsets.UTF_8)
-        ));
-        String userInfo = sauceREST.getStoredFiles();
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/storage/" + this.sauceREST.getUsername() + "");
-    }
-
-    @Test
     void testUpdateJobInfo() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
@@ -393,27 +383,6 @@ class SauceRESTTest {
 
         String expectedConcurrencyInfo = "{\"timestamp\":1447392030.111457,\"concurrency\":{\"organization\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"ca8b135d2e7e456385344811e05d84a6\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}},\"team\":{\"current\":{\"vms\":1,\"rds\":0,\"mac_vms\":0},\"id\":\"7e3beebb84bf4efaadffbbbbe780f294\",\"allowed\":{\"vms\":100,\"rds\":2,\"mac_vms\":100}}}}";
         assertEquals(expectedConcurrencyInfo, concurrencyInfo);
-    }
-
-    @Test
-    void testUploadFile() throws Exception {
-//        urlConnection.setResponseCode(200);
-//        urlConnection.setInputStream(new ByteArrayInputStream("{ \"md5\": \"abc123445213242\" }".getBytes(
-//            StandardCharsets.UTF_8)));
-//
-//        sauceREST.uploadFile(
-//            new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)),
-//            "gavin.txt",
-//            true
-//        );
-//        assertEquals(
-//            "/rest/v1/storage/" + this.sauceREST.getUsername() + "/gavin.txt",
-//            this.urlConnection.getRealURL().getPath()
-//        );
-//        assertEquals(
-//            "overwrite=true",
-//            this.urlConnection.getRealURL().getQuery()
-//        );
     }
 
     @Test
