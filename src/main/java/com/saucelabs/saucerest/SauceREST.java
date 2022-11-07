@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest;
 
 import com.saucelabs.saucerest.api.Job;
+import com.saucelabs.saucerest.api.Platform;
 import com.saucelabs.saucerest.api.Storage;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.FailsafeException;
@@ -22,16 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -187,6 +178,14 @@ public class SauceREST implements Serializable {
 
     public Storage getStorage() {
         return new Storage(this.apiServer);
+    }
+
+    public Platform getPlatform(DataCenter dataCenter) {
+        return new Platform(dataCenter);
+    }
+
+    public Platform getPlatform() {
+        return new Platform(this.apiServer);
     }
 
     /**

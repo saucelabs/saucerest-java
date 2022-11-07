@@ -62,9 +62,9 @@ public class JobTest {
 
         if (DataCenter.EU == param) {
             job = new SauceREST(EU).getJob(driver.get().getSessionId().toString());
-        } else if (DataCenter.USWEST == param) {
+        } else if (DataCenter.US == param) {
             job = new SauceREST(US).getJob(driver.get().getSessionId().toString());
-        } else if (DataCenter.APAC == param) {
+        } else if (DataCenter.APAC_SOUTHEAST == param) {
             job = new SauceREST(APAC_SOUTHEAST).getJob(driver.get().getSessionId().toString());
         }
     }
