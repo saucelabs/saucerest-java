@@ -2,6 +2,7 @@ package com.saucelabs.saucerest;
 
 import com.saucelabs.saucerest.api.Job;
 import com.saucelabs.saucerest.api.Platform;
+import com.saucelabs.saucerest.api.RealDevices;
 import com.saucelabs.saucerest.api.Storage;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.FailsafeException;
@@ -186,6 +187,14 @@ public class SauceREST implements Serializable {
 
     public Platform getPlatform() {
         return new Platform(this.apiServer);
+    }
+
+    public RealDevices getRealDevices(DataCenter dataCenter) {
+        return new RealDevices(dataCenter);
+    }
+
+    public RealDevices getRealDevices() {
+        return new RealDevices(this.apiServer);
     }
 
     /**
