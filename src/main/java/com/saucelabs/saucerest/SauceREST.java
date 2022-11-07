@@ -1531,18 +1531,6 @@ public class SauceREST implements Serializable {
     }
 
     /**
-     * Returns a String (in JSON format) representing the list of objects describing all the OS and
-     * browser platforms currently supported on Sauce Labs. (see <a href="https://docs.saucelabs.com/reference/rest-api/#get-supported-platforms">https://docs.saucelabs.com/reference/rest-api/#get-supported-platforms</a>).
-     *
-     * @param automationApi the automation API name
-     * @return String (in JSON format) representing the supported platforms information
-     */
-    public String getSupportedPlatforms(String automationApi) {
-        URL restEndpoint = buildURL("info/platforms/" + automationApi);
-        return retrieveResults(restEndpoint);
-    }
-
-    /**
      * Retrieve jobs associated with a build
      *
      * @param source JobSource enum
