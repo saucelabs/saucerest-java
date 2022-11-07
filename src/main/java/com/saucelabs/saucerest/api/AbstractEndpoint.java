@@ -140,9 +140,9 @@ public abstract class AbstractEndpoint {
     Response makeRequest(Request request) throws IOException {
         OkHttpClient client;
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(30, TimeUnit.SECONDS);
-        builder.readTimeout(30, TimeUnit.SECONDS);
-        builder.writeTimeout(30, TimeUnit.SECONDS);
+        builder.connectTimeout(300, TimeUnit.SECONDS);
+        builder.readTimeout(300, TimeUnit.SECONDS);
+        builder.writeTimeout(300, TimeUnit.SECONDS);
         client = builder.build();
         Response response = client.newCall(request).execute();
 

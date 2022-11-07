@@ -260,15 +260,6 @@ class SauceRESTTest {
     }
 
     @Test
-    void testGetSupportedPlatforms_appium() throws Exception {
-        urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(getClass().getResource("/appium.json").openStream());
-
-        String results = sauceREST.getSupportedPlatforms("appium");
-        assertEquals(this.urlConnection.getRealURL().getPath(), "/rest/v1/info/platforms/appium");
-    }
-
-    @Test
     void testRecordCI() {
         urlConnection.setResponseCode(200);
         urlConnection.setInputStream(new ByteArrayInputStream(
