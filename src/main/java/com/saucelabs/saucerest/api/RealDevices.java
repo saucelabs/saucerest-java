@@ -98,6 +98,23 @@ public class RealDevices extends AbstractEndpoint {
     }
 
     /**
+     * Deletes a real device job/test by ID.
+     * Documentation is
+     * <a href="https://docs.saucelabs.com/dev/api/rdc/">here</a>
+     *
+     * @param jobID The ID of the job/test to delete
+     */
+    public void deleteSpecificRealDeviceJob(String jobID) {
+        String url = getBaseEndpoint() + "/jobs/" + jobID;
+
+        try {
+            deleteResponse(url);
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
+
+    /**
      * The base endpoint of the Platform endpoint APIs.
      */
     private String getBaseEndpoint() {
