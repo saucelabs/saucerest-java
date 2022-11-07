@@ -98,6 +98,8 @@ public class RealDevices extends AbstractEndpoint {
     }
 
     /**
+     * TODO: This endpoint is currently not documented and also does not return any response whatsoever.
+     *  Update this method and add integration tests including a model and so on when above is fixed.
      * Deletes a real device job/test by ID.
      * Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/rdc/">here</a>
