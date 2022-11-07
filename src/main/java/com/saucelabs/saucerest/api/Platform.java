@@ -4,13 +4,8 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.List;
 
 public class Platform extends AbstractEndpoint {
 
@@ -67,16 +62,5 @@ public class Platform extends AbstractEndpoint {
      */
     private String getBaseEndpoint() {
         return baseURL + "rest/v1/info";
-    }
-
-    /**
-     * Need to use this as the response is a JSON array instead of a JSON object.
-     */
-    protected <T> List<T> getResponseListClass(String jsonResponse, Class<T> clazz) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
-
-        Type listPlatform = Types.newParameterizedType(List.class, clazz);
-        JsonAdapter<List<T>> adapter = moshi.adapter(listPlatform);
-        return adapter.fromJson(jsonResponse);
     }
 }

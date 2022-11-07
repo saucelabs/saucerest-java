@@ -4,10 +4,13 @@ import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 import okhttp3.*;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -157,6 +160,17 @@ public abstract class AbstractEndpoint {
         // failOnUnknown() will make sure that API changes in SL are caught ASAP so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
         return jsonAdapter.fromJson(jsonResponse);
+    }
+
+    /**
+     * Need to use this as the response is a JSON array instead of a JSON object.
+     */
+    protected <T> List<T> getResponseListClass(String jsonResponse, Class<T> clazz) throws IOException {
+        Moshi moshi = new Moshi.Builder().build();
+
+        Type listPlatform = Types.newParameterizedType(List.class, clazz);
+        JsonAdapter<List<T>> adapter = moshi.adapter(listPlatform);
+        return adapter.fromJson(jsonResponse);
     }
 
     /**
