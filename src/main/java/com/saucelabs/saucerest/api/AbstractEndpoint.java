@@ -2,6 +2,9 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.ErrorExplainers;
+import com.saucelabs.saucerest.SauceException;
+import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
@@ -14,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractEndpoint {
+public abstract class AbstractEndpoint extends AbstractModel {
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
@@ -53,7 +56,14 @@ public abstract class AbstractEndpoint {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
         for (Map.Entry<String, Object> param : params.entrySet()) {
-            urlBuilder.addQueryParameter(param.getKey(), param.getValue().toString());
+            // Check if parameter is a String array and add every element one by one to the url
+            if (param.getValue().getClass() == (String[].class)) {
+                for (String element : (String[]) param.getValue()) {
+                    urlBuilder.addQueryParameter(param.getKey(), element);
+                }
+            } else {
+                urlBuilder.addQueryParameter(param.getKey(), param.getValue().toString());
+            }
         }
 
         Request request = new Request.Builder()
@@ -150,7 +160,19 @@ public abstract class AbstractEndpoint {
         Response response = client.newCall(request).execute();
 
         if (!response.isSuccessful()) {
-            throw new RuntimeException("Unexpected code " + response);
+
+            switch (response.code()) {
+                case 401:
+                    throw new SauceException.NotAuthorized(ErrorExplainers.incorrectCreds(username, accessKey));
+                case 400:
+                    if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
+                        throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
+                    } else {
+                        throw new RuntimeException("Unexpected code " + response);
+                    }
+                default:
+                    throw new RuntimeException("Unexpected code " + response);
+            }
         }
         return response;
     }
@@ -171,18 +193,5 @@ public abstract class AbstractEndpoint {
         Type listPlatform = Types.newParameterizedType(List.class, clazz);
         JsonAdapter<List<T>> adapter = moshi.adapter(listPlatform);
         return adapter.fromJson(jsonResponse);
-    }
-
-    /**
-     * Transform a model class into JSON.
-     *
-     * @param clazz
-     * @param <T>
-     * @return
-     */
-    protected <T> String toJson(Class<T> clazz) {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-        return jsonAdapter.toJson((T) clazz);
     }
 }

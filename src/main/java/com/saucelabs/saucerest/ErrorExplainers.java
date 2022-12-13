@@ -3,7 +3,11 @@ package com.saucelabs.saucerest;
 /**
  * A nice clean place to collect error messages intended to guide users when throwing exceptions.
  */
-class ErrorExplainers {
+public class ErrorExplainers {
+
+    public static String errorMessageBuilder(String errorReason, String errorExplanation) {
+        return (String.join(System.lineSeparator(), errorReason, errorExplanation));
+    }
 
     static String missingCreds() {
         return String.join(System.lineSeparator(),
@@ -14,7 +18,7 @@ class ErrorExplainers {
         );
     }
 
-    static String incorrectCreds(String username, String accessKey) {
+    public static String incorrectCreds(String username, String accessKey) {
         String endOfKey = accessKey.substring(accessKey.length() - 3);
 
         return String.join(System.lineSeparator(),
@@ -47,7 +51,7 @@ class ErrorExplainers {
         );
     }
 
-    static String JobNotYetDone() {
+    public static String JobNotYetDone() {
         return String.join(System.lineSeparator(),
             " * This job hasn't finished processing yet.",
             " * After driver.quit() is called it will take some seconds to process and make available all job assets"
@@ -67,6 +71,28 @@ class ErrorExplainers {
             " * Tunnel id could not be found. Possible reasons:",
             " * The tunnel id requested does not exist in this data center. Ensure the data center endpoint is correct.",
             " * A tunnel with this id never existed."
+        );
+    }
+
+    public static String ResigningNotAllowed() {
+        return String.join(System.lineSeparator(),
+            " * Trying to set Resigning for this app failed. Possible reason:",
+            " * You set the app platform to be Android. Resigning is only available and applied for iOS apps.",
+            " * Either use Instrumentation which is for Android apps or change the platform to iOS."
+        );
+    }
+
+    public static String InstrumentationNotAllowed() {
+        return String.join(System.lineSeparator(),
+            " * Trying to set Instrumentation for this app failed. Possible reason:",
+            " * You set the app platform to be iOS. Instrumentation is only available and applied for Android apps.",
+            " * Either use Resigning which is for iOS apps or change the platform to Android."
+        );
+    }
+
+    public static String DeviceLockOnlyOnAndroid() {
+        return String.join(System.lineSeparator(),
+            " * Trying to setup a PIN code is only available for Android devices."
         );
     }
 }
