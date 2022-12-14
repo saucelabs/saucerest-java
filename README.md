@@ -129,8 +129,8 @@ This is going to be continuous process which means we will release changes to Sa
 ### Get all files
 
 ```java
-Storage storage=new SauceREST(DataCenter.EU).getStorage();
-  GetAppFiles getAppFiles=storage.getFiles();
+Storage storage = new SauceREST(DataCenter.EU).getStorage();
+GetAppFiles getAppFiles = storage.getFiles();
 ```
 
 # Maven

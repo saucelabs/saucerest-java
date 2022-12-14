@@ -2,6 +2,8 @@ package com.saucelabs.saucerest.unit;
 
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.storage.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -127,7 +129,6 @@ class EditAppGroupSettingsTest {
             .setSettings(settings)
             .build();
 
-
-        System.out.println(editAppGroupSettings.toJson());
+        Assertions.assertDoesNotThrow(() -> new JSONObject(editAppGroupSettings.toJson()));
     }
 }
