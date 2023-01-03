@@ -5,6 +5,7 @@ enum DataCenter {
     US("https://ondemand.us-west-1.saucelabs.com/wd/hub"),
     EU("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
     // Turn off testing against APAC as not all APIs are supported in this region yet
+    // TODO: add this after API endpoints are supported in APAC
     //APAC_SOUTHEAST("https://ondemand.apac-southeast-1.saucelabs.com/wd/hub");
 
     public final String label;
