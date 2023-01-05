@@ -1475,12 +1475,17 @@ public class SauceREST implements Serializable {
         } catch (IOException e) {
             Throwable throwable = e.getCause();
 
-            if (throwable instanceof SauceException.NotAuthorized) {
+            if (throwable instanceof FileNotFoundException) {
+                throw (FileNotFoundException) throwable;
+            } else if (throwable instanceof IOException) {
+                throw (IOException) throwable;
+	    } else if (throwable instanceof SauceException.NotAuthorized) {
                 throw (SauceException.NotAuthorized) throwable;
             } else if (throwable instanceof SauceException.NotFound) {
                 throw (SauceException.NotFound) throwable;
-            }
-            logger.log(Level.WARNING, "Error deleting tunnel", e);
+            } else {
+                throw new SauceException.UnknownError("Unknown Error deleting tunnel");
+	    }
         }
 
         InputStream stream = connection.getInputStream();

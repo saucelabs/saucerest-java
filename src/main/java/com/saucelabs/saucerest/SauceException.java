@@ -22,6 +22,16 @@ public class SauceException extends RuntimeException {
     public SauceException() {
     }
 
+    public static class UnknownError extends SauceException {
+
+        public UnknownError(String message) {
+            super(message);
+        }
+
+        public UnknownError() {
+        }
+    }
+
     public static class NotAuthorized extends SauceException {
 
         public NotAuthorized(String message) {
