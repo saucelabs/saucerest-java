@@ -42,6 +42,16 @@ public class SauceException extends RuntimeException {
         }
     }
 
+    public static class UnknownError extends SauceException {
+
+        public UnknownError(String message) {
+            super(message);
+        }
+
+        public UnknownError() {
+        }
+    }
+
     public static class TooManyRequests extends SauceException {
     }
 
