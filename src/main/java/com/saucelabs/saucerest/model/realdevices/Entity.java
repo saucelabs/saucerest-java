@@ -34,11 +34,13 @@ public class Entity {
     public Long startTime;
     @Json(name = "status")
     public String status;
+    @Json(name = "test_report_type")
+    public String testReportType;
 
     public Entity() {
     }
 
-    public Entity(Object assignedTunnelId, String automationBackend, String consolidatedStatus, Long creationTime, String deviceName, String deviceType, Long endTime, String id, Boolean manual, String name, String os, String osVersion, String ownerSauce, Long startTime, String status) {
+    public Entity(Object assignedTunnelId, String automationBackend, String consolidatedStatus, Long creationTime, String deviceName, String deviceType, Long endTime, String id, Boolean manual, String name, String os, String osVersion, String ownerSauce, Long startTime, String status, String testReportType) {
         super();
         this.assignedTunnelId = assignedTunnelId;
         this.automationBackend = automationBackend;
@@ -55,5 +57,6 @@ public class Entity {
         this.ownerSauce = ownerSauce;
         this.startTime = startTime;
         this.status = status;
+        this.testReportType = testReportType;
     }
 }
