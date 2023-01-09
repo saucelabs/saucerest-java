@@ -5,8 +5,7 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.Storage;
 import com.saucelabs.saucerest.model.storage.*;
-import org.awaitility.Awaitility;
-import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -45,24 +42,116 @@ public class StorageTest {
     }
 
     @BeforeAll
-    public static void uploadAppFiles() {
-        for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
-            Thread t = new Thread(() -> {
-                File file = new StorageTestHelper().getAppFile(appFile);
-                try {
-                    storageEU.uploadFile(file);
-                    storageUS.uploadFile(file);
-                } catch (IOException ignored) {
-                }
-            });
-            t.start();
+    public static void uploadAppFiles() throws IOException {
+        //TODO: rework this whole thing
+//        boolean needAppUploading = false;
+//
+//        if (storageEU.getGroups().items.size() != 4) {
+//            needAppUploading = true;
+//        }
+//
+//        if (storageUS.getGroups().items.size() != 4) {
+//            needAppUploading = true;
+//        }
+//
+//        if (needAppUploading) {
+//            for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
+//                Thread t = new Thread(() -> {
+//                    File file = new StorageTestHelper().getAppFile(appFile);
+//                    try {
+//                        storageEU.uploadFile(file);
+//                        storageUS.uploadFile(file);
+//                    } catch (IOException ignored) {
+//                    }
+//                });
+//                t.start();
+//            }
+//
+//            Awaitility.await()
+//                .atMost(5, TimeUnit.MINUTES)
+//                .until(() ->
+//                    storageEU.getGroups().items.size() == 4 &&
+//                        storageUS.getGroups().items.size() == 4);
+//        }
+    }
+
+    @AfterEach
+    public void resetAppGroupSettings() throws IOException {
+        for (ItemInteger itemInteger : storageEU.getGroups().items) {
+            if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
+                Settings settings = new Settings.Builder()
+                    .setInstrumentation(new Instrumentation.Builder()
+                        .setBiometrics(true)
+                        .setImageInjection(true)
+                        .setNetworkCapture(true)
+                        .build())
+                    .setInstrumentationEnabled(true)
+                    .setOrientation("Portrait")
+                    .setSetupDeviceLock(true)
+                    .setAudioCapture(true)
+                    .build();
+
+                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
+                    .setSettings(settings)
+                    .build();
+
+                storageEU.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+            } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+                Settings settings = new Settings.Builder()
+                    .setResigning(new Resigning.Builder()
+                        .setBiometrics(true)
+                        .setImageInjection(true)
+                        .setNetworkCapture(true)
+                        .build())
+                    .setResigningEnabled(true)
+                    .setAudioCapture(true)
+                    .build();
+
+                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+                    .setSettings(settings)
+                    .build();
+
+                storageEU.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+            }
         }
 
-        Awaitility.await()
-            .atMost(5, TimeUnit.MINUTES)
-            .until(() ->
-                storageEU.getGroups().items.size() == 4 &&
-                    storageUS.getGroups().items.size() == 4);
+        for (ItemInteger itemInteger : storageUS.getGroups().items) {
+            if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
+                Settings settings = new Settings.Builder()
+                    .setInstrumentation(new Instrumentation.Builder()
+                        .setBiometrics(true)
+                        .setImageInjection(true)
+                        .setNetworkCapture(true)
+                        .build())
+                    .setInstrumentationEnabled(true)
+                    .setOrientation("Portrait")
+                    .setSetupDeviceLock(true)
+                    .setAudioCapture(true)
+                    .build();
+
+                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
+                    .setSettings(settings)
+                    .build();
+
+                storageUS.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+            } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+                Settings settings = new Settings.Builder()
+                    .setResigning(new Resigning.Builder()
+                        .setBiometrics(true)
+                        .setImageInjection(true)
+                        .setNetworkCapture(true)
+                        .build())
+                    .setResigningEnabled(true)
+                    .setAudioCapture(true)
+                    .build();
+
+                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+                    .setSettings(settings)
+                    .build();
+
+                storageUS.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+            }
+        }
     }
 
     @ParameterizedTest
@@ -132,6 +221,39 @@ public class StorageTest {
 
     @ParameterizedTest
     @EnumSource(Region.class)
+    public void getAppFilesTestWithBuilder(Region region) throws IOException {
+        setup(region);
+
+        StorageParameter storageParameter = new StorageParameter.Builder()
+            .setQ("DemoApp")
+            .setKind(new String[]{"android"})
+            .build();
+
+        GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
+
+        Assertions.assertNotNull(getAppFiles.items);
+        Assertions.assertNotNull(getAppFiles.totalItems);
+        getAppFiles.items.forEach(item -> Assertions.assertEquals("android", item.kind));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void getAppFilesTestWithTwoKinds(Region region) throws IOException {
+        setup(region);
+
+        StorageParameter storageParameter = new StorageParameter.Builder()
+            .setKind(new String[]{"android", "ios"})
+            .build();
+
+        GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
+
+        Assertions.assertNotNull(getAppFiles.items);
+        Assertions.assertNotNull(getAppFiles.totalItems);
+        getAppFiles.items.forEach(item -> Assertions.assertTrue(item.kind.equals("android") || item.kind.equals("ios")));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
     public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
         setup(region);
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
@@ -176,10 +298,15 @@ public class StorageTest {
     @EnumSource(Region.class)
     public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
         setup(region);
-        ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(queryParameters);
+        StorageParameter storageParameter = new StorageParameter.Builder()
+            .setQ("DemoApp")
+            .setPerPage("5")
+            .build();
+
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(storageParameter.toMap());
 
         Assertions.assertNotNull(getAppStorageGroups);
+        getAppStorageGroups.items.forEach(item -> Assertions.assertTrue(item.name.contains("demoapp")));
     }
 
     @ParameterizedTest
@@ -187,16 +314,26 @@ public class StorageTest {
     public void updateAppGroupSettings(Region region) throws IOException {
         setup(region);
 
-        // Call getGroups() to get the group ID first
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(ImmutableMap.of("kind", "ios"));
+        // Get group ID first
+        GetAppStorageGroupsParameters groupsParameters = new GetAppStorageGroupsParameters.Builder()
+            .setKind("ios")
+            .setQ("com.saucelabs.mydemoapp.ios")
+            .build();
+
+        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(groupsParameters.toMap());
         int groupId = getAppStorageGroups.items.get(0).id;
-        Map<String, Object> rawData = ImmutableMap.of("settings", ImmutableMap.of("resigning", ImmutableMap.of("image_injection", false)));
-        String jsonBody = new JSONObject(rawData).toString();
 
-        EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, jsonBody);
+        Settings settings = new Settings.Builder()
+            .setAudioCapture(true)
+            .build();
 
-        Assertions.assertNotNull(editAppGroupSettings);
-        Assertions.assertFalse(editAppGroupSettings.settings.resigning.imageInjection);
+        EditAppGroupSettings editAppGroupSettings1 = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+            .setSettings(settings)
+            .build();
+
+        EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, editAppGroupSettings1.toJson());
+
+        Assertions.assertTrue(editAppGroupSettings.settings.audioCapture);
     }
 
     @ParameterizedTest
@@ -219,7 +356,7 @@ public class StorageTest {
         setup(region);
 
         // Call getFiles() to get a file ID so we can use it as a parameter
-        GetAppFiles getAppFiles = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        GetAppFiles getAppFiles = storage.get().getFiles(new StorageParameter.Builder().setQ("iOS-Real-Device-MyRNDemoApp.ipa").build().toMap());
         String fileId = getAppFiles.items.get(0).id;
 
         storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
@@ -233,16 +370,16 @@ public class StorageTest {
         setup(region);
 
         // Call getFiles() to get a file ID so we can use it as a parameter
-        GetAppFiles getAppFiles = storage.get().getFiles(ImmutableMap.of("q", "iOS-Real-Device-MyRNDemoApp.ipa"));
+        GetAppFiles getAppFiles = storage.get().getFiles(new StorageParameter.Builder().setQ("iOS-Real-Device-MyRNDemoApp.ipa").build().toMap());
         String fileId = getAppFiles.items.get(0).id;
 
         storage.get().updateFileDescription(fileId, "Updated through Integration Test");
-        GetAppFiles file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+        GetAppFiles file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
 
         Assertions.assertEquals("Updated through Integration Test", file.items.get(0).description);
 
         storage.get().updateFileDescription(fileId, "");
-        file = storage.get().getFiles(ImmutableMap.of("file_id", fileId));
+        file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
 
         Assertions.assertEquals("", file.items.get(0).description);
     }

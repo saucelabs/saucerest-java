@@ -63,4 +63,31 @@ public class SauceException extends RuntimeException {
         public NotYetDone() {
         }
     }
+
+    public static class ResigningNotAllowed extends SauceException {
+        public ResigningNotAllowed(String message) {
+            super(message);
+        }
+
+        public ResigningNotAllowed() {
+        }
+    }
+
+    public static class InstrumentationNotAllowed extends SauceException {
+        public InstrumentationNotAllowed(String message) {
+            super(message);
+        }
+
+        public InstrumentationNotAllowed() {
+        }
+    }
+
+    public static class DeviceLockOnlyOnAndroid extends SauceException {
+        public DeviceLockOnlyOnAndroid(String message) {
+            super(message);
+        }
+
+        public DeviceLockOnlyOnAndroid() {
+        }
+    }
 }

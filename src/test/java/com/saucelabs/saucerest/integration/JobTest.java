@@ -64,9 +64,11 @@ public class JobTest {
             job = new SauceREST(EU).getJob(driver.get().getSessionId().toString());
         } else if (DataCenter.US == param) {
             job = new SauceREST(US).getJob(driver.get().getSessionId().toString());
-        } else if (DataCenter.APAC_SOUTHEAST == param) {
-            job = new SauceREST(APAC_SOUTHEAST).getJob(driver.get().getSessionId().toString());
         }
+        // TODO: add this after API endpoints are supported in APAC
+        /* else if (DataCenter.APAC_SOUTHEAST == param) {
+            job = new SauceREST(APAC_SOUTHEAST).getJob(driver.get().getSessionId().toString());
+        } */
     }
 
     @BeforeEach

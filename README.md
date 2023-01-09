@@ -106,18 +106,37 @@ sauce.getJobInfo();
 ```
 
 ### About a requested number of jobs
+
 ```java
-sauce.getJobInfo(n);  #n is the number of jobs to retrieve, as an integer
+sauce.getJobInfo(n);  #n is the number of jobs to retrieve,as an integer
 ```
 
 ### About your tunnels
+
 ```java
-String tunnels = sauce.getTunnels();
+String tunnels=sauce.getTunnels();
+```
+
+# SauceREST 2.x
+
+With version 2.x of SauceREST we have made code-breaking changes to this wrapper. It has been updated to be more
+future-proof and to also support the newest APIs from Sauce Labs.
+
+This is going to be continuous process which means we will release changes to SauceREST over time.
+
+## Storage
+
+### Get all files
+
+```java
+Storage storage = new SauceREST(DataCenter.EU).getStorage();
+GetAppFiles getAppFiles = storage.getFiles();
 ```
 
 # Maven
 
 ```xml
+
 <dependencies>
   <dependency>
     <groupId>com.saucelabs</groupId>

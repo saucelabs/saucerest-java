@@ -9,12 +9,30 @@ public class Proxy {
     @Json(name = "port")
     public Integer port;
 
-    public Proxy() {
+    private Proxy(Builder builder) {
+        host = builder.host;
+        port = builder.port;
     }
 
-    public Proxy(String host, Integer port) {
-        super();
-        this.host = host;
-        this.port = port;
+    public static final class Builder {
+        private String host;
+        private Integer port;
+
+        public Builder() {
+        }
+
+        public Builder setHost(String val) {
+            host = val;
+            return this;
+        }
+
+        public Builder setPort(Integer val) {
+            port = val;
+            return this;
+        }
+
+        public Proxy build() {
+            return new Proxy(this);
+        }
     }
 }

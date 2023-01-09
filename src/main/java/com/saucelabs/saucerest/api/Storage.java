@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
 
 public class Storage extends AbstractEndpoint {
@@ -22,7 +23,7 @@ public class Storage extends AbstractEndpoint {
     }
 
     /**
-     * Get files without providing query parameters. Documentations is
+     * Get files without providing query parameters. Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-files">here</a>
      *
      * @return {@link GetAppFiles}
@@ -37,12 +38,13 @@ public class Storage extends AbstractEndpoint {
     /**
      * Use parameter names from
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-files">here</a>
+     * The parameters can be built manually or by using {@link StorageParameter}
      *
      * @param params Query parameters for this request
      * @return {@link GetAppFiles}
      * @throws IOException API request failed
      */
-    public GetAppFiles getFiles(ImmutableMap<String, Object> params) throws IOException {
+    public GetAppFiles getFiles(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
 
         return getResponseClass(getResponseObject(url, params), GetAppFiles.class);
@@ -64,12 +66,13 @@ public class Storage extends AbstractEndpoint {
     /**
      * Use parameter names from
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-groups">here</a>
+     * The parameters can be built manually or by using {@link StorageParameter}
      *
      * @param params Query parameters for this request
      * @return {@link GetAppStorageGroups}
      * @throws IOException API request failed
      */
-    public GetAppStorageGroups getGroups(ImmutableMap<String, Object> params) throws IOException {
+    public GetAppStorageGroups getGroups(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
         return getResponseClass(getResponseObject(url, params), GetAppStorageGroups.class);
@@ -102,6 +105,12 @@ public class Storage extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
         return getResponseClass(putResponse(url, jsonBody), EditAppGroupSettings.class);
+    }
+
+    public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, EditAppGroupSettings editAppGroupSettings) throws IOException {
+        String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
+
+        return getResponseClass(putResponse(url, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
     }
 
     /**
@@ -214,12 +223,12 @@ public class Storage extends AbstractEndpoint {
     }
 
     /**
-     * Need a upload-specific post method for the additional parameters.
+     * Need an upload-specific post method for the additional parameters.
      *
      * @param url         Sauce Labs API endpoint
      * @param file        App file
      * @param fileName    A different filename for the uploaded app. Default is its local filename
-     * @param description A optional description of the app
+     * @param description An optional description of the app
      * @return A string with the response as a string
      * @throws IOException API request failed
      */
@@ -251,6 +260,7 @@ public class Storage extends AbstractEndpoint {
     /**
      * Can't use {@link AbstractEndpoint#getResponseObject(String)} because it would write the whole response into memory.
      * This would be a problem if the app file to be downloaded is larger than 1MB.
+     *
      * @param url The URL to download the app file
      * @return {@link Response}
      */

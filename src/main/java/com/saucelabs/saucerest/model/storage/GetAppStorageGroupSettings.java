@@ -11,13 +11,37 @@ public class GetAppStorageGroupSettings {
     @Json(name = "identifier")
     public String identifier;
 
-    public GetAppStorageGroupSettings() {
+    private GetAppStorageGroupSettings(Builder builder) {
+        settings = builder.settings;
+        kind = builder.kind;
+        identifier = builder.identifier;
     }
 
-    public GetAppStorageGroupSettings(Settings settings, String kind, String identifier) {
-        super();
-        this.settings = settings;
-        this.kind = kind;
-        this.identifier = identifier;
+    public static final class Builder {
+        private Settings settings;
+        private String kind;
+        private String identifier;
+
+        public Builder() {
+        }
+
+        public Builder setSettings(Settings val) {
+            settings = val;
+            return this;
+        }
+
+        public Builder setKind(String val) {
+            kind = val;
+            return this;
+        }
+
+        public Builder setIdentifier(String val) {
+            identifier = val;
+            return this;
+        }
+
+        public GetAppStorageGroupSettings build() {
+            return new GetAppStorageGroupSettings(this);
+        }
     }
 }
