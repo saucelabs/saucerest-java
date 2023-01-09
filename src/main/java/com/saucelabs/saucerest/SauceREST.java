@@ -1468,23 +1468,22 @@ public class SauceREST implements Serializable {
      * @return BufferedInputStream with response from server
      */
     public BufferedInputStream deleteTunnel(String tunnelId) throws IOException {
-        HttpURLConnection connection = null;
         try {
             URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
-            connection = setConnection(restEndpoint, HttpMethod.DELETE);
+            HttpURLConnection connection = setConnection(restEndpoint, HttpMethod.DELETE);
+            InputStream stream = connection.getInputStream();
+            return new BufferedInputStream(stream);
         } catch (IOException e) {
-            Throwable throwable = e.getCause();
+            Throwable cause = e.getCause();
 
-            if (throwable instanceof SauceException.NotAuthorized) {
-                throw (SauceException.NotAuthorized) throwable;
-            } else if (throwable instanceof SauceException.NotFound) {
-                throw (SauceException.NotFound) throwable;
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            } else if (cause instanceof SauceException.NotAuthorized || cause instanceof SauceException.NotFound) {
+                throw (SauceException) cause;
+            } else {
+                throw new SauceException.UnknownError("Unknown Error deleting tunnel");
             }
-            logger.log(Level.WARNING, "Error deleting tunnel", e);
         }
-
-        InputStream stream = connection.getInputStream();
-        return new BufferedInputStream(stream);
     }
 
     /**
