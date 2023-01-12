@@ -9,7 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.saucelabs.saucerest.DataCenter.*;
@@ -68,12 +67,6 @@ public class SauceConnectTest {
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
-        if (dataCenter.equals(EU)) {
-            Assertions.assertEquals(1, tunnelIDs.size());
-        } else if (dataCenter.equals(US)) {
-            Assertions.assertEquals(1, tunnelIDs.size());
-        } else {
-            Assertions.assertEquals(0, tunnelIDs.size());
-        }
+        Assertions.assertEquals(dataCenter.equals(EU_CENTRAL) || dataCenter.equals(US_WEST) ? 1 : 0, tunnelIDs.size());
     }
 }

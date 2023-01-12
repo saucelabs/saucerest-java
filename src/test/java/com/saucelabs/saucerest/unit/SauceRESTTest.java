@@ -182,7 +182,7 @@ class SauceRESTTest {
     @BeforeEach
     void setUp() throws Exception {
         urlConnection = new MockHttpURLConnection();
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -201,7 +201,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnClose() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockInputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -212,7 +212,7 @@ class SauceRESTTest {
 
     private void setConnectionThrowIOExceptionOnWrite() throws MalformedURLException {
         urlConnection = new MockHttpURLConnection(new ExceptionThrowingMockOutputStream());
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -236,7 +236,7 @@ class SauceRESTTest {
 
     @Test
     void testConfirmSerializable() {
-        SauceREST original = new SauceREST(null, null, DataCenter.US);
+        SauceREST original = new SauceREST(null, null, DataCenter.US_WEST);
         SauceREST copy = SerializationUtils.clone(original);
         assertEquals(original, copy);
     }
@@ -1125,7 +1125,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromEU() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.EU_CENTRAL) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1141,7 +1141,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUS() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1157,7 +1157,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUSByDefault() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1173,7 +1173,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromEUWithString() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", "EU") {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", "EU_CENTRAL") {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
@@ -1205,7 +1205,7 @@ class SauceRESTTest {
     @Test
     void testGetPublicJobLinkFromUsWithInvalidString() {
         // GIVEN
-        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US) {
+        this.sauceREST = new SauceREST("fakeuser", "fakekey", DataCenter.US_WEST) {
             @Override
             public HttpURLConnection openConnection(URL url) {
                 SauceRESTTest.this.urlConnection.setRealURL(url);
