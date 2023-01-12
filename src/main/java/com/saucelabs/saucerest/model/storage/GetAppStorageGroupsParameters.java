@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GetAppStorageGroupsParameters {
-    private String q;
-    private String kind;
-    private String[] groupIds;
-    private int page;
+    private final String q;
+    private final String kind;
+    private final String[] groupIds;
+    private final int page;
     private String perPage;
 
     private GetAppStorageGroupsParameters(Builder builder) {

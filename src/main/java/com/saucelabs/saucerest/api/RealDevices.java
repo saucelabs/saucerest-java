@@ -15,6 +15,14 @@ public class RealDevices extends AbstractEndpoint {
         super(apiServer);
     }
 
+    public RealDevices(String username, String accessKey, DataCenter dataCenter) {
+        super(username, accessKey, dataCenter);
+    }
+
+    public RealDevices(String username, String accessKey, String apiServer) {
+        super(username, accessKey, apiServer);
+    }
+
     /**
      * Returns all real device in Sauce Labs. Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/rdc/#get-devices">here</a>
