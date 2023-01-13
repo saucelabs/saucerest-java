@@ -38,6 +38,20 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.baseURL = apiServer;
     }
 
+    public AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
+        this.username = username;
+        this.accessKey = accessKey;
+        this.credentials = Credentials.basic(username, accessKey);
+        this.baseURL = dataCenter.apiServer;
+    }
+
+    public AbstractEndpoint(String username, String accessKey, String apiServer) {
+        this.username = username;
+        this.accessKey = accessKey;
+        this.credentials = Credentials.basic(username, accessKey);
+        this.baseURL = apiServer;
+    }
+
     public String getResponseObject(String url) throws IOException {
         Response response = getResponse(url);
 

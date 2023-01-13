@@ -30,6 +30,16 @@ public class Job extends AbstractEndpoint {
         this.jobID = sessionId;
     }
 
+    public Job(String username, String accessKey, DataCenter dataCenter, String jobID) {
+        super(username, accessKey, dataCenter);
+        this.jobID = jobID;
+    }
+
+    public Job(String username, String accessKey, String apiServer, String jobID) {
+        super(username, accessKey, apiServer);
+        this.jobID = jobID;
+    }
+
     public JSONObject getDetails() throws IOException {
         return new JSONObject(getResponseObject(getBaseEndpoint()));
     }
