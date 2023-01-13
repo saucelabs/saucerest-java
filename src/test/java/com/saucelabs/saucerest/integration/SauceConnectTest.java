@@ -13,6 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.saucelabs.saucerest.DataCenter.*;
+
+/**
+ * Sauce Connect integration tests by nature require a running Sauce Connect tunnel. On GitHub this is done via an
+ * action that starts the required tunnels. Locally running these tests require the developer to start a tunnel beforehand.
+ */
 public class SauceConnectTest {
 
     @ParameterizedTest
