@@ -42,8 +42,7 @@ public class SauceConnect extends AbstractEndpoint {
     public List<String> getTunnelsForAUser(String username) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels";
 
-        //return getResponseListClass(getResponseObject(url), List.class);
-        return null;
+        return getResponseListClass(getResponseObject(url), String.class);
     }
 
     public void getTunnelInformation() {
