@@ -17,6 +17,14 @@ public class Platform extends AbstractEndpoint {
         super(apiServer);
     }
 
+    public Platform(String username, String accessKey, DataCenter dataCenter) {
+        super(username, accessKey, dataCenter);
+    }
+
+    public Platform(String username, String accessKey, String apiServer) {
+        super(username, accessKey, apiServer);
+    }
+
     /**
      * Returns the status of Sauce Labs. Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/platform/#get-sauce-labs-teststatus">here</a>

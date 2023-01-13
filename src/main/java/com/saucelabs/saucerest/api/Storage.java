@@ -22,6 +22,14 @@ public class Storage extends AbstractEndpoint {
         super(apiServer);
     }
 
+    public Storage(String username, String accessKey, DataCenter dataCenter) {
+        super(username, accessKey, dataCenter);
+    }
+
+    public Storage(String username, String accessKey, String apiServer) {
+        super(username, accessKey, apiServer);
+    }
+
     /**
      * Get files without providing query parameters. Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-files">here</a>
