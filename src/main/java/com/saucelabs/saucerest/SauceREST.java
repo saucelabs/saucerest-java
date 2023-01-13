@@ -1,9 +1,6 @@
 package com.saucelabs.saucerest;
 
-import com.saucelabs.saucerest.api.Job;
-import com.saucelabs.saucerest.api.Platform;
-import com.saucelabs.saucerest.api.RealDevices;
-import com.saucelabs.saucerest.api.Storage;
+import com.saucelabs.saucerest.api.*;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.FailsafeException;
 import net.jodah.failsafe.RetryPolicy;
@@ -78,16 +75,17 @@ public class SauceREST implements Serializable {
     /**
      * Retry policy default values.
      */
-    private int maxDuration;
-    private int maxRetries;
-    private int delay;
-    private int maxDelay;
-    private int delayFactor;
-    private ChronoUnit chronoUnit;
-    private List<Class<? extends Throwable>> throwableList;
+    private final int maxDuration;
+    private final int maxRetries;
+    private final int delay;
+    private final int maxDelay;
+    private final int delayFactor;
+    private final ChronoUnit chronoUnit;
+    private final List<Class<? extends Throwable>> throwableList;
 
     /**
      * Constructs a new instance of the SauceREST class.
+     *
      * @param dataCenter
      */
     public SauceREST(DataCenter dataCenter) {
@@ -195,6 +193,10 @@ public class SauceREST implements Serializable {
 
     public RealDevices getRealDevices() {
         return new RealDevices(this.apiServer);
+    }
+
+    public SauceConnect getSauceConnect() {
+        return new SauceConnect(this.username, this.accessKey, this.apiServer);
     }
 
     /**

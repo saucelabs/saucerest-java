@@ -23,7 +23,7 @@ public class EditAppGroupSettings extends AbstractModel {
 
     public static final class Builder {
         private Settings settings;
-        private Platform platform;
+        private final Platform platform;
 
         public enum Platform {
             IOS, ANDROID;
