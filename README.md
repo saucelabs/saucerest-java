@@ -28,7 +28,17 @@ Paramaters:
 | access-key  | String (required)               | your sauce labs accesskey              |
 | data_center | String or DataCenter (required) | one of US, US_EAST, EU, APAC_SOUTHEAST |
 
+### Public Methods
 
+Some methods do not need authentication:
+
+```java
+SauceREST sauce = new SauceREST(null, null, "data_center");
+```
+OR
+```java
+SauceREST sauce = new SauceREST(null, null, Datacenter.US);
+```
 
 Users generally only have access to their own jobs and resources.  Parent accounts may have access to their children's jobs.  Check out the Sauce Labs documentation for more information.
 
