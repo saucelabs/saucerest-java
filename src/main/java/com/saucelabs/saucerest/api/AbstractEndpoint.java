@@ -27,28 +27,44 @@ public abstract class AbstractEndpoint extends AbstractModel {
     public AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-        this.credentials = Credentials.basic(username, accessKey);
+        if (username == null && accessKey == null ) {
+            this.credentials = null;
+        } else {
+            this.credentials = Credentials.basic(username, accessKey);
+        }
         this.baseURL = dataCenter.apiServer;
     }
 
     public AbstractEndpoint(String apiServer) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-        this.credentials = Credentials.basic(username, accessKey);
+        if (username == null && accessKey == null ) {
+            this.credentials = null;
+        } else {
+            this.credentials = Credentials.basic(username, accessKey);
+        }
         this.baseURL = apiServer;
     }
 
     public AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
-        this.credentials = Credentials.basic(username, accessKey);
+        if (username == null && accessKey == null ) {
+            this.credentials = null;
+        } else {
+            this.credentials = Credentials.basic(username, accessKey);
+        }
         this.baseURL = dataCenter.apiServer;
     }
 
     public AbstractEndpoint(String username, String accessKey, String apiServer) {
         this.username = username;
         this.accessKey = accessKey;
-        this.credentials = Credentials.basic(username, accessKey);
+        if (username == null && accessKey == null ) {
+            this.credentials = null;
+        } else {
+            this.credentials = Credentials.basic(username, accessKey);
+        }
         this.baseURL = apiServer;
     }
 
@@ -80,8 +96,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
             }
         }
 
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .header("User-Agent", userAgent)
             .url(urlBuilder.build().toString())
             .build();
@@ -103,8 +124,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     public String postResponse(String url, Map<String, Object> payload, MediaType mediaType) throws IOException {
         String json = new JSONObject(payload).toString();
 
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .header("User-Agent", userAgent)
             .url(url)
             .post(RequestBody.create(json, mediaType))
@@ -118,8 +144,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     public String putResponse(String url, Map<String, Object> payload) throws IOException {
         String json = new JSONObject(payload).toString();
 
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .url(url)
             .put(RequestBody.create(json, MediaType.parse("application/json")))
             .build();
@@ -132,8 +163,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     public String putResponse(String url, String payload) throws IOException {
         String json = new JSONObject(payload).toString();
 
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .url(url)
             .put(RequestBody.create(json, MediaType.parse("application/json")))
             .build();
@@ -144,8 +180,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     public String deleteResponse(String url) throws IOException {
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .url(url)
             .delete()
             .build();
@@ -156,8 +197,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     private Response getResponse(String url) throws IOException {
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
             .url(url)
             .build();
 
