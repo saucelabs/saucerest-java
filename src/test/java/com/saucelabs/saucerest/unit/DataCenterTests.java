@@ -12,14 +12,14 @@ class DataCenterTests
 {
     @ParameterizedTest
     @CsvSource({
-        "US,      US",
-        "us,      US",
-        "EU,      EU",
-        "Eu,      EU",
-        "US_EAST, US_EAST",
-        "us_EaSt, US_EAST",
-        "APAC_SOUTHEAST,    APAC_SOUTHEAST",
-        "apac_southeast,    APAC_SOUTHEAST",
+        "US_WEST,        US_WEST",
+        "us_WeSt,        US_WEST",
+        "EU_CENTRAL,     EU_CENTRAL",
+        "Eu_central,     EU_CENTRAL",
+        "US_EAST,        US_EAST",
+        "us_EaSt,        US_EAST",
+        "APAC_SOUTHEAST, APAC_SOUTHEAST",
+        "apac_southeast, APAC_SOUTHEAST",
     })
     void testFromString(String input, DataCenter expected)
     {

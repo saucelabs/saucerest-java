@@ -18,15 +18,15 @@ SauceREST sauce = new SauceREST("username", "access-key", "data_center");
 ```
 OR
 ```java
-SauceREST sauce = new SauceREST("username", "access-key", Datacenter.US);
+SauceREST sauce = new SauceREST("username", "access-key", DataCenter.US_WEST);
 ```
-Paramaters:
+Parameters:
 
-| Name        | Type                            | Details                                |
-|-------------|---------------------------------|----------------------------------------|
-| username    | String (required)               | your sauce labs username               |
-| access-key  | String (required)               | your sauce labs accesskey              |
-| data_center | String or DataCenter (required) | one of US, US_EAST, EU, APAC_SOUTHEAST |
+| Name        | Type                            | Details                                                     |
+|-------------|---------------------------------|-------------------------------------------------------------|
+| username    | String (required)               | your sauce labs username                                    |
+| access-key  | String (required)               | your sauce labs accesskey                                   |
+| data_center | String or DataCenter (required) | one of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
 
 
 
@@ -129,7 +129,7 @@ This is going to be continuous process which means we will release changes to Sa
 ### Get all files
 
 ```java
-Storage storage = new SauceREST(DataCenter.EU).getStorage();
+Storage storage = new SauceREST(DataCenter.EU_CENTRAL).getStorage();
 GetAppFiles getAppFiles = storage.getFiles();
 ```
 

@@ -21,8 +21,8 @@ import java.nio.file.Paths;
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
 
-    private static final Storage storageEU = new SauceREST(DataCenter.EU).getStorage();
-    private static final Storage storageUS = new SauceREST(DataCenter.US).getStorage();
+    private static final Storage euCentralStorage = new SauceREST(DataCenter.EU_CENTRAL).getStorage();
+    private static final Storage usWestStorage = new SauceREST(DataCenter.US_WEST).getStorage();
     @TempDir
     private Path tempDir;
 
@@ -31,10 +31,7 @@ public class StorageTest {
      * app files yet.
      */
     enum Region {
-        EU(), US();
-
-        Region() {
-        }
+        EU_CENTRAL, US_WEST;
     }
 
     public void setup(Region region) {
@@ -77,7 +74,7 @@ public class StorageTest {
 
     @AfterEach
     public void resetAppGroupSettings() throws IOException {
-        for (ItemInteger itemInteger : storageEU.getGroups().items) {
+        for (ItemInteger itemInteger : euCentralStorage.getGroups().items) {
             if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
                 Settings settings = new Settings.Builder()
                     .setInstrumentation(new Instrumentation.Builder()
@@ -95,7 +92,7 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                storageEU.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
                 Settings settings = new Settings.Builder()
                     .setResigning(new Resigning.Builder()
@@ -111,11 +108,11 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                storageEU.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
             }
         }
 
-        for (ItemInteger itemInteger : storageUS.getGroups().items) {
+        for (ItemInteger itemInteger : usWestStorage.getGroups().items) {
             if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
                 Settings settings = new Settings.Builder()
                     .setInstrumentation(new Instrumentation.Builder()
@@ -133,7 +130,7 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                storageUS.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
                 Settings settings = new Settings.Builder()
                     .setResigning(new Resigning.Builder()
@@ -149,7 +146,7 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                storageUS.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
             }
         }
     }
