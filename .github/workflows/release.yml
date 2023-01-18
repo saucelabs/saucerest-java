@@ -6,7 +6,14 @@ on:
       releaseversion:
         description: 'Release version'
         required: true
-        default: '1.1.0'
+        default: '2.0.0'
+        
+permissions:
+  contents: write
+
+env:
+  SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
+  SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
 
 jobs:
   publish:
@@ -20,6 +27,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
