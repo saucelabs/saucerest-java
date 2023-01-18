@@ -8,6 +8,10 @@ on:
         required: true
         default: '1.1.0'
 
+env:
+  SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
+  SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
