@@ -25,10 +25,7 @@ public class RealDevicesTest {
      * app files yet.
      */
     enum Region {
-        EU(), US();
-
-        Region() {
-        }
+        EU_CENTRAL, US_WEST
     }
 
     @BeforeAll
@@ -43,13 +40,13 @@ public class RealDevicesTest {
         sauceCapabilities.setCapability("name", "SauceREST Android Real Device Integration Test");
 
         capabilities.setCapability("sauce:options", sauceCapabilities);
-        URL sauceLabsURLEU = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.eu-central-1.saucelabs.com/wd/hub");
-        URL sauceLabsURLUS = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.us-west-1.saucelabs.com/wd/hub");
+        URL euCentralSauceLabsUrl = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.eu-central-1.saucelabs.com/wd/hub");
+        URL usWestSauceLabsUrl = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.us-west-1.saucelabs.com/wd/hub");
 
-        AndroidDriver driverEU = new AndroidDriver(sauceLabsURLEU, capabilities);
+        AndroidDriver driverEU = new AndroidDriver(euCentralSauceLabsUrl, capabilities);
         //driverEU.get("https://saucedemo.com");
         driverEU.quit();
-        AndroidDriver driverUS = new AndroidDriver(sauceLabsURLUS, capabilities);
+        AndroidDriver driverUS = new AndroidDriver(usWestSauceLabsUrl, capabilities);
         //driverUS.get("https://saucedemo.com");
         driverUS.quit();
     }

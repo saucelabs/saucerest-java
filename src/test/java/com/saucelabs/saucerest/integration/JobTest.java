@@ -60,10 +60,10 @@ public class JobTest {
         URL url = new URL(param.label);
         driver.set(new RemoteWebDriver(url, options));
 
-        if (DataCenter.EU == param) {
-            job = new SauceREST(EU).getJob(driver.get().getSessionId().toString());
-        } else if (DataCenter.US == param) {
-            job = new SauceREST(US).getJob(driver.get().getSessionId().toString());
+        if (DataCenter.EU_CENTRAL == param) {
+            job = new SauceREST(EU_CENTRAL).getJob(driver.get().getSessionId().toString());
+        } else if (DataCenter.US_WEST == param) {
+            job = new SauceREST(US_WEST).getJob(driver.get().getSessionId().toString());
         }
         // TODO: add this after API endpoints are supported in APAC
         /* else if (DataCenter.APAC_SOUTHEAST == param) {
