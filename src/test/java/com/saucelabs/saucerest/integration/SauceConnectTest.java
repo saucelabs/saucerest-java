@@ -103,10 +103,13 @@ public class SauceConnectTest {
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
-        TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelIDs.get(0));
 
-        Assertions.assertEquals(1, tunnelIDs.size());
-        Assertions.assertNotNull(tunnelInformation);
+        for (String tunnelID : tunnelIDs) {
+            TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelID);
+
+            Assertions.assertEquals(1, tunnelIDs.size());
+            Assertions.assertNotNull(tunnelInformation);
+        }
     }
 
     @ParameterizedTest
@@ -117,9 +120,11 @@ public class SauceConnectTest {
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
-        JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelIDs.get(0));
+        for (String tunnelID : tunnelIDs) {
+            JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelID);
 
-        Assertions.assertFalse(jobsForATunnel.id.isEmpty());
-        Assertions.assertNotNull(jobsForATunnel.jobsRunning);
+            Assertions.assertFalse(jobsForATunnel.id.isEmpty());
+            Assertions.assertNotNull(jobsForATunnel.jobsRunning);
+        }
     }
 }
