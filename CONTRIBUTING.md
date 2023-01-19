@@ -12,8 +12,8 @@ We appreciate contributions from the community, helping to make this library bet
 
 ## Step 3. Make your changes
 1. Code Changes should be accompanied by documentation (if new features) and tests
-3. Run the JUnit tests with `mvn test` if appropriate
-4. Once they all pass, you're gold!
+2. Run the JUnit tests with `mvn test` if appropriate
+3. Once they all pass, you're gold!
 
 ## Step 4. Commit
 1. List changed files with `git status`
