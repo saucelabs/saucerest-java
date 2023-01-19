@@ -3,6 +3,7 @@ package com.saucelabs.saucerest.integration;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.SauceConnect;
+import com.saucelabs.saucerest.model.sauceconnect.JobsForATunnel;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
@@ -14,8 +15,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.io.IOException;
 import java.util.List;
 
-import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
-import static com.saucelabs.saucerest.DataCenter.US_WEST;
+import static com.saucelabs.saucerest.DataCenter.*;
 
 /**
  * Sauce Connect integration tests by nature require a running Sauce Connect tunnel. On GitHub this is done via an
@@ -63,23 +63,12 @@ public class SauceConnectTest {
         Assertions.assertFalse(versions.downloads.win32.sha1.isEmpty());
     }
 
-    @ParameterizedTest
-    @EnumSource(DataCenter.class)
-    public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
-
-        Assertions.assertEquals(dataCenter.equals(EU_CENTRAL) || dataCenter.equals(US_WEST) ? 1 : 0, tunnelIDs.size());
-    }
-
     @AfterAll
     @SuppressWarnings("all")
     @ParameterizedTest
     @EnumSource(DataCenter.class)
-    public static void stopTunnels() throws IOException {
-        SauceREST sauceREST = new SauceREST(EU_CENTRAL);
+    public static void stopTunnels(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
@@ -95,7 +84,21 @@ public class SauceConnectTest {
 
     @ParameterizedTest
     @EnumSource(DataCenter.class)
-    public void getTunnelInformation(DataCenter dataCenter) throws IOException {
+    public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+
+        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+
+        Assertions.assertEquals(
+            dataCenter.equals(EU_CENTRAL) ||
+                dataCenter.equals(US_WEST) ||
+                dataCenter.equals(APAC_SOUTHEAST) ? 1 : 0, tunnelIDs.size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
@@ -104,5 +107,19 @@ public class SauceConnectTest {
 
         Assertions.assertEquals(1, tunnelIDs.size());
         Assertions.assertNotNull(tunnelInformation);
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+
+        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+
+        JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelIDs.get(0));
+
+        Assertions.assertFalse(jobsForATunnel.id.isEmpty());
+        Assertions.assertNotNull(jobsForATunnel.jobsRunning);
     }
 }

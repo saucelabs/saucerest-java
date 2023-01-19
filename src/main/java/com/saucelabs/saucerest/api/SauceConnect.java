@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.model.sauceconnect.JobsForATunnel;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
@@ -47,18 +48,54 @@ public class SauceConnect extends AbstractEndpoint {
         return getResponseListClass(getResponseObject(url), String.class);
     }
 
+    /**
+     * Returns information about the specified tunnel.
+     *
+     * @param username The authentication username of the owner of the requested tunnel.
+     * @param tunnelID The unique identifier of the requested tunnel.
+     * @return {@link TunnelInformation}
+     * @throws IOException
+     */
     public TunnelInformation getTunnelInformation(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
         return getResponseClass(getResponseObject(url), TunnelInformation.class);
     }
 
+    /**
+     * Returns information about the specified tunnel.
+     *
+     * @param tunnelID The unique identifier of the requested tunnel.
+     * @return {@link TunnelInformation}
+     * @throws IOException
+     */
     public TunnelInformation getTunnelInformation(String tunnelID) throws IOException {
         return getTunnelInformation(this.username, tunnelID);
     }
 
-    public void getCurrentJobsForATunnel() {
+    /**
+     * Returns the number of currently running jobs for the specified tunnel.
+     *
+     * @param username The authentication username of the user whose tunnels you are requesting.
+     * @param tunnelID The unique identifier of the requested tunnel.
+     * @return {@link JobsForATunnel}
+     * @throws IOException API request failed
+     */
+    public JobsForATunnel getCurrentJobsForATunnel(String username, String tunnelID) throws IOException {
+        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID + "/num_jobs";
 
+        return getResponseClass(getResponseObject(url), JobsForATunnel.class);
+    }
+
+    /**
+     * Returns the number of currently running jobs for the specified tunnel.
+     *
+     * @param tunnelID The unique identifier of the requested tunnel.
+     * @return {@link JobsForATunnel}
+     * @throws IOException API request failed
+     */
+    public JobsForATunnel getCurrentJobsForATunnel(String tunnelID) throws IOException {
+        return getCurrentJobsForATunnel(this.username, tunnelID);
     }
 
     /**
