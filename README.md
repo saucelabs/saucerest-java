@@ -1,5 +1,6 @@
 SauceREST Java [![codecov.io](https://codecov.io/github/saucelabs/saucerest-java/coverage.svg?branch=master)](https://codecov.io/github/saucelabs/saucerest-java?branch=master)
 ![example workflow](https://github.com/saucelabs/saucerest-java/actions/workflows/java-ci.yml/badge.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/com.saucelabs/saucerest.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.saucelabs%20a%3Asaucerest)
 
 ---
 
