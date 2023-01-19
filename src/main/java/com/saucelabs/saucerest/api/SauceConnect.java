@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
 
 import java.io.IOException;
@@ -53,8 +54,29 @@ public class SauceConnect extends AbstractEndpoint {
 
     }
 
-    public void stopTunnel() {
+    /**
+     * Shuts down the specified tunnel.
+     *
+     * @param username The authentication username of the user whose tunnels you are requesting.
+     * @param tunnelID The unique identifier of the tunnel to stop.
+     * @return {@link StopTunnel}
+     * @throws IOException API request failed
+     */
+    public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
+        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
+        return getResponseClass(deleteResponse(url), StopTunnel.class);
+    }
+
+    /**
+     * Shuts down the specified tunnel.
+     *
+     * @param tunnelID The unique identifier of the tunnel to stop.
+     * @return {@link StopTunnel}
+     * @throws IOException API request failed
+     */
+    public StopTunnel stopTunnel(String tunnelID) throws IOException {
+        return stopTunnel(this.username, tunnelID);
     }
 
     /**
