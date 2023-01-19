@@ -4,6 +4,7 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.SauceConnect;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
+import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -75,9 +76,10 @@ public class SauceConnectTest {
 
     @AfterAll
     @SuppressWarnings("all")
+    @ParameterizedTest
     @EnumSource(DataCenter.class)
-    public static void stopTunnels(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
+    public static void stopTunnels() throws IOException {
+        SauceREST sauceREST = new SauceREST(EU_CENTRAL);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
@@ -89,5 +91,18 @@ public class SauceConnectTest {
             Assertions.assertFalse(stopTunnel.id.isEmpty());
             Assertions.assertNotNull(stopTunnel.jobsRunning);
         }
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getTunnelInformation(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+
+        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+        TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelIDs.get(0));
+
+        Assertions.assertEquals(1, tunnelIDs.size());
+        Assertions.assertNotNull(tunnelInformation);
     }
 }

@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
+import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
 
 import java.io.IOException;
@@ -46,8 +47,14 @@ public class SauceConnect extends AbstractEndpoint {
         return getResponseListClass(getResponseObject(url), String.class);
     }
 
-    public void getTunnelInformation() {
+    public TunnelInformation getTunnelInformation(String username, String tunnelID) throws IOException {
+        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
+        return getResponseClass(getResponseObject(url), TunnelInformation.class);
+    }
+
+    public TunnelInformation getTunnelInformation(String tunnelID) throws IOException {
+        return getTunnelInformation(this.username, tunnelID);
     }
 
     public void getCurrentJobsForATunnel() {
