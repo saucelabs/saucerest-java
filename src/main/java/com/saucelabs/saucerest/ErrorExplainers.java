@@ -82,17 +82,23 @@ public class ErrorExplainers {
         );
     }
 
-    public static String InstrumentationNotAllowed() {
-        return String.join(System.lineSeparator(),
-            " * Trying to set Instrumentation for this app failed. Possible reason:",
-            " * You set the app platform to be iOS. Instrumentation is only available and applied for Android apps.",
-            " * Either use Resigning which is for iOS apps or change the platform to Android."
-        );
-    }
+  public static String InstrumentationNotAllowed() {
+    return String.join(System.lineSeparator(),
+      " * Trying to set Instrumentation for this app failed. Possible reason:",
+      " * You set the app platform to be iOS. Instrumentation is only available and applied for Android apps.",
+      " * Either use Resigning which is for iOS apps or change the platform to Android."
+    );
+  }
 
-    public static String DeviceLockOnlyOnAndroid() {
-        return String.join(System.lineSeparator(),
-            " * Trying to setup a PIN code is only available for Android devices."
-        );
-    }
+  public static String DeviceLockOnlyOnAndroid() {
+    return String.join(System.lineSeparator(),
+      " * Trying to setup a PIN code is only available for Android devices."
+    );
+  }
+
+  public static String NoResult() {
+    return String.join(System.lineSeparator(),
+      " * API request was successful but nothing found."
+    );
+  }
 }

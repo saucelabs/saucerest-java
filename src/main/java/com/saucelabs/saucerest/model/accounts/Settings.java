@@ -29,5 +29,4 @@ public class Settings {
     this.realDevices = realDevices;
     this.virtualMachines = virtualMachines;
   }
-
 }
