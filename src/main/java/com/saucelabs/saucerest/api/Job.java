@@ -125,28 +125,29 @@ public class Job extends AbstractEndpoint {
             } );
     }
 
-    public void deleteAllAssets() throws IOException {
-        String url = getBaseEndpoint() + "/assets";
+  public void deleteAllAssets() throws IOException {
+    String url = getBaseEndpoint() + "/assets";
 
-        deleteResponse(url);
+    deleteResponse(url);
+  }
+
+  private JSONObject updateDetails(Map<String, Object> updates) throws IOException {
+    return new JSONObject(putResponse(getBaseEndpoint(), updates));
+  }
+
+  @Override
+  protected String getBaseEndpoint() {
+    return super.getBaseEndpoint() + "/rest/v1/" + username + "/jobs/" + jobID;
+  }
+
+  private void downloadKnownAsset(TestAsset asset, Path location, String prepend) {
+    if (!location.getFileName().toString().contains(".")) {
+      location = Paths.get(location.toString(), prepend + asset.label);
     }
 
-    private JSONObject updateDetails(Map<String, Object> updates) throws IOException {
-        return new JSONObject(putResponse(getBaseEndpoint(), updates));
-    }
+    String url = getBaseEndpoint() + "/assets/" + asset.label;
 
-    private String getBaseEndpoint() {
-        return baseURL + "/rest/v1/" + username + "/jobs/" + jobID;
-    }
-
-    private void downloadKnownAsset(TestAsset asset, Path location, String prepend) {
-        if (!location.getFileName().toString().contains(".")) {
-            location = Paths.get(location.toString(), prepend + asset.label);
-        }
-
-        String url = getBaseEndpoint() + "/assets/" + asset.label;
-
-        try {
+    try {
             BufferedSource stream = getStream(url);
             BufferedSink sink = Okio.buffer(Okio.sink(location));
             sink.writeAll(Objects.requireNonNull(stream));

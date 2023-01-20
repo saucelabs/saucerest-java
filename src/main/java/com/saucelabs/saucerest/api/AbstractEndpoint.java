@@ -58,25 +58,29 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     public AbstractEndpoint(String username, String accessKey, String apiServer) {
-        this.username = username;
-        this.accessKey = accessKey;
-        if (username == null && accessKey == null ) {
-            this.credentials = null;
-        } else {
-            this.credentials = Credentials.basic(username, accessKey);
-        }
-        this.baseURL = apiServer;
+      this.username = username;
+      this.accessKey = accessKey;
+      if (username == null && accessKey == null) {
+        this.credentials = null;
+      } else {
+        this.credentials = Credentials.basic(username, accessKey);
+      }
+      this.baseURL = apiServer;
     }
 
-    public String getResponseObject(String url) throws IOException {
-        Response response = getResponse(url);
+  protected String getBaseEndpoint() {
+    return baseURL;
+  }
 
-        return response.body().string();
-    }
+  public String getResponseObject(String url) throws IOException {
+    Response response = getResponse(url);
 
-    /**
-     * Make a GET request with query parameters.
-     *
+    return response.body().string();
+  }
+
+  /**
+   * Make a GET request with query parameters.
+   *
      * @param url    Sauce Labs API endpoint
      * @param params query parameters for GET request
      * @return

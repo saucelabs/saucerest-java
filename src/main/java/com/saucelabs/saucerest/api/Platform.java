@@ -68,7 +68,8 @@ public class Platform extends AbstractEndpoint {
     /**
      * The base endpoint of the Platform endpoint APIs.
      */
-    private String getBaseEndpoint() {
-        return baseURL + "rest/v1/info";
+    @Override
+    protected String getBaseEndpoint() {
+      return super.getBaseEndpoint() + "rest/v1/info";
     }
 }

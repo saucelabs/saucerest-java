@@ -226,8 +226,9 @@ public class Storage extends AbstractEndpoint {
     /**
      * The base endpoint of the Storage endpoint APIs.
      */
-    private String getBaseEndpoint() {
-        return baseURL + "v1/storage";
+    @Override
+    protected String getBaseEndpoint() {
+      return super.getBaseEndpoint() + "v1/storage";
     }
 
     /**
