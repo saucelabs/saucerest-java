@@ -31,7 +31,7 @@ public class StorageTest {
      * app files yet.
      */
     enum Region {
-        EU_CENTRAL, US_WEST;
+        EU_CENTRAL, US_WEST
     }
 
     public void setup(Region region) {

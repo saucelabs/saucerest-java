@@ -17,51 +17,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AccountsTest {
-  @ParameterizedTest
-  @EnumSource(DataCenter.class)
-  public void lookupTeamsWithoutNameTest(DataCenter dataCenter) throws IOException {
-    SauceREST sauceREST = new SauceREST(dataCenter);
-    Accounts accounts = sauceREST.getAccounts();
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void lookupTeamsWithoutNameTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
 
-    LookupTeams lookupTeams = accounts.lookupTeams();
+        LookupTeams lookupTeams = accounts.lookupTeams();
 
-    assertNotNull(lookupTeams);
-  }
-
-  @ParameterizedTest
-  @EnumSource(DataCenter.class)
-  public void lookupTeamsWithNameTest(DataCenter dataCenter) throws IOException {
-    SauceREST sauceREST = new SauceREST(dataCenter);
-    Accounts accounts = sauceREST.getAccounts();
-
-    LookupTeams lookupTeams = accounts.lookupTeams("NotExisting");
-
-    assertNotNull(lookupTeams);
-    assertEquals(0, lookupTeams.count);
-    assertEquals(0, lookupTeams.results.size());
-  }
-
-  @ParameterizedTest
-  @EnumSource(DataCenter.class)
-  public void getSpecificTeamTest(DataCenter dataCenter) throws IOException {
-    SauceREST sauceREST = new SauceREST(dataCenter);
-    Accounts accounts = sauceREST.getAccounts();
-
-    LookupTeams lookupTeams = accounts.lookupTeams();
-
-    for (Result result : lookupTeams.results) {
-      Team team = accounts.getSpecificTeam(result.id);
-
-      assertNotNull(team);
+        assertNotNull(lookupTeams);
     }
-  }
 
-  @ParameterizedTest
-  @EnumSource(DataCenter.class)
-  public void getSpecificTeamNotFoundTest(DataCenter dataCenter) {
-    SauceREST sauceREST = new SauceREST(dataCenter);
-    Accounts accounts = sauceREST.getAccounts();
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void lookupTeamsWithNameTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
 
-    Assertions.assertThrows(SauceException.NotFound.class, () -> accounts.getSpecificTeam("1234"));
-  }
+        LookupTeams lookupTeams = accounts.lookupTeams("NotExisting");
+
+        assertNotNull(lookupTeams);
+        assertEquals(0, lookupTeams.count);
+        assertEquals(0, lookupTeams.results.size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getSpecificTeamTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupTeams lookupTeams = accounts.lookupTeams();
+
+        for (Result result : lookupTeams.results) {
+            Team team = accounts.getSpecificTeam(result.id);
+
+            assertNotNull(team);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getSpecificTeamNotFoundTest(DataCenter dataCenter) {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        Assertions.assertThrows(SauceException.NotFound.class, () -> accounts.getSpecificTeam("1234"));
+    }
 }

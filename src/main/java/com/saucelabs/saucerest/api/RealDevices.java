@@ -129,6 +129,6 @@ public class RealDevices extends AbstractEndpoint {
      */
     @Override
     protected String getBaseEndpoint() {
-      return super.getBaseEndpoint() + "v1/rdc";
+        return super.getBaseEndpoint() + "v1/rdc";
     }
 }

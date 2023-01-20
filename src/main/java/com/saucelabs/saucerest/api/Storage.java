@@ -228,7 +228,7 @@ public class Storage extends AbstractEndpoint {
      */
     @Override
     protected String getBaseEndpoint() {
-      return super.getBaseEndpoint() + "v1/storage";
+        return super.getBaseEndpoint() + "v1/storage";
     }
 
     /**

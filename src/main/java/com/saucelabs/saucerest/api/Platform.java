@@ -70,6 +70,6 @@ public class Platform extends AbstractEndpoint {
      */
     @Override
     protected String getBaseEndpoint() {
-      return super.getBaseEndpoint() + "rest/v1/info";
+        return super.getBaseEndpoint() + "rest/v1/info";
     }
 }

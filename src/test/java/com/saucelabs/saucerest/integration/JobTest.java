@@ -34,7 +34,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.saucelabs.saucerest.DataCenter.*;
+import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
+import static com.saucelabs.saucerest.DataCenter.US_WEST;
 
 @ExtendWith(AfterBeforeParameterResolver.class)
 public class JobTest {

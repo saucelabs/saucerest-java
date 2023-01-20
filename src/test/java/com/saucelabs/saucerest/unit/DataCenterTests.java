@@ -8,8 +8,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DataCenterTests
-{
+class DataCenterTests {
     @ParameterizedTest
     @CsvSource({
         "US_WEST,        US_WEST",
@@ -21,8 +20,7 @@ class DataCenterTests
         "APAC_SOUTHEAST, APAC_SOUTHEAST",
         "apac_southeast, APAC_SOUTHEAST",
     })
-    void testFromString(String input, DataCenter expected)
-    {
+    void testFromString(String input, DataCenter expected) {
         assertEquals(expected, DataCenter.fromString(input));
     }
 
@@ -33,8 +31,7 @@ class DataCenterTests
 
     @ParameterizedTest
     @EnumSource(DataCenter.class)
-    void testEdsServer(DataCenter datacenter)
-    {
+    void testEdsServer(DataCenter datacenter) {
         assertTrue(datacenter.edsServer().endsWith("saucelabs.com/v1/eds/"));
     }
 }
