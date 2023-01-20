@@ -1468,6 +1468,7 @@ public class SauceREST implements Serializable {
      *
      * @param tunnelId Identifier of the tunnel to delete
      * @return BufferedInputStream with response from server
+     * @deprecated
      */
     public BufferedInputStream deleteTunnel(String tunnelId) throws IOException {
         try {
@@ -1493,6 +1494,7 @@ public class SauceREST implements Serializable {
      * user.
      *
      * @return String (in JSON format) representing the tunnel information
+     * @deprecated
      */
     public String getTunnels() {
         URL restEndpoint = buildURL(username + "/tunnels");
@@ -1504,6 +1506,7 @@ public class SauceREST implements Serializable {
      *
      * @param tunnelId the Sauce Tunnel ID
      * @return String (in JSON format) representing the tunnel information
+     * @deprecated
      */
     public String getTunnelInformation(String tunnelId) {
         URL restEndpoint = buildURL(username + "/tunnels/" + tunnelId);
