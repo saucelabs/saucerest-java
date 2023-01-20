@@ -65,20 +65,20 @@ public class SauceConnectTest {
 
     @AfterAll
     @SuppressWarnings("all")
-    @ParameterizedTest
-    @EnumSource(DataCenter.class)
-    public static void stopTunnels(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+    public static void tearDown() throws IOException {
+        for (DataCenter dataCenter : DataCenter.values()) {
+            SauceREST sauceREST = new SauceREST(dataCenter);
+            SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+            List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
-        for (String tunnelID : tunnelIDs) {
-            StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
+            for (String tunnelID : tunnelIDs) {
+                StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
 
-            Assertions.assertTrue(stopTunnel.result);
-            Assertions.assertFalse(stopTunnel.id.isEmpty());
-            Assertions.assertNotNull(stopTunnel.jobsRunning);
+                Assertions.assertTrue(stopTunnel.result);
+                Assertions.assertFalse(stopTunnel.id.isEmpty());
+                Assertions.assertNotNull(stopTunnel.jobsRunning);
+            }
         }
     }
 
