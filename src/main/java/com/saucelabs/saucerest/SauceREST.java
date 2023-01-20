@@ -188,25 +188,29 @@ public class SauceREST implements Serializable {
     }
 
     public RealDevices getRealDevices(DataCenter dataCenter) {
-        return new RealDevices(dataCenter);
+      return new RealDevices(dataCenter);
     }
 
-    public RealDevices getRealDevices() {
-        return new RealDevices(this.apiServer);
-    }
+  public RealDevices getRealDevices() {
+    return new RealDevices(this.apiServer);
+  }
 
-    public SauceConnect getSauceConnect() {
-        return new SauceConnect(this.username, this.accessKey, this.apiServer);
-    }
+  public SauceConnect getSauceConnect() {
+    return new SauceConnect(this.username, this.accessKey, this.apiServer);
+  }
 
-    /**
-     * Returns username assigned to this interface
-     *
-     * @return Returns username assigned to this interface
-     */
-    public String getUsername() {
-        return this.username;
-    }
+  public Accounts getAccounts() {
+    return new Accounts(this.username, this.accessKey, this.apiServer);
+  }
+
+  /**
+   * Returns username assigned to this interface
+   *
+   * @return Returns username assigned to this interface
+   */
+  public String getUsername() {
+    return this.username;
+  }
 
     /**
      * Returns server assigned to this interface
