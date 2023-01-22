@@ -30,7 +30,7 @@ public class Accounts extends AbstractEndpoint {
 
     @Override
     protected String getBaseEndpoint() {
-        return super.getBaseEndpoint() + "/team-management/v1/";
+        return super.getBaseEndpoint() + "team-management/v1/";
     }
 
     /**
@@ -51,7 +51,7 @@ public class Accounts extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public LookupTeams lookupTeams(String name) throws IOException {
-        String url = getBaseEndpoint() + "/teams?name=" + name;
+        String url = getBaseEndpoint() + "teams?name=" + name;
 
         return getResponseClass(getResponseObject(url), LookupTeams.class);
     }

@@ -7,14 +7,12 @@ import com.saucelabs.saucerest.api.Accounts;
 import com.saucelabs.saucerest.model.accounts.LookupTeams;
 import com.saucelabs.saucerest.model.accounts.Result;
 import com.saucelabs.saucerest.model.accounts.Team;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountsTest {
     @ParameterizedTest
@@ -62,6 +60,6 @@ public class AccountsTest {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
 
-        Assertions.assertThrows(SauceException.NotFound.class, () -> accounts.getSpecificTeam("1234"));
+        assertThrows(SauceException.NotFound.class, () -> accounts.getSpecificTeam("1234"));
     }
 }
