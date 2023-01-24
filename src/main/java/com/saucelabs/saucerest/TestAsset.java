@@ -22,7 +22,7 @@ public enum TestAsset {
     }
 
     public static Optional<TestAsset> get(String label) {
-        return Arrays.stream(TestAsset.values())
+        return Arrays.stream(values())
             .filter(asset -> asset.label.equals(label))
             .findFirst();
     }

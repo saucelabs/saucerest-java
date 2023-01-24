@@ -8,7 +8,6 @@ import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -16,6 +15,11 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.saucelabs.saucerest.DataCenter.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Sauce Connect integration tests by nature require a running Sauce Connect tunnel. On GitHub this is done via an
@@ -30,17 +34,19 @@ public class SauceConnectTest {
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
         Versions versions = sauceConnect.getLatestVersions();
 
-        Assertions.assertFalse(versions.latestVersion.isEmpty());
-        Assertions.assertFalse(versions.infoUrl.isEmpty());
-        Assertions.assertFalse(versions.warning.isEmpty());
-        Assertions.assertFalse(versions.downloads.linux.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.linux.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.linuxArm64.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.linuxArm64.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.osx.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.osx.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.win32.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.win32.sha1.isEmpty());
+        assertAll(
+            () -> assertFalse(versions.latestVersion.isEmpty()),
+            () -> assertFalse(versions.infoUrl.isEmpty()),
+            () -> assertFalse(versions.warning.isEmpty()),
+            () -> assertFalse(versions.downloads.linux.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.linux.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.linuxArm64.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.linuxArm64.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.osx.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.osx.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.win32.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.win32.sha1.isEmpty())
+        );
     }
 
     @ParameterizedTest
@@ -50,17 +56,19 @@ public class SauceConnectTest {
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
         Versions versions = sauceConnect.getLatestVersions();
 
-        Assertions.assertFalse(versions.latestVersion.isEmpty());
-        Assertions.assertFalse(versions.infoUrl.isEmpty());
-        Assertions.assertFalse(versions.warning.isEmpty());
-        Assertions.assertFalse(versions.downloads.linux.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.linux.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.linuxArm64.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.linuxArm64.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.osx.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.osx.sha1.isEmpty());
-        Assertions.assertFalse(versions.downloads.win32.downloadUrl.isEmpty());
-        Assertions.assertFalse(versions.downloads.win32.sha1.isEmpty());
+        assertAll(
+            () -> assertFalse(versions.latestVersion.isEmpty()),
+            () -> assertFalse(versions.infoUrl.isEmpty()),
+            () -> assertFalse(versions.warning.isEmpty()),
+            () -> assertFalse(versions.downloads.linux.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.linux.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.linuxArm64.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.linuxArm64.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.osx.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.osx.sha1.isEmpty()),
+            () -> assertFalse(versions.downloads.win32.downloadUrl.isEmpty()),
+            () -> assertFalse(versions.downloads.win32.sha1.isEmpty())
+        );
     }
 
     @AfterAll
@@ -75,55 +83,37 @@ public class SauceConnectTest {
             for (String tunnelID : tunnelIDs) {
                 StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
 
-                Assertions.assertTrue(stopTunnel.result);
-                Assertions.assertFalse(stopTunnel.id.isEmpty());
-                Assertions.assertNotNull(stopTunnel.jobsRunning);
+                assertTrue(stopTunnel.result);
+                assertFalse(stopTunnel.id.isEmpty());
+                assertNotNull(stopTunnel.jobsRunning);
             }
         }
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
-    public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
+    @EnumSource(DataCenter.class)
+    public void getTunnelInformationTestAndGetJobsForATunnelTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
-        Assertions.assertEquals(
-            dataCenter.equals(EU_CENTRAL) ||
-                dataCenter.equals(US_WEST) ||
-                dataCenter.equals(APAC_SOUTHEAST) ? 1 : 0, tunnelIDs.size());
-    }
+        if (dataCenter.equals(US_EAST)) {
+            assertEquals(0, tunnelIDs.size());
+        } else {
+            assertEquals(1, tunnelIDs.size());
+            assertAll(
+                () -> {
+                    TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelIDs.get(0));
+                    assertNotNull(tunnelInformation);
+                },
+                () -> {
+                    JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelIDs.get(0));
 
-    @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
-    public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
-
-        for (String tunnelID : tunnelIDs) {
-            TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelID);
-
-            Assertions.assertEquals(1, tunnelIDs.size());
-            Assertions.assertNotNull(tunnelInformation);
-        }
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
-    public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
-
-        for (String tunnelID : tunnelIDs) {
-            JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelID);
-
-            Assertions.assertFalse(jobsForATunnel.id.isEmpty());
-            Assertions.assertNotNull(jobsForATunnel.jobsRunning);
+                    assertFalse(jobsForATunnel.id.isEmpty());
+                    assertNotNull(jobsForATunnel.jobsRunning);
+                }
+            );
         }
     }
 }

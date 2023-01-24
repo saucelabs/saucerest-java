@@ -36,6 +36,10 @@ import java.util.Map;
 
 import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
 import static com.saucelabs.saucerest.DataCenter.US_WEST;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(AfterBeforeParameterResolver.class)
 public class JobTest {
@@ -89,6 +93,7 @@ public class JobTest {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @EnumSource(DataCenter.class)
     public void getDetails(DataCenter param, TestInfo testInfo) throws IOException {
@@ -96,19 +101,21 @@ public class JobTest {
 
         Map<String, Object> testDetails = response.toMap();
 
-        Assertions.assertEquals("googlechrome", testDetails.get("browser"));
-        Assertions.assertEquals("Windows 10", testDetails.get("os"));
-        Assertions.assertEquals("webdriver", testDetails.get("automation_backend"));
-        Assertions.assertEquals("team", testDetails.get("public"));
-        Assertions.assertTrue((Boolean) testDetails.get("record_screenshots"));
-        Assertions.assertTrue((Boolean) testDetails.get("record_video"));
-        Assertions.assertTrue(((List<String>) testDetails.get("tags")).isEmpty());
-        Assertions.assertNull(testDetails.get("error"));
-        Assertions.assertNull(testDetails.get("selenium_version"));
-        Assertions.assertNull(testDetails.get("name"));
-        Assertions.assertNull(testDetails.get("assigned_tunnel_id"));
-        Assertions.assertNull(testDetails.get("passed"));
-        Assertions.assertNull(testDetails.get("custom-data"));
+        assertAll(
+            () -> assertEquals("googlechrome", testDetails.get("browser")),
+            () -> assertEquals("Windows 10", testDetails.get("os")),
+            () -> assertEquals("webdriver", testDetails.get("automation_backend")),
+            () -> assertEquals("team", testDetails.get("public")),
+            () -> assertTrue((Boolean) testDetails.get("record_screenshots")),
+            () -> assertTrue((Boolean) testDetails.get("record_video")),
+            () -> assertTrue(((List<String>) testDetails.get("tags")).isEmpty()),
+            () -> assertNull(testDetails.get("error")),
+            () -> assertNull(testDetails.get("selenium_version")),
+            () -> assertNull(testDetails.get("name")),
+            () -> assertNull(testDetails.get("assigned_tunnel_id")),
+            () -> assertNull(testDetails.get("passed")),
+            () -> assertNull(testDetails.get("custom-data"))
+        );
     }
 
     @ParameterizedTest
@@ -117,7 +124,7 @@ public class JobTest {
         String newName = "Newly Changed Name";
         JSONObject response = job.changeName(newName);
 
-        Assertions.assertEquals(newName, response.get("name"));
+        assertEquals(newName, response.get("name"));
     }
 
     @ParameterizedTest
@@ -126,7 +133,7 @@ public class JobTest {
         String newName = "Newly Changed Build";
         JSONObject response = job.changeBuild(newName);
 
-        Assertions.assertEquals(newName, response.get("build"));
+        assertEquals(newName, response.get("build"));
     }
 
     @ParameterizedTest
@@ -134,7 +141,7 @@ public class JobTest {
     public void changeVisibility(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeVisibility(JobVisibility.PRIVATE);
 
-        Assertions.assertEquals(JobVisibility.PRIVATE.value, response.get("public"));
+        assertEquals(JobVisibility.PRIVATE.value, response.get("public"));
     }
 
     @ParameterizedTest
@@ -142,7 +149,7 @@ public class JobTest {
     public void changeResultsTrue(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeResults(true);
 
-        Assertions.assertEquals("passed", response.get("consolidated_status"));
+        assertEquals("passed", response.get("consolidated_status"));
     }
 
     @ParameterizedTest
@@ -150,7 +157,7 @@ public class JobTest {
     public void changeResultsFalse(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.changeResults(false);
 
-        Assertions.assertEquals("failed", response.get("consolidated_status"));
+        assertEquals("failed", response.get("consolidated_status"));
     }
 
     @ParameterizedTest
@@ -158,7 +165,7 @@ public class JobTest {
     public void passed(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.passed();
 
-        Assertions.assertEquals("passed", response.get("consolidated_status"));
+        assertEquals("passed", response.get("consolidated_status"));
     }
 
     @ParameterizedTest
@@ -166,7 +173,7 @@ public class JobTest {
     public void failed(DataCenter param, TestInfo testInfo) throws IOException {
         JSONObject response = job.failed();
 
-        Assertions.assertEquals("failed", response.get("consolidated_status"));
+        assertEquals("failed", response.get("consolidated_status"));
     }
 
     @ParameterizedTest
@@ -175,7 +182,7 @@ public class JobTest {
         List<String> tags = ImmutableList.of("tag1", "tag2", "tag3");
         JSONObject response = job.addTags(tags);
 
-        Assertions.assertEquals(tags, response.toMap().get("tags"));
+        assertEquals(tags, response.toMap().get("tags"));
     }
 
     @ParameterizedTest
@@ -184,7 +191,7 @@ public class JobTest {
         Map<String, Object> data = ImmutableMap.of("key1", "value1", "key2", "value2");
         JSONObject response = job.addCustomData(data);
 
-        Assertions.assertEquals(data, response.toMap().get("custom-data"));
+        assertEquals(data, response.toMap().get("custom-data"));
     }
 
     @ParameterizedTest
@@ -193,14 +200,14 @@ public class JobTest {
         driver = null;
         JSONObject response = job.stop();
 
-        Assertions.assertEquals("in progress", response.get("status"));
+        assertEquals("in progress", response.get("status"));
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertDoesNotThrow(() ->
             Awaitility.await()
                 .atMost(Duration.ofSeconds(5))
                 .pollInterval(Duration.ofSeconds(1))
-                .until(() -> "complete".equals(job.getDetails().get("status")));
-        });
+                .until(() -> "complete".equals(job.getDetails().get("status")))
+        );
     }
 
     @ParameterizedTest
@@ -224,7 +231,7 @@ public class JobTest {
         Assertions.assertFalse(response.toMap().values().isEmpty());
         response.toMap().values().stream()
             .map(asset -> asset instanceof ArrayList ? "screenshots.zip" : (String) asset)
-            .forEach(asset -> Assertions.assertTrue(TestAsset.get(asset).isPresent()));
+            .forEach(asset -> assertTrue(TestAsset.get(asset).isPresent()));
     }
 
     @ParameterizedTest
@@ -239,10 +246,12 @@ public class JobTest {
         job.download(TestAsset.SELENIUM_LOG, Paths.get(tempDir.toString()));
         job.download(TestAsset.SAUCE_LOG, Paths.get(tempDir.toString()));
 
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")));
+        assertAll(
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")))
+        );
     }
 
     @ParameterizedTest
@@ -254,7 +263,7 @@ public class JobTest {
 
         job.download(TestAsset.SELENIUM_LOG, Paths.get(tempDir.toString(), "customName.log"));
 
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "customName.log")));
+        assertTrue(Files.exists(Paths.get(tempDir.toString(), "customName.log")));
     }
 
     @ParameterizedTest
@@ -266,10 +275,12 @@ public class JobTest {
 
         job.downloadAllAssets(tempDir);
 
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")));
+        assertAll(
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "selenium-server.log"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4")))
+        );
     }
 
     @ParameterizedTest
@@ -284,10 +295,12 @@ public class JobTest {
 
         job.downloadAllAssets(tempDir, currentDefault);
 
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "screenshots.zip")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "log.json")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "selenium-server.log")));
-        Assertions.assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "video.mp4")));
+        assertAll(
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "screenshots.zip"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "log.json"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "selenium-server.log"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), currentDefault + "video.mp4")))
+        );
     }
 
     @ParameterizedTest
@@ -301,12 +314,12 @@ public class JobTest {
 
         job.deleteAllAssets();
 
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        Assertions.assertThrows(RuntimeException.class, () ->
             Awaitility.await()
                 .atMost(Duration.ofSeconds(20))
                 .pollInterval(Duration.ofMillis(500))
-                .until(() -> job.availableAssets() == null);
-        });
+                .until(() -> job.availableAssets() == null)
+        );
     }
 
 }

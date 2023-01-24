@@ -1,5 +1,9 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
@@ -156,18 +160,22 @@ public class StorageTest {
     public void uploadAppFileTest(Region region) throws IOException {
         setup(region);
         File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile);
+        UploadFileApp uploadFileIpa = storage.get().uploadFile(ipaFile);
 
-        Assertions.assertEquals(ipaFile.getName(), uploadFileApp.item.name);
-        Assertions.assertEquals("", uploadFileApp.item.description);
-        Assertions.assertEquals("ios", uploadFileApp.item.kind);
+        assertAll(
+            () -> assertEquals(ipaFile.getName(), uploadFileIpa.item.name),
+            () -> assertEquals("", uploadFileIpa.item.description),
+            () -> assertEquals("ios", uploadFileIpa.item.kind)
+        );
 
         File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile);
+        UploadFileApp uploadFileApk = storage.get().uploadFile(apkFile);
 
-        Assertions.assertEquals(apkFile.getName(), uploadFileApp.item.name);
-        Assertions.assertEquals("", uploadFileApp.item.description);
-        Assertions.assertEquals("android", uploadFileApp.item.kind);
+        assertAll(
+            () -> assertEquals(apkFile.getName(), uploadFileApk.item.name),
+            () -> assertEquals("", uploadFileApk.item.description),
+            () -> assertEquals("android", uploadFileApk.item.kind)
+        );
     }
 
     @ParameterizedTest
@@ -175,18 +183,22 @@ public class StorageTest {
     public void uploadAppFileWithFileNameTest(Region region) throws IOException {
         setup(region);
         File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa");
+        UploadFileApp uploadFileIpa = storage.get().uploadFile(ipaFile, "test-file-name.ipa");
 
-        Assertions.assertEquals("test-file-name.ipa", uploadFileApp.item.name);
-        Assertions.assertEquals("", uploadFileApp.item.description);
-        Assertions.assertEquals("ios", uploadFileApp.item.kind);
+        assertAll(
+            () -> assertEquals("test-file-name.ipa", uploadFileIpa.item.name),
+            () -> assertEquals("", uploadFileIpa.item.description),
+            () -> assertEquals("ios", uploadFileIpa.item.kind)
+        );
 
         File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk");
+        UploadFileApp uploadFileApk = storage.get().uploadFile(apkFile, "test-file-name.apk");
 
-        Assertions.assertEquals("test-file-name.apk", uploadFileApp.item.name);
-        Assertions.assertEquals("", uploadFileApp.item.description);
-        Assertions.assertEquals("android", uploadFileApp.item.kind);
+        assertAll(
+            () -> assertEquals("test-file-name.apk", uploadFileApk.item.name),
+            () -> assertEquals("", uploadFileApk.item.description),
+            () -> assertEquals("android", uploadFileApk.item.kind)
+        );
     }
 
     @ParameterizedTest
@@ -194,16 +206,24 @@ public class StorageTest {
     public void uploadAppFileWithFileNameAndDescriptionTest(Region region) throws IOException {
         setup(region);
         File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa", "My App File Description");
+        UploadFileApp uploadFileIpa = storage.get().uploadFile(ipaFile, "test-file-name.ipa",
+            "My App File Description");
 
-        Assertions.assertEquals("test-file-name.ipa", uploadFileApp.item.name);
-        Assertions.assertEquals("My App File Description", uploadFileApp.item.description);
+        assertAll(
+            () -> assertEquals("test-file-name.ipa", uploadFileIpa.item.name),
+            () -> assertEquals("My App File Description", uploadFileIpa.item.description),
+            () -> assertEquals("ios", uploadFileIpa.item.kind)
+        );
 
         File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk", "My App File Description");
+        UploadFileApp uploadFileApk = storage.get().uploadFile(apkFile, "test-file-name.apk",
+            "My App File Description");
 
-        Assertions.assertEquals("test-file-name.apk", uploadFileApp.item.name);
-        Assertions.assertEquals("My App File Description", uploadFileApp.item.description);
+        assertAll(
+            () -> assertEquals("test-file-name.apk", uploadFileApk.item.name),
+            () -> assertEquals("My App File Description", uploadFileApk.item.description),
+            () -> assertEquals("android", uploadFileApk.item.kind)
+        );
     }
 
     @ParameterizedTest
@@ -212,8 +232,8 @@ public class StorageTest {
         setup(region);
         GetAppFiles getAppFiles = storage.get().getFiles();
 
-        Assertions.assertNotNull(getAppFiles.items);
-        Assertions.assertNotNull(getAppFiles.totalItems);
+        assertNotNull(getAppFiles.items);
+        assertNotNull(getAppFiles.totalItems);
     }
 
     @ParameterizedTest
@@ -228,9 +248,9 @@ public class StorageTest {
 
         GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
 
-        Assertions.assertNotNull(getAppFiles.items);
-        Assertions.assertNotNull(getAppFiles.totalItems);
-        getAppFiles.items.forEach(item -> Assertions.assertEquals("android", item.kind));
+        assertNotNull(getAppFiles.items);
+        assertNotNull(getAppFiles.totalItems);
+        getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
     }
 
     @ParameterizedTest
@@ -244,8 +264,8 @@ public class StorageTest {
 
         GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
 
-        Assertions.assertNotNull(getAppFiles.items);
-        Assertions.assertNotNull(getAppFiles.totalItems);
+        assertNotNull(getAppFiles.items);
+        assertNotNull(getAppFiles.totalItems);
         getAppFiles.items.forEach(item -> Assertions.assertTrue(item.kind.equals("android") || item.kind.equals("ios")));
     }
 
@@ -256,19 +276,19 @@ public class StorageTest {
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
         GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
-        Assertions.assertNotNull(getAppFiles);
-        Assertions.assertEquals(5, getAppFiles.perPage);
+        assertNotNull(getAppFiles);
+        assertEquals(5, getAppFiles.perPage);
         Assertions.assertTrue(getAppFiles.links.self.contains("DemoApp"));
 
         queryParameters = ImmutableMap.of("kind", "android");
         getAppFiles = storage.get().getFiles(queryParameters);
 
-        getAppFiles.items.forEach(item -> Assertions.assertEquals("android", item.kind));
+        getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
 
         queryParameters = ImmutableMap.of("kind", "ios");
         getAppFiles = storage.get().getFiles(queryParameters);
 
-        getAppFiles.items.forEach(item -> Assertions.assertEquals("ios", item.kind));
+        getAppFiles.items.forEach(item -> assertEquals("ios", item.kind));
     }
 
     @ParameterizedTest
@@ -278,7 +298,7 @@ public class StorageTest {
         ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "abc123");
         GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
-        Assertions.assertEquals(0, getAppFiles.items.size());
+        assertEquals(0, getAppFiles.items.size());
     }
 
     @ParameterizedTest
@@ -287,7 +307,7 @@ public class StorageTest {
         setup(region);
         GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
 
-        Assertions.assertNotNull(getAppStorageGroups);
+        assertNotNull(getAppStorageGroups);
         Assertions.assertTrue(getAppStorageGroups.items.size() > 0);
     }
 
@@ -302,7 +322,7 @@ public class StorageTest {
 
         GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(storageParameter.toMap());
 
-        Assertions.assertNotNull(getAppStorageGroups);
+        assertNotNull(getAppStorageGroups);
         getAppStorageGroups.items.forEach(item -> Assertions.assertTrue(item.name.contains("demoapp")));
     }
 
@@ -344,7 +364,7 @@ public class StorageTest {
 
         GetAppStorageGroupSettings getGroupSettings = storage.get().getGroupSettings(groupId);
 
-        Assertions.assertNotNull(getGroupSettings);
+        assertNotNull(getGroupSettings);
     }
 
     @ParameterizedTest
@@ -373,12 +393,12 @@ public class StorageTest {
         storage.get().updateFileDescription(fileId, "Updated through Integration Test");
         GetAppFiles file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
 
-        Assertions.assertEquals("Updated through Integration Test", file.items.get(0).description);
+        assertEquals("Updated through Integration Test", file.items.get(0).description);
 
         storage.get().updateFileDescription(fileId, "");
         file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
 
-        Assertions.assertEquals("", file.items.get(0).description);
+        assertEquals("", file.items.get(0).description);
     }
 
     @ParameterizedTest
@@ -389,12 +409,12 @@ public class StorageTest {
         // Upload app file, save file ID
         UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
         String fileId = uploadFileApp.item.id;
-        Assertions.assertNotNull(fileId);
+        assertNotNull(fileId);
 
         DeleteAppFile deleteAppFile = storage.get().deleteFile(fileId);
         String fileIdOfDeletedApp = deleteAppFile.item.id;
 
-        Assertions.assertEquals(fileIdOfDeletedApp, fileId);
+        assertEquals(fileIdOfDeletedApp, fileId);
     }
 
     @ParameterizedTest
@@ -408,6 +428,6 @@ public class StorageTest {
 
         DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
         int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
-        Assertions.assertEquals(groupIdOfDeletedGroup, groupId);
+        assertEquals(groupIdOfDeletedGroup, groupId);
     }
 }
