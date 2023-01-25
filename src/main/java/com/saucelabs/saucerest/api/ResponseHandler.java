@@ -5,8 +5,7 @@ import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.SauceException;
 import okhttp3.Response;
 
-import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
+import static java.net.HttpURLConnection.*;
 
 /**
  * Handle non-200 HTTP responses differently if needed per endpoint.
@@ -29,25 +28,38 @@ public class ResponseHandler {
                 }
 
             case HTTP_UNAUTHORIZED:
-                String errorReasons = "";
-                String username = endpoint.username;
-                String accessKey = endpoint.accessKey;
+                throw new SauceException.NotAuthorized(checkCredentials(endpoint));
 
-                if (username == null || username.isEmpty()) {
-                    errorReasons = String.join(System.lineSeparator(), "Your username is empty or blank.");
+            case HTTP_BAD_REQUEST:
+                if (endpoint instanceof Job) {
+                    if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
+                        throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
+                    } else {
+                        throw new RuntimeException("Unexpected code " + response);
+                    }
                 }
 
-                if (accessKey == null || accessKey.isEmpty()) {
-                    errorReasons = String.join(System.lineSeparator(), "Your access key is empty or blank.");
-                }
-
-                if (!errorReasons.isEmpty()) {
-                    errorReasons = (String.join(System.lineSeparator(), errorReasons, ErrorExplainers.missingCreds()));
-                } else {
-                    errorReasons = ErrorExplainers.incorrectCreds(username, accessKey);
-                }
-
-                throw new SauceException.NotAuthorized(errorReasons);
+            default:
+                throw new RuntimeException("Unexpected code " + response);
         }
+    }
+
+    private static String checkCredentials(AbstractEndpoint endpoint) {
+        String username = endpoint.username;
+        String accessKey = endpoint.accessKey;
+
+        if ((username == null || username.isEmpty()) && (accessKey == null || accessKey.isEmpty())) {
+            return String.join(System.lineSeparator(), "Your username and access key are empty or blank.", ErrorExplainers.missingCreds());
+        }
+
+        if (username == null || username.isEmpty()) {
+            return String.join(System.lineSeparator(), "Your username is empty or blank.", ErrorExplainers.missingCreds());
+        }
+
+        if (accessKey == null || accessKey.isEmpty()) {
+            return String.join(System.lineSeparator(), "Your access key is empty or blank.", ErrorExplainers.missingCreds());
+        }
+
+        return ErrorExplainers.incorrectCreds(username, accessKey);
     }
 }
