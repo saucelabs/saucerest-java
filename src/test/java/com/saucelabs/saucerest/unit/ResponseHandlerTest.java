@@ -19,14 +19,14 @@ class ResponseHandlerTest {
 
     @Test
     public void tunnelNotFoundTest() {
-        Response response = getMockResponse(getMockRequest("https://saucelabs.com/rest/v1/fakeuser/tunnels/1234", HttpMethod.DELETE), 404, "");
+        Response response = getMockResponse(getMockRequest("https://saucelabs.com/rest/v1/fakeuser/tunnels/1234", HttpMethod.DELETE), 404);
 
         assertThrows(SauceException.NotFound.class, () -> responseHandler(new SauceConnect(DataCenter.EU_CENTRAL), response));
     }
 
     @Test
     public void notAuthorizedTest() {
-        Response response = getMockResponse(getMockRequest("https://fakewebsite.com", HttpMethod.GET), 401, "");
+        Response response = getMockResponse(getMockRequest("https://fakewebsite.com", HttpMethod.GET), 401);
 
         assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint(null, null), response));
         assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint("fakeuser", null), response));
@@ -38,6 +38,13 @@ class ResponseHandlerTest {
         Response response = getMockResponse(getMockRequest("https://saucelabs.com/rest/v1/fakeuser/jobs/1234", HttpMethod.GET), 400, "Job hasn't finished running");
 
         assertThrows(SauceException.NotYetDone.class, () -> responseHandler(getMockJob("fakeuser", "fakeaccesskey"), response));
+    }
+
+    @Test
+    public void defaultExceptionTest() {
+        Response response = getMockResponse(getMockRequest("https://saucelabs.com", HttpMethod.GET), 500);
+
+        assertThrows(RuntimeException.class, () -> responseHandler(getMockAbstractEndpoint("fakeuser", "fakeaccesskey"), response));
     }
 
     private AbstractEndpoint getMockAbstractEndpoint(String username, String accessKey) {
@@ -72,5 +79,9 @@ class ResponseHandlerTest {
             .code(code)
             .message(message)
             .build();
+    }
+
+    private Response getMockResponse(Request request, int code) {
+        return getMockResponse(request, code, "");
     }
 }

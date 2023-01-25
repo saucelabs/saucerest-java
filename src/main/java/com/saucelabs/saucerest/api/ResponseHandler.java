@@ -15,7 +15,6 @@ public class ResponseHandler {
 
     public static void responseHandler(AbstractEndpoint endpoint, Response response) {
         // TODO: refactor this to use Java 17 pattern matching in the future
-
         switch (response.code()) {
             case HTTP_NOT_FOUND:
                 if (endpoint instanceof SauceConnect) {
@@ -26,10 +25,8 @@ public class ResponseHandler {
                 } else {
                     throw new SauceException.NotFound();
                 }
-
             case HTTP_UNAUTHORIZED:
                 throw new SauceException.NotAuthorized(checkCredentials(endpoint));
-
             case HTTP_BAD_REQUEST:
                 if (endpoint instanceof Job) {
                     if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
@@ -38,7 +35,6 @@ public class ResponseHandler {
                         throw new RuntimeException("Unexpected code " + response);
                     }
                 }
-
             default:
                 throw new RuntimeException("Unexpected code " + response);
         }
