@@ -232,21 +232,6 @@ public abstract class AbstractEndpoint extends AbstractModel {
         Response response = client.newCall(request).execute();
 
         if (!response.isSuccessful()) {
-
-//            switch (response.code()) {
-//                case 401:
-//                    throw new SauceException.NotAuthorized(ErrorExplainers.incorrectCreds(username, accessKey));
-//                case 400:
-//                    if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
-//                        throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
-//                    } else {
-//                        throw new RuntimeException("Unexpected code " + response);
-//                    }
-//                case 404:
-//                    throw new SauceException.NotFound(ErrorExplainers.NoResult());
-//                default:
-//                    throw new RuntimeException("Unexpected code " + response);
-//            }
             responseHandler(this, response);
         }
         return response;
