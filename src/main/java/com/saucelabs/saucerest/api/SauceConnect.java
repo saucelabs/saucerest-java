@@ -139,7 +139,7 @@ public class SauceConnect extends AbstractEndpoint {
      * The base endpoint of the Sauce Connect endpoint APIs.
      */
     @Override
-    protected String getBaseEndpoint() {
+    public String getBaseEndpoint() {
         return super.getBaseEndpoint() + "rest/v1/";
     }
 }

@@ -2,8 +2,6 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.ErrorExplainers;
-import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -17,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
+
 public abstract class AbstractEndpoint extends AbstractModel {
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
@@ -28,7 +28,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
 
-        if (username == null && accessKey == null) {
+        if (username == null || accessKey == null) {
             this.credentials = null;
         } else {
             this.credentials = Credentials.basic(username, accessKey);
@@ -41,7 +41,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
 
-        if (username == null && accessKey == null) {
+        if (username == null || accessKey == null) {
             this.credentials = null;
         } else {
             this.credentials = Credentials.basic(username, accessKey);
@@ -54,7 +54,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.username = username;
         this.accessKey = accessKey;
 
-        if (username == null && accessKey == null) {
+        if (username == null || accessKey == null) {
             this.credentials = null;
         } else {
             this.credentials = Credentials.basic(username, accessKey);
@@ -67,7 +67,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.username = username;
         this.accessKey = accessKey;
 
-        if (username == null && accessKey == null) {
+        if (username == null || accessKey == null) {
             this.credentials = null;
         } else {
             this.credentials = Credentials.basic(username, accessKey);
@@ -233,20 +233,21 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
         if (!response.isSuccessful()) {
 
-            switch (response.code()) {
-                case 401:
-                    throw new SauceException.NotAuthorized(ErrorExplainers.incorrectCreds(username, accessKey));
-                case 400:
-                    if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
-                        throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
-                    } else {
-                        throw new RuntimeException("Unexpected code " + response);
-                    }
-                case 404:
-                    throw new SauceException.NotFound(ErrorExplainers.NoResult());
-                default:
-                    throw new RuntimeException("Unexpected code " + response);
-            }
+//            switch (response.code()) {
+//                case 401:
+//                    throw new SauceException.NotAuthorized(ErrorExplainers.incorrectCreds(username, accessKey));
+//                case 400:
+//                    if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
+//                        throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
+//                    } else {
+//                        throw new RuntimeException("Unexpected code " + response);
+//                    }
+//                case 404:
+//                    throw new SauceException.NotFound(ErrorExplainers.NoResult());
+//                default:
+//                    throw new RuntimeException("Unexpected code " + response);
+//            }
+            responseHandler(this, response);
         }
         return response;
     }

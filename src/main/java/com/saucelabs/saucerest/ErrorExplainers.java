@@ -9,7 +9,7 @@ public class ErrorExplainers {
         return (String.join(System.lineSeparator(), errorReason, errorExplanation));
     }
 
-    static String missingCreds() {
+    public static String missingCreds() {
         return String.join(System.lineSeparator(),
             "If using System Properties/Environment Variables (ENVars), this can happen because:",
             " * You are using a toolchain which does not automatically propagate ENVars between tools",
@@ -66,10 +66,18 @@ public class ErrorExplainers {
         );
     }
 
-    static String TunnelNotFound() {
+    public static String TunnelNotFound() {
         return String.join(System.lineSeparator(),
-            " * Tunnel id could not be found. Possible reasons:",
-            " * The tunnel id requested does not exist in this data center. Ensure the data center endpoint is correct.",
+            " * Tunnel ID could not be found. Possible reasons:",
+            " * The tunnel ID requested does not exist in this data center. Ensure the data center endpoint is correct.",
+            " * A tunnel with this id never existed."
+        );
+    }
+
+    public static String TunnelNotFound(String tunnelID) {
+        return String.join(System.lineSeparator(),
+            " * Tunnel ID " + tunnelID + " could not be found. Possible reasons:",
+            " * The tunnel ID requested does not exist in this data center. Ensure the data center endpoint is correct.",
             " * A tunnel with this id never existed."
         );
     }
@@ -82,13 +90,13 @@ public class ErrorExplainers {
         );
     }
 
-  public static String InstrumentationNotAllowed() {
-    return String.join(System.lineSeparator(),
-      " * Trying to set Instrumentation for this app failed. Possible reason:",
-      " * You set the app platform to be iOS. Instrumentation is only available and applied for Android apps.",
-      " * Either use Resigning which is for iOS apps or change the platform to Android."
-    );
-  }
+    public static String InstrumentationNotAllowed() {
+        return String.join(System.lineSeparator(),
+            " * Trying to set Instrumentation for this app failed. Possible reason:",
+            " * You set the app platform to be iOS. Instrumentation is only available and applied for Android apps.",
+            " * Either use Resigning which is for iOS apps or change the platform to Android."
+        );
+    }
 
   public static String DeviceLockOnlyOnAndroid() {
     return String.join(System.lineSeparator(),
