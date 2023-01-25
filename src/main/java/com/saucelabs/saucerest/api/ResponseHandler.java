@@ -15,6 +15,7 @@ public class ResponseHandler {
 
     public static void responseHandler(AbstractEndpoint endpoint, Response response) {
         // TODO: refactor this to use Java 17 pattern matching in the future
+        // TODO: add more specific error messages for each endpoint
         switch (response.code()) {
             case HTTP_NOT_FOUND:
                 if (endpoint instanceof SauceConnect) {
