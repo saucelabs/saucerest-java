@@ -117,7 +117,6 @@ public class SauceConnectTest {
     public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
-
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
         for (String tunnelID : tunnelIDs) {

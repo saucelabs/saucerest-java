@@ -40,7 +40,7 @@ public class Accounts extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public LookupTeams lookupTeams() throws IOException {
-        String url = getBaseEndpoint() + "/teams/";
+        String url = getBaseEndpoint() + "teams/";
 
         return getResponseClass(getResponseObject(url), LookupTeams.class);
     }
@@ -64,7 +64,7 @@ public class Accounts extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public Team getSpecificTeam(String teamID) throws IOException {
-        String url = getBaseEndpoint() + "/teams/" + teamID;
+        String url = getBaseEndpoint() + "teams/" + teamID;
 
         return getResponseClass(getResponseObject(url), Team.class);
     }
