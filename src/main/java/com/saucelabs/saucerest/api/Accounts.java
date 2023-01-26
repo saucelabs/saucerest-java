@@ -1,10 +1,14 @@
 package com.saucelabs.saucerest.api;
 
+import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.model.accounts.CreateTeam;
 import com.saucelabs.saucerest.model.accounts.LookupTeams;
+import com.saucelabs.saucerest.model.accounts.Settings;
 import com.saucelabs.saucerest.model.accounts.Team;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Account Management API Methods <br>
@@ -67,5 +71,19 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
         return getResponseClass(getResponseObject(url), Team.class);
+    }
+
+    public CreateTeam createTeam(String name, String organizationID, Settings settings) throws IOException {
+        String url = getBaseEndpoint() + "teams/";
+        Map map = ImmutableMap.of("name", name, "organization", organizationID, "settings", settings);
+
+        return getResponseClass(postResponse(url, map), CreateTeam.class);
+    }
+
+    public CreateTeam createTeam(String name, String organizationID, Settings settings, String description) throws IOException {
+        String url = getBaseEndpoint() + "teams/";
+        Map map = ImmutableMap.of("name", name, "organization", organizationID, "settings", settings, "description", description);
+
+        return getResponseClass(postResponse(url, map), CreateTeam.class);
     }
 }
