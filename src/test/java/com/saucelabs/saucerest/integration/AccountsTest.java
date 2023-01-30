@@ -92,4 +92,28 @@ public class AccountsTest {
 
         accounts.deleteTeam(createTeam.id);
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void updateTeamTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+        String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
+
+        Settings settings = new Settings.Builder()
+            .setVirtualMachines(0)
+            .build();
+
+        CreateTeam createTeam = accounts.createTeam(teamName, settings, RandomStringUtils.randomAlphabetic(8));
+
+        assertNotNull(createTeam);
+        assertEquals(teamName, createTeam.name);
+
+        UpdateTeam updateTeam = accounts.updateTeam(createTeam.id, "Updated" + teamName, settings, "Updated description");
+
+        assertEquals("Updated description", updateTeam.description);
+        assertEquals("Updated" + teamName, updateTeam.name);
+        assertEquals(0, updateTeam.settings.virtualMachines);
+        accounts.deleteTeam(createTeam.id);
+    }
 }

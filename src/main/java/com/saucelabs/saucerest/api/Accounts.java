@@ -105,4 +105,23 @@ public class Accounts extends AbstractEndpoint {
 
         deleteResponse(url);
     }
+
+    /**
+     * Replaces all values of the specified team with the new set of parameters passed in the request. To update only certain parameters, see Partially Update Team.
+     *
+     * @param teamID      The unique identifier of the team. You can look up the IDs of teams in your organization using the {@link LookupTeams} endpoint.
+     * @param name        The name of the team as it will be after the update. Pass the current value to keep the name unchanged.
+     * @param settings    The updated concurrency allocations for the team. The available attributes are:
+     *                    virtual_machines - INTEGER
+     *                    The settings parameter is required, but you only need to include the applicable concurrency attribute(s) for the team.
+     * @param description A description to distinguish the team within the organization. If the previous team definition included a description, omitting the parameter in the update will delete it from the team record.
+     * @return {@link UpdateTeam}
+     * @throws IOException API request failed
+     */
+    public UpdateTeam updateTeam(String teamID, String name, Settings settings, String description) throws IOException {
+        String url = getBaseEndpoint() + "teams/" + teamID;
+        Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
+
+        return getResponseClass(putResponse(url, map), UpdateTeam.class);
+    }
 }
