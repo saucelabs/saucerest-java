@@ -124,4 +124,10 @@ public class Accounts extends AbstractEndpoint {
 
         return getResponseClass(putResponse(url, map), UpdateTeam.class);
     }
+
+    public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
+        String url = getBaseEndpoint() + "teams/" + teamID;
+
+        return getResponseClass(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
+    }
 }

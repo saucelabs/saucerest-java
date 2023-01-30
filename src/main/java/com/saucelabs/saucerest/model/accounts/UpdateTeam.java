@@ -1,9 +1,10 @@
 
 package com.saucelabs.saucerest.model.accounts;
 
+import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.Json;
 
-public class UpdateTeam {
+public class UpdateTeam extends AbstractModel {
 
     @Json(name = "id")
     public String id;
@@ -54,4 +55,37 @@ public class UpdateTeam {
         this.updatedAt = updatedAt;
     }
 
+    private UpdateTeam(Builder builder) {
+        settings = builder.settings;
+        description = builder.description;
+        name = builder.name;
+    }
+
+    public static final class Builder {
+        private Settings settings;
+        private String description;
+        private String name;
+
+        public Builder() {
+        }
+
+        public Builder setSettings(Settings val) {
+            settings = val;
+            return this;
+        }
+
+        public Builder setDescription(String val) {
+            description = val;
+            return this;
+        }
+
+        public Builder setName(String val) {
+            name = val;
+            return this;
+        }
+
+        public UpdateTeam build() {
+            return new UpdateTeam(this);
+        }
+    }
 }

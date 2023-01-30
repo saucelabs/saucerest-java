@@ -44,15 +44,16 @@ public class Settings extends AbstractModel {
         public Builder() {
         }
 
-        public Builder setLiveOnly(Boolean val) {
-            liveOnly = val;
-            return this;
-        }
-
-        public Builder setRealDevices(Integer val) {
-            realDevices = val;
-            return this;
-        }
+        // Currently not supported by the API
+//        public Builder setLiveOnly(Boolean val) {
+//            liveOnly = val;
+//            return this;
+//        }
+//
+//        public Builder setRealDevices(Integer val) {
+//            realDevices = val;
+//            return this;
+//        }
 
         public Builder setVirtualMachines(Integer val) {
             virtualMachines = val;
