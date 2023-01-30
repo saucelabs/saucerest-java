@@ -191,6 +191,44 @@ public abstract class AbstractEndpoint extends AbstractModel {
         }
     }
 
+    public String patchResponse(String url, Map<String, Object> payload) throws IOException {
+        String json = new JSONObject(payload).toString();
+
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
+            .url(url)
+            .patch(RequestBody.create(json, MediaType.parse("application/json")))
+            .build();
+
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
+    }
+
+    public String patchResponse(String url, String payload) throws IOException {
+        String json = new JSONObject(payload).toString();
+
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
+            .url(url)
+            .patch(RequestBody.create(json, MediaType.parse("application/json")))
+            .build();
+
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
+    }
+
     public String deleteResponse(String url) throws IOException {
         Request.Builder chain = new Request.Builder();
 
