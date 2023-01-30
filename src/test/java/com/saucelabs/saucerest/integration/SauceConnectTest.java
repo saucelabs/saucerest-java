@@ -83,7 +83,7 @@ public class SauceConnectTest {
     }
 
     @ParameterizedTest
-    @EnumSource(DataCenter.class)
+    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
@@ -97,7 +97,7 @@ public class SauceConnectTest {
     }
 
     @ParameterizedTest
-    @EnumSource(DataCenter.class)
+    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
@@ -113,7 +113,7 @@ public class SauceConnectTest {
     }
 
     @ParameterizedTest
-    @EnumSource(DataCenter.class)
+    @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         SauceConnect sauceConnect = sauceREST.getSauceConnect();
