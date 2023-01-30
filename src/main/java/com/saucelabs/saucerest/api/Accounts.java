@@ -94,6 +94,12 @@ public class Accounts extends AbstractEndpoint {
         return getResponseClass(getResponseObject(url), Organizations.class);
     }
 
+    /**
+     * Deletes the specified team from the organization of the requesting account.
+     *
+     * @param teamID The unique identifier of the team. You can look up the IDs of teams in your organization using the {@link LookupTeams} endpoint.
+     * @throws IOException API request failed
+     */
     public void deleteTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
