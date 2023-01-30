@@ -2,10 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.model.accounts.CreateTeam;
-import com.saucelabs.saucerest.model.accounts.LookupTeams;
-import com.saucelabs.saucerest.model.accounts.Settings;
-import com.saucelabs.saucerest.model.accounts.Team;
+import com.saucelabs.saucerest.model.accounts.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -76,40 +73,30 @@ public class Accounts extends AbstractEndpoint {
     /**
      * Creates a new team under the organization of the requesting account.
      *
-     * @param name           A name for the new team.
-     * @param organizationID The unique ID of the organization under which the team is created. You can look up your organization ID by calling the GET https://api.{region}.saucelabs.com/team-management/v1/organizations/ endpoint.
-     * @param settings       The settings object specifies the concurrency allocations for the team within the organization. The available attributes are:
-     *                       virtual_machines - INTEGER
-     *                       The settings parameter is required, but you only need to include the applicable concurrency attribute(s) for the team.
+     * @param name        A name for the new team.
+     * @param settings    The settings object specifies the concurrency allocations for the team within the organization. The available attributes are:
+     *                    virtual_machines - INTEGER
+     *                    The settings parameter is required, but you only need to include the applicable concurrency attribute(s) for the team.
+     * @param description A description to distinguish the team within the organization.
      * @return {@link CreateTeam}
      * @throws IOException API request failed
      */
-    public CreateTeam createTeam(String name, String organizationID, Settings settings) throws IOException {
-        return createTeam(name, organizationID, settings, null);
-    }
-
-    /**
-     * Creates a new team under the organization of the requesting account.
-     *
-     * @param name           A name for the new team.
-     * @param organizationID The unique ID of the organization under which the team is created. You can look up your organization ID by calling the GET https://api.{region}.saucelabs.com/team-management/v1/organizations/ endpoint.
-     * @param settings       The settings object specifies the concurrency allocations for the team within the organization. The available attributes are:
-     *                       virtual_machines - INTEGER
-     *                       The settings parameter is required, but you only need to include the applicable concurrency attribute(s) for the team.
-     * @param description    A description to distinguish the team within the organization.
-     * @return {@link CreateTeam}
-     * @throws IOException API request failed
-     */
-    public CreateTeam createTeam(String name, String organizationID, Settings settings, String description) throws IOException {
+    public CreateTeam createTeam(String name, Settings settings, String description) throws IOException {
         String url = getBaseEndpoint() + "teams/";
-        Map map;
-
-        if (description == null) {
-            map = ImmutableMap.of("name", name, "organization", organizationID, "settings", settings);
-        } else {
-            map = ImmutableMap.of("name", name, "organization", organizationID, "settings", settings, "description", description);
-        }
+        Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
         return getResponseClass(postResponse(url, map), CreateTeam.class);
+    }
+
+    public Organizations getOrganization() throws IOException {
+        String url = getBaseEndpoint() + "organizations";
+
+        return getResponseClass(getResponseObject(url), Organizations.class);
+    }
+
+    public void deleteTeam(String teamID) throws IOException {
+        String url = getBaseEndpoint() + "teams/" + teamID;
+
+        deleteResponse(url);
     }
 }

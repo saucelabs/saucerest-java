@@ -4,9 +4,8 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.Accounts;
-import com.saucelabs.saucerest.model.accounts.LookupTeams;
-import com.saucelabs.saucerest.model.accounts.Result;
-import com.saucelabs.saucerest.model.accounts.Team;
+import com.saucelabs.saucerest.model.accounts.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -61,5 +60,36 @@ public class AccountsTest {
         Accounts accounts = sauceREST.getAccounts();
 
         assertThrows(SauceException.NotFound.class, () -> accounts.getSpecificTeam("1234"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(DataCenter.class)
+    public void getOrganizationTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        Organizations organizations = accounts.getOrganization();
+
+        assertNotNull(organizations);
+        assertEquals(1, organizations.count);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void createTeamTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+        String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
+
+        Settings settings = new Settings.Builder()
+            .setVirtualMachines(0)
+            .build();
+
+        CreateTeam createTeam = accounts.createTeam(teamName, settings, RandomStringUtils.randomAlphabetic(8));
+
+        assertNotNull(createTeam);
+        assertEquals(teamName, createTeam.name);
+
+        accounts.deleteTeam(createTeam.id);
     }
 }
