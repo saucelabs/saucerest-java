@@ -137,7 +137,7 @@ public class Job extends AbstractEndpoint {
 
     @Override
     protected String getBaseEndpoint() {
-        return super.getBaseEndpoint() + "/rest/v1/" + username + "/jobs/" + jobID;
+        return super.getBaseEndpoint() + "rest/v1/" + username + "/jobs/" + jobID;
     }
 
     private void downloadKnownAsset(TestAsset asset, Path location, String prepend) {
