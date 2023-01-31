@@ -125,6 +125,14 @@ public class Accounts extends AbstractEndpoint {
         return getResponseClass(putResponse(url, map), UpdateTeam.class);
     }
 
+    /**
+     * Updates one or more individual editable parameters (such as the concurrency allocation) of the specified team without requiring a full profile update.
+     *
+     * @param teamID     The unique identifier of the team. You can look up the ID of teams in your organization using the {@link LookupTeams} endpoint.
+     * @param updateTeam The {@link UpdateTeam} object containing the parameters to update.
+     * @return {@link UpdateTeam}
+     * @throws IOException API request failed
+     */
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
