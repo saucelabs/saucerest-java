@@ -153,6 +153,24 @@ public abstract class AbstractEndpoint extends AbstractModel {
         }
     }
 
+    public String postResponse(String url) throws IOException {
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
+            .header("User-Agent", userAgent)
+            .url(url)
+            .post(RequestBody.create("", MediaType.parse("application/json")))
+            .build();
+
+        try (Response response = makeRequest(request)) {
+            return response.body().string();
+        }
+    }
+
     public String putResponse(String url, Map<String, Object> payload) throws IOException {
         String json = new JSONObject(payload).toString();
 

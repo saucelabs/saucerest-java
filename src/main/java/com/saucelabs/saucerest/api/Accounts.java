@@ -5,6 +5,7 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.model.accounts.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,5 +151,18 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID + "/members";
 
         return getResponseClass(getResponseObject(url), TeamMembers.class);
+    }
+
+    /**
+     * Globally regenerates new access key values for every member of the specified team.
+     *
+     * @param teamID Identifies the team for which you are resetting member access keys.
+     * @return {@link ResetAccessKeyForTeam}
+     * @throws IOException API request failed
+     */
+    public List<ResetAccessKeyForTeam> resetAccessKeyForTeam(String teamID) throws IOException {
+        String url = getBaseEndpoint() + "teams/" + teamID + "/reset-access-key";
+
+        return getResponseListClass(postResponse(url), ResetAccessKeyForTeam.class);
     }
 }

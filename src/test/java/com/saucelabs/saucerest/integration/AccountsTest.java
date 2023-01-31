@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -153,5 +154,20 @@ public class AccountsTest {
         TeamMembers teamMembers = accounts.getTeamMembers(lookupTeams.results.get(0).id);
 
         assertNotNull(teamMembers);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void resetAccessKeyTeam(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        // TODO: after create user endpoint is implemented expand test to create a user and add it to the team and then reset the access key
+        CreateTeam createTeam = accounts.createTeam("000" + RandomStringUtils.randomAlphabetic(12), new Settings.Builder().setVirtualMachines(0).build(), RandomStringUtils.randomAlphabetic(8));
+
+        List<ResetAccessKeyForTeam> resetAccessKeyForTeam = accounts.resetAccessKeyForTeam(createTeam.id);
+
+        assertNotNull(resetAccessKeyForTeam);
+        assertEquals(0, resetAccessKeyForTeam.size());
     }
 }
