@@ -142,4 +142,16 @@ public class AccountsTest {
         assertEquals("Updated" + teamName, updateTeam.name);
         accounts.deleteTeam(createTeam.id);
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getTeamMembersTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupTeams lookupTeams = accounts.lookupTeams();
+        TeamMembers teamMembers = accounts.getTeamMembers(lookupTeams.results.get(0).id);
+
+        assertNotNull(teamMembers);
+    }
 }

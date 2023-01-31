@@ -138,4 +138,17 @@ public class Accounts extends AbstractEndpoint {
 
         return getResponseClass(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
     }
+
+    /**
+     * Returns the number of members in the specified team and lists each member.
+     *
+     * @param teamID Identifies the team for which you are requesting the list of members.
+     * @return {@link TeamMembers}
+     * @throws IOException API request failed
+     */
+    public TeamMembers getTeamMembers(String teamID) throws IOException {
+        String url = getBaseEndpoint() + "teams/" + teamID + "/members";
+
+        return getResponseClass(getResponseObject(url), TeamMembers.class);
+    }
 }
