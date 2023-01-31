@@ -1,28 +1,27 @@
 
 package com.saucelabs.saucerest.model.accounts;
 
-import javax.annotation.Generated;
+import com.squareup.moshi.Json;
 
-@Generated("jsonschema2pojo")
 public class CreateTeam {
 
-    @com.squareup.moshi.Json(name = "created_at")
+    @Json(name = "created_at")
     public String createdAt;
-    @com.squareup.moshi.Json(name = "description")
+    @Json(name = "description")
     public String description;
-    @com.squareup.moshi.Json(name = "group")
+    @Json(name = "group")
     public Group group;
-    @com.squareup.moshi.Json(name = "id")
+    @Json(name = "id")
     public String id;
-    @com.squareup.moshi.Json(name = "is_default")
+    @Json(name = "is_default")
     public Boolean isDefault;
-    @com.squareup.moshi.Json(name = "name")
+    @Json(name = "name")
     public String name;
-    @com.squareup.moshi.Json(name = "org_uuid")
+    @Json(name = "org_uuid")
     public String orgUuid;
-    @com.squareup.moshi.Json(name = "settings")
+    @Json(name = "settings")
     public Settings settings;
-    @com.squareup.moshi.Json(name = "updated_at")
+    @Json(name = "updated_at")
     public String updatedAt;
 
     /**
