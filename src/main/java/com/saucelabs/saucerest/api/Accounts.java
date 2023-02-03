@@ -178,6 +178,13 @@ public class Accounts extends AbstractEndpoint {
         return getResponseClass(getResponseObject(url), LookupUsers.class);
     }
 
+    /**
+     * Queries the organization of the requesting account and returns the number of users matching the query and a basic profile of each user, including the ID value, which may be a required parameter of other API calls related to a specific user.
+     *
+     * @param lookupUsersParameter {@link LookupUsersParameter}
+     * @return {@link LookupUsers}
+     * @throws IOException API request failed
+     */
     public LookupUsers lookupUsers(LookupUsersParameter lookupUsersParameter) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
