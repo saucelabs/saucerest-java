@@ -190,4 +190,10 @@ public class Accounts extends AbstractEndpoint {
 
         return getResponseClass(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
     }
+
+    public User getUser(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID;
+
+        return getResponseClass(getResponseObject(url), User.class);
+    }
 }

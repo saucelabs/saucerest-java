@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.accounts;
 
 import com.squareup.moshi.Json;
@@ -20,11 +19,6 @@ public class Organizations {
     public Organizations() {
     }
 
-    /**
-     * @param count
-     * @param links
-     * @param results
-     */
     public Organizations(Links links, Integer count, List<Result> results) {
         super();
         this.links = links;

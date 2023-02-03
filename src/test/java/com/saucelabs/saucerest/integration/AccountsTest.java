@@ -185,4 +185,16 @@ public class AccountsTest {
 
         assertNotNull(lookupUsers);
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsers lookupUsers = accounts.lookupUsers();
+        User user = accounts.getUser(lookupUsers.results.get(0).id);
+
+        assertNotNull(user);
+    }
 }
