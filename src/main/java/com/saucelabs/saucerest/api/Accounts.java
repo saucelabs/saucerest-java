@@ -191,6 +191,13 @@ public class Accounts extends AbstractEndpoint {
         return getResponseClass(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
     }
 
+    /**
+     * Returns the full profile of the specified user. The ID of the user is the only valid unique identifier.
+     *
+     * @param userID The user's unique identifier. You can look up the IDs of users in your organization using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
     public User getUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID;
 
