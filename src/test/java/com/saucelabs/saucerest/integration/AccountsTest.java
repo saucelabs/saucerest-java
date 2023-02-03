@@ -170,4 +170,19 @@ public class AccountsTest {
         assertNotNull(resetAccessKeyForTeam);
         assertEquals(0, resetAccessKeyForTeam.size());
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void lookupUsersWithParametersTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
+            .setRoles(LookupUsersParameter.Roles.ORGADMIN)
+            .build();
+
+        LookupUsers lookupUsers = accounts.lookupUsers(lookupUsersParameter);
+
+        assertNotNull(lookupUsers);
+    }
 }
