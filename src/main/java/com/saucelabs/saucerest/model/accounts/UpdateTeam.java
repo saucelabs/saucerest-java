@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.accounts;
 
 import com.saucelabs.saucerest.model.AbstractModel;

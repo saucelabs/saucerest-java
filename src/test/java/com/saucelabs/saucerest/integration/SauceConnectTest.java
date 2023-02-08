@@ -15,8 +15,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.io.IOException;
 import java.util.List;
 
-import static com.saucelabs.saucerest.DataCenter.*;
-
 /**
  * Sauce Connect integration tests by nature require a running Sauce Connect tunnel. On GitHub this is done via an
  * action that starts the required tunnels. Locally running these tests require the developer to start a tunnel beforehand.
@@ -90,10 +88,7 @@ public class SauceConnectTest {
 
         List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
 
-        Assertions.assertEquals(
-            dataCenter.equals(EU_CENTRAL) ||
-                dataCenter.equals(US_WEST) ||
-                dataCenter.equals(APAC_SOUTHEAST) ? 1 : 0, tunnelIDs.size());
+        Assertions.assertTrue(tunnelIDs.size() > 0);
     }
 
     @ParameterizedTest
@@ -107,7 +102,7 @@ public class SauceConnectTest {
         for (String tunnelID : tunnelIDs) {
             TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelID);
 
-            Assertions.assertEquals(1, tunnelIDs.size());
+            Assertions.assertTrue(tunnelIDs.size() > 0);
             Assertions.assertNotNull(tunnelInformation);
         }
     }

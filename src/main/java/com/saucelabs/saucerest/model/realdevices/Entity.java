@@ -36,11 +36,13 @@ public class Entity {
     public String status;
     @Json(name = "test_report_type")
     public String testReportType;
+    @Json(name = "has_crashed")
+    public Boolean hasCrashed;
 
     public Entity() {
     }
 
-    public Entity(Object assignedTunnelId, String automationBackend, String consolidatedStatus, Long creationTime, String deviceName, String deviceType, Long endTime, String id, Boolean manual, String name, String os, String osVersion, String ownerSauce, Long startTime, String status, String testReportType) {
+    public Entity(Object assignedTunnelId, String automationBackend, String consolidatedStatus, Long creationTime, String deviceName, String deviceType, Long endTime, String id, Boolean manual, String name, String os, String osVersion, String ownerSauce, Long startTime, String status, String testReportType, Boolean hasCrashed) {
         super();
         this.assignedTunnelId = assignedTunnelId;
         this.automationBackend = automationBackend;
@@ -58,5 +60,6 @@ public class Entity {
         this.startTime = startTime;
         this.status = status;
         this.testReportType = testReportType;
+        this.hasCrashed = hasCrashed;
     }
 }

@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.accounts;
 
 import com.squareup.moshi.Json;
@@ -16,10 +15,6 @@ public class Role {
     public Role() {
     }
 
-    /**
-     * @param role
-     * @param name
-     */
     public Role(String name, Integer role) {
         super();
         this.name = name;
