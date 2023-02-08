@@ -88,11 +88,13 @@ public class DeviceJob {
     public String testfairyLogUrl;
     @Json(name = "test_report_type")
     public String testReportType;
+    @Json(name = "crash_log_url")
+    public String crashLogUrl;
 
     public DeviceJob() {
     }
 
-    public DeviceJob(ApplicationSummary applicationSummary, Object assignedTunnelId, String deviceType, String ownerSauce, String automationBackend, BaseConfig baseConfig, String build, Boolean collectsAutomatorLog, String consolidatedStatus, Long creationTime, DeviceDescriptor deviceDescriptor, Long endTime, Object error, String id, String frameworkLogUrl, String deviceLogUrl, String requestsUrl, Object testCasesUrl, Object junitLogUrl, Boolean manual, Long modificationTime, String name, String os, String osVersion, String deviceName, Boolean passed, Boolean proxied, Boolean recordScreenshots, List<Object> screenshots, Boolean recordVideo, Long startTime, String status, List<Object> tags, String videoUrl, String remoteAppFileUrl, String appiumSessionId, Object deviceSessionId, String client, String networkLogUrl, String testfairyLogUrl, String testReportType) {
+    public DeviceJob(ApplicationSummary applicationSummary, Object assignedTunnelId, String deviceType, String ownerSauce, String automationBackend, BaseConfig baseConfig, String build, Boolean collectsAutomatorLog, String consolidatedStatus, Long creationTime, DeviceDescriptor deviceDescriptor, Long endTime, Object error, String id, String frameworkLogUrl, String deviceLogUrl, String requestsUrl, Object testCasesUrl, Object junitLogUrl, Boolean manual, Long modificationTime, String name, String os, String osVersion, String deviceName, Boolean passed, Boolean proxied, Boolean recordScreenshots, List<Object> screenshots, Boolean recordVideo, Long startTime, String status, List<Object> tags, String videoUrl, String remoteAppFileUrl, String appiumSessionId, Object deviceSessionId, String client, String networkLogUrl, String testfairyLogUrl, String testReportType, String crashLogUrl) {
         super();
         this.applicationSummary = applicationSummary;
         this.assignedTunnelId = assignedTunnelId;
@@ -135,5 +137,6 @@ public class DeviceJob {
         this.networkLogUrl = networkLogUrl;
         this.testfairyLogUrl = testfairyLogUrl;
         this.testReportType = testReportType;
+        this.crashLogUrl = crashLogUrl;
     }
 }
