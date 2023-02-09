@@ -197,7 +197,7 @@ public class JobTest {
 
         Assertions.assertDoesNotThrow(() -> {
             Awaitility.await()
-                .atMost(Duration.ofSeconds(5))
+                .atMost(Duration.ofSeconds(20))
                 .pollInterval(Duration.ofSeconds(1))
                 .until(() -> "complete".equals(job.getDetails().get("status")));
         });
