@@ -293,7 +293,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
         client = builder.build();
         Response response = client.newCall(request).execute();
 
-        if (String.valueOf(response.code()).startsWith("5") && String.valueOf(response.code()).length() == 3) {
+        Integer responseCode = response.code();
+        Integer responseCodeLength = String.valueOf(responseCode).length();
+
+        if (responseCodeLength == 3 && (responseCode == 429 || String.valueOf(responseCode).startsWith("5"))) {
             Response finalResponse = response;
             response = Failsafe.with(
                     new RetryPolicy<>()
