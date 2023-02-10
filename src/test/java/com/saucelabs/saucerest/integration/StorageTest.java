@@ -92,7 +92,11 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                }
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
                 Settings settings = new Settings.Builder()
                     .setResigning(new Resigning.Builder()
@@ -108,7 +112,11 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                }
             }
         }
 
@@ -130,7 +138,11 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
+                }
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
                 Settings settings = new Settings.Builder()
                     .setResigning(new Resigning.Builder()
@@ -146,7 +158,11 @@ public class StorageTest {
                     .setSettings(settings)
                     .build();
 
-                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
+                }
             }
         }
     }
