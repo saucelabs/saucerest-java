@@ -6,18 +6,24 @@ import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 import okhttp3.*;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
 public abstract class AbstractEndpoint extends AbstractModel {
+    private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
@@ -286,6 +292,20 @@ public abstract class AbstractEndpoint extends AbstractModel {
         builder.writeTimeout(300, TimeUnit.SECONDS);
         client = builder.build();
         Response response = client.newCall(request).execute();
+
+        Integer responseCode = response.code();
+        Integer responseCodeLength = String.valueOf(responseCode).length();
+
+        if (responseCodeLength == 3 && (responseCode == 429 || String.valueOf(responseCode).startsWith("5"))) {
+            Response finalResponse = response;
+            response = Failsafe.with(
+                    new RetryPolicy<>()
+                        .handle(RuntimeException.class)
+                        .withBackoff(30, 500, ChronoUnit.MILLIS)
+                        .withMaxRetries(2)
+                        .onRetry(e -> logger.log(Level.WARNING, () -> "Retrying because of " + finalResponse.code())))
+                .get(() -> client.newCall(request).execute());
+        }
 
         if (!response.isSuccessful()) {
             responseHandler(this, response);
