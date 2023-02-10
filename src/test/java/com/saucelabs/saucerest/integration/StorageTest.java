@@ -330,7 +330,7 @@ public class StorageTest {
         // Get group ID first
         GetAppStorageGroupsParameters groupsParameters = new GetAppStorageGroupsParameters.Builder()
             .setKind("ios")
-            .setQ("com.saucelabs.mydemoapp.ios")
+            .setQ("com.saucelabs.mydemoapp.rn")
             .build();
 
         GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(groupsParameters.toMap());
