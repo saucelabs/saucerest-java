@@ -58,10 +58,12 @@ jobs:
   Upload_apps:
     needs: main_job
     uses: ./.github/workflows/upload_my_demo_app.yml
+    secrets: inherit
 
   Setup_Sauce_Connect:
     needs: main_job
     uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
+    secrets: inherit
 
   Integration:
     needs: [ main_job, Upload_apps, Setup_Sauce_Connect ]
