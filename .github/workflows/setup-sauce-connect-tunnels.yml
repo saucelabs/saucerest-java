@@ -1,5 +1,8 @@
 name: Setup Sauce Connect Tunnels
 
+on:
+  workflow_call:
+
 env:
   SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
   SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}

@@ -1,6 +1,7 @@
 name: Upload My Demo App monthly
 
 on:
+  workflow_call:
   workflow_dispatch:
   schedule:
     - cron: '0 5 */30 * *'
