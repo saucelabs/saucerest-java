@@ -56,6 +56,7 @@ jobs:
           flags: unittests
 
   Upload_apps:
+    name: Upload My Demo Apps
     needs: main_job
     uses: ./.github/workflows/upload_my_demo_app.yml
     secrets: inherit
@@ -66,7 +67,7 @@ jobs:
     secrets: inherit
 
   Integration:
-    needs: [ main_job, Upload_apps, Setup_Sauce_Connect ]
+    needs: [ main_job, Upload_apps ]
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks

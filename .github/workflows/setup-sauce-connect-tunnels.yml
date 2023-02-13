@@ -9,6 +9,7 @@ env:
 
 jobs:
   setup_sauce_connect_tunnels:
+    name: Setup Sauce Connect Tunnels
     runs-on: ubuntu-latest
     steps:
       - name: Setup Sauce Connect US-West
