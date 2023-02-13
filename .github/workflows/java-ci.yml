@@ -55,8 +55,14 @@ jobs:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
 
+  Upload_apps:
+    uses: ./.github/workflows/upload_my_demo_app.yml
+
+  Setup_Sauce_Connect:
+    uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
+
   Integration:
-    needs: main_job
+    needs: main_job, Upload_apps, Setup_Sauce_Connect
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
@@ -80,30 +86,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Setup Sauce Connect US-West
-        uses: saucelabs/sauce-connect-action@v2
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          tunnelName: github-action-tunnel-us-west
-          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-west.yaml
-
-      - name: Setup Sauce Connect EU-Central
-        uses: saucelabs/sauce-connect-action@v2
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          tunnelName: github-action-tunnel-eu-central
-          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
-
-      - name: Setup Sauce Connect APAC-Southeast
-        uses: saucelabs/sauce-connect-action@v2
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          tunnelName: github-action-tunnel-apac-southeast
-          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-apac-southeast.yaml
 
       - name: Build with Maven
         if: ${{ env.NOT_FROM_FORK }} == 'true'
