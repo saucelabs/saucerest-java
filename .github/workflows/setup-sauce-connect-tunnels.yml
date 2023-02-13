@@ -12,6 +12,9 @@ jobs:
     name: Setup Sauce Connect Tunnels
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Sauce Connect US-West
         uses: saucelabs/sauce-connect-action@v2
         with:
