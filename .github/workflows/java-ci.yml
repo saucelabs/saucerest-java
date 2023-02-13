@@ -62,7 +62,7 @@ jobs:
     uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
 
   Integration:
-    needs: main_job, Upload_apps, Setup_Sauce_Connect
+    needs: [ main_job, Upload_apps, Setup_Sauce_Connect ]
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
