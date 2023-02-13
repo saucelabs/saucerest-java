@@ -67,18 +67,18 @@ jobs:
     secrets: inherit
 
   Integration:
-    needs: [ main_job, Upload_apps ]
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    # Only run integration tests if the code is coming from this repo and not forks
+    needs: [ main_job, Upload_apps, Setup_Sauce_Connect
+      name: Integration Tests
+        runs-on: ubuntu-latest
+        # Only run integration tests if the code is coming from this repo and not forks
 
-    steps:
-      - name: Set env var for Integration Tests
-        if: ${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }}
-        run: |
-          echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
+        steps:
+          - name: Set env var for Integration Tests
+            if: ${ { github.repository == github.event.pull_request.head.repo.full_name } } || ${{ github.event.push.head.repo.full_name == github.repository }}
+                  run: |
+                  echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
 
-      - name: Print env var
+                  - name: Print env var
         run: |
           echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
       - uses: actions/checkout@v3
