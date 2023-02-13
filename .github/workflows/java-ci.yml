@@ -63,7 +63,7 @@ jobs:
   Setup_Sauce_Connect:
     name: Setup Sauce Connect tunnels
     needs: main_job
-    uses: ./.github/workflows/setup_sauce_connect_tunnels.yml
+    uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
     secrets: inherit
 
   Integration:
