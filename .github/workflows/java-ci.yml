@@ -56,9 +56,11 @@ jobs:
           flags: unittests
 
   Upload_apps:
+    needs: main_job
     uses: ./.github/workflows/upload_my_demo_app.yml
 
   Setup_Sauce_Connect:
+    needs: main_job
     uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
 
   Integration:
