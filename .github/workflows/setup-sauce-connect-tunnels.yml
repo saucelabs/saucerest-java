@@ -8,26 +8,29 @@ env:
   SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
 
 jobs:
-  - name: Setup Sauce Connect US-West
-    uses: saucelabs/sauce-connect-action@v2
-    with:
-      username: ${{ secrets.SAUCE_USERNAME }}
-      accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-      tunnelName: github-action-tunnel-us-west
-      configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-west.yaml
+  setup_sauce_connect_tunnels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Sauce Connect US-West
+        uses: saucelabs/sauce-connect-action@v2
+        with:
+          username: ${{ secrets.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelName: github-action-tunnel-us-west
+          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-west.yaml
 
-  - name: Setup Sauce Connect EU-Central
-    uses: saucelabs/sauce-connect-action@v2
-    with:
-      username: ${{ secrets.SAUCE_USERNAME }}
-      accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-      tunnelName: github-action-tunnel-eu-central
-      configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
+      - name: Setup Sauce Connect EU-Central
+        uses: saucelabs/sauce-connect-action@v2
+        with:
+          username: ${{ secrets.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelName: github-action-tunnel-eu-central
+          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
 
-  - name: Setup Sauce Connect APAC-Southeast
-    uses: saucelabs/sauce-connect-action@v2
-    with:
-      username: ${{ secrets.SAUCE_USERNAME }}
-      accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-      tunnelName: github-action-tunnel-apac-southeast
-      configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-apac-southeast.yaml
+      - name: Setup Sauce Connect APAC-Southeast
+        uses: saucelabs/sauce-connect-action@v2
+        with:
+          username: ${{ secrets.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelName: github-action-tunnel-apac-southeast
+          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-apac-southeast.yaml
