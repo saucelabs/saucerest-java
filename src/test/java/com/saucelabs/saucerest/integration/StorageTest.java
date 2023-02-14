@@ -7,7 +7,6 @@ import com.saucelabs.saucerest.api.Storage;
 import com.saucelabs.saucerest.model.storage.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -34,119 +34,77 @@ public class StorageTest {
         EU_CENTRAL, US_WEST
     }
 
-    public void setup(Region region) {
-        storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorage());
+    private EditAppGroupSettings getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform platform) {
+        if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
+            Settings settings = new Settings.Builder()
+                .setInstrumentation(new Instrumentation.Builder()
+                    .setBiometrics(true)
+                    .setImageInjection(true)
+                    .setNetworkCapture(true)
+                    .build())
+                .setInstrumentationEnabled(true)
+                .setOrientation("Portrait")
+                .setSetupDeviceLock(true)
+                .setAudioCapture(true)
+                .build();
+
+            return new EditAppGroupSettings.Builder(platform)
+                .setSettings(settings)
+                .build();
+        } else if (platform.equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+            Settings settings = new Settings.Builder()
+                .setResigning(new Resigning.Builder()
+                    .setBiometrics(true)
+                    .setImageInjection(true)
+                    .setNetworkCapture(true)
+                    .build())
+                .setResigningEnabled(true)
+                .setAudioCapture(true)
+                .build();
+
+            return new EditAppGroupSettings.Builder(platform)
+                .setSettings(settings)
+                .build();
+        }
+
+        return null;
     }
 
-    @BeforeAll
-    public static void uploadAppFiles() throws IOException {
-        //TODO: rework this whole thing
-//        boolean needAppUploading = false;
-//
-//        if (storageEU.getGroups().items.size() != 4) {
-//            needAppUploading = true;
-//        }
-//
-//        if (storageUS.getGroups().items.size() != 4) {
-//            needAppUploading = true;
-//        }
-//
-//        if (needAppUploading) {
-//            for (StorageTestHelper.AppFile appFile : StorageTestHelper.AppFile.values()) {
-//                Thread t = new Thread(() -> {
-//                    File file = new StorageTestHelper().getAppFile(appFile);
-//                    try {
-//                        storageEU.uploadFile(file);
-//                        storageUS.uploadFile(file);
-//                    } catch (IOException ignored) {
-//                    }
-//                });
-//                t.start();
-//            }
-//
-//            Awaitility.await()
-//                .atMost(5, TimeUnit.MINUTES)
-//                .until(() ->
-//                    storageEU.getGroups().items.size() == 4 &&
-//                        storageUS.getGroups().items.size() == 4);
-//        }
+    public void setup(Region region) {
+        storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorage());
     }
 
     @AfterEach
     public void resetAppGroupSettings() throws IOException {
         for (ItemInteger itemInteger : euCentralStorage.getGroups().items) {
             if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-                Settings settings = new Settings.Builder()
-                    .setInstrumentation(new Instrumentation.Builder()
-                        .setBiometrics(true)
-                        .setImageInjection(true)
-                        .setNetworkCapture(true)
-                        .build())
-                    .setInstrumentationEnabled(true)
-                    .setOrientation("Portrait")
-                    .setSetupDeviceLock(true)
-                    .setAudioCapture(true)
-                    .build();
-
-                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-                    .setSettings(settings)
-                    .build();
-
-                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                }
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-                Settings settings = new Settings.Builder()
-                    .setResigning(new Resigning.Builder()
-                        .setBiometrics(true)
-                        .setImageInjection(true)
-                        .setNetworkCapture(true)
-                        .build())
-                    .setResigningEnabled(true)
-                    .setAudioCapture(true)
-                    .build();
-
-                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
-                    .setSettings(settings)
-                    .build();
-
-                euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                }
             }
         }
 
         for (ItemInteger itemInteger : usWestStorage.getGroups().items) {
             if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-                Settings settings = new Settings.Builder()
-                    .setInstrumentation(new Instrumentation.Builder()
-                        .setBiometrics(true)
-                        .setImageInjection(true)
-                        .setNetworkCapture(true)
-                        .build())
-                    .setInstrumentationEnabled(true)
-                    .setOrientation("Portrait")
-                    .setSetupDeviceLock(true)
-                    .setAudioCapture(true)
-                    .build();
-
-                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-                    .setSettings(settings)
-                    .build();
-
-                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
+                }
             } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-                Settings settings = new Settings.Builder()
-                    .setResigning(new Resigning.Builder()
-                        .setBiometrics(true)
-                        .setImageInjection(true)
-                        .setNetworkCapture(true)
-                        .build())
-                    .setResigningEnabled(true)
-                    .setAudioCapture(true)
-                    .build();
-
-                EditAppGroupSettings editAppGroupSettingsRequest = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
-                    .setSettings(settings)
-                    .build();
-
-                usWestStorage.updateAppStorageGroupSettings(itemInteger.id, editAppGroupSettingsRequest);
+                try {
+                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
+                } catch (IOException ignored) {
+                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
+                }
             }
         }
     }
@@ -314,7 +272,7 @@ public class StorageTest {
         // Get group ID first
         GetAppStorageGroupsParameters groupsParameters = new GetAppStorageGroupsParameters.Builder()
             .setKind("ios")
-            .setQ("com.saucelabs.mydemoapp.ios")
+            .setQ("com.saucelabs.mydemoapp.rn")
             .build();
 
         GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(groupsParameters.toMap());

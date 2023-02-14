@@ -1,4 +1,3 @@
-
 package com.saucelabs.saucerest.model.accounts;
 
 import com.squareup.moshi.Json;
@@ -30,17 +29,6 @@ public class CreateTeam {
     public CreateTeam() {
     }
 
-    /**
-     * @param createdAt
-     * @param settings
-     * @param isDefault
-     * @param name
-     * @param description
-     * @param id
-     * @param group
-     * @param orgUuid
-     * @param updatedAt
-     */
     public CreateTeam(String createdAt, String description, Group group, String id, Boolean isDefault, String name, String orgUuid, Settings settings, String updatedAt) {
         super();
         this.createdAt = createdAt;
@@ -53,5 +41,4 @@ public class CreateTeam {
         this.settings = settings;
         this.updatedAt = updatedAt;
     }
-
 }

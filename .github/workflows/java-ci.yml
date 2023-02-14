@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 
 permissions:
@@ -23,8 +23,7 @@ jobs:
     steps:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@master
-        with:
-          # All of these options are optional, so you can remove them if you are happy with the defaults
+        with: # All of these options are optional, so you can remove them if you are happy with the defaults
           concurrent_skipping: 'always'
           skip_after_successful_duplicate: 'true'
           paths_ignore: '["**/README.md", "**/docs/**"]'
@@ -55,8 +54,20 @@ jobs:
           file: ./target/site/jacoco/jacoco.xml
           flags: unittests
 
-  Integration:
+  Upload_apps:
+    name: Upload My Demo Apps
     needs: main_job
+    uses: ./.github/workflows/upload_my_demo_app.yml
+    secrets: inherit
+
+  #  Setup_Sauce_Connect:
+  #    name: Setup Sauce Connect tunnels
+  #    needs: main_job
+  #    uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
+  #    secrets: inherit
+
+  Integration:
+    needs: [ main_job, Upload_apps ]
     name: Integration Tests
     runs-on: ubuntu-latest
     # Only run integration tests if the code is coming from this repo and not forks
@@ -70,6 +81,7 @@ jobs:
       - name: Print env var
         run: |
           echo "NOT_FROM_FORK: ${{ env.NOT_FROM_FORK }}"
+
       - uses: actions/checkout@v3
         if: ${{ env.NOT_FROM_FORK }} == 'true'
 

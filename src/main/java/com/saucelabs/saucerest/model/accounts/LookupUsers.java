@@ -4,7 +4,7 @@ import com.squareup.moshi.Json;
 
 import java.util.List;
 
-public class Organizations {
+public class LookupUsers {
 
     @Json(name = "links")
     public Links links;
@@ -16,10 +16,10 @@ public class Organizations {
     /**
      * No args constructor for use in serialization
      */
-    public Organizations() {
+    public LookupUsers() {
     }
 
-    public Organizations(Links links, Integer count, List<Result> results) {
+    public LookupUsers(Links links, Integer count, List<Result> results) {
         super();
         this.links = links;
         this.count = count;

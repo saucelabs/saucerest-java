@@ -7,7 +7,7 @@ import java.util.List;
 public class GetAppStorageGroups {
 
     @Json(name = "items")
-    public List<ItemInteger> items = null;
+    public List<ItemInteger> items;
     @Json(name = "links")
     public Links links;
     @Json(name = "page")
