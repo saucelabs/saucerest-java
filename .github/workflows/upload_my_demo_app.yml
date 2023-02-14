@@ -12,7 +12,7 @@ env:
 
 jobs:
   download_upload_apk_eu:
-    name: Upload My Demo App apk
+    name: Upload My Demo App apk to EU
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App apk
@@ -25,7 +25,7 @@ jobs:
           args: -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" --location --request POST 'https://api.eu-central-1.saucelabs.com/v1/storage/upload' --form 'payload=@"Android-MyDemoAppRN.apk"' --form 'name="Android-MyDemoAppRN.apk"'
 
   download_upload_zip_eu:
-    name: Upload My Demo App zip
+    name: Upload My Demo App zip to EU
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App zip
@@ -38,7 +38,7 @@ jobs:
           args: -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" --location --request POST 'https://api.eu-central-1.saucelabs.com/v1/storage/upload' --form 'payload=@"iOS-Simulator-MyRNDemoApp.zip"' --form 'name="iOS-Simulator-MyRNDemoApp.zip"'
 
   download_upload_ipa_eu:
-    name: Upload My Demo App ipa
+    name: Upload My Demo App ipa to EU
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App ipa
@@ -51,7 +51,7 @@ jobs:
           args: -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" --location --request POST 'https://api.eu-central-1.saucelabs.com/v1/storage/upload' --form 'payload=@"iOS-Real-Device-MyRNDemoApp.ipa"' --form 'name="iOS-Real-Device-MyRNDemoApp.ipa"'
 
   download_upload_apk_us:
-    name: Upload My Demo App apk
+    name: Upload My Demo App apk to US
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App apk
@@ -64,7 +64,7 @@ jobs:
           args: -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" --location --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' --form 'payload=@"Android-MyDemoAppRN.apk"' --form 'name="Android-MyDemoAppRN.apk"'
 
   download_upload_zip_us:
-    name: Upload My Demo App zip
+    name: Upload My Demo App zip to US
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App zip
@@ -77,7 +77,7 @@ jobs:
           args: -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" --location --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' --form 'payload=@"iOS-Simulator-MyRNDemoApp.zip"' --form 'name="iOS-Simulator-MyRNDemoApp.zip"'
 
   download_upload_ipa_us:
-    name: Upload My Demo App ipa
+    name: Upload My Demo App ipa to US
     runs-on: ubuntu-latest
     steps:
       - name: Download My Demo App ipa
