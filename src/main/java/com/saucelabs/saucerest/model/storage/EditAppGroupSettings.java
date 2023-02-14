@@ -20,7 +20,6 @@ public class EditAppGroupSettings extends AbstractModel {
         settings = builder.settings;
     }
 
-
     public static final class Builder {
         private Settings settings;
         private final Platform platform;
