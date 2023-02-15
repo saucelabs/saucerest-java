@@ -162,7 +162,7 @@ public class Job extends AbstractEndpoint {
 
         Awaitility.await()
             .ignoreExceptionsMatching(e -> e.getMessage().contains("Bad Request"))
-            .atMost(Duration.ofSeconds(20))
+            .atMost(Duration.ofSeconds(60))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> getResponseObject(url) != null);
     }
