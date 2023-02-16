@@ -178,7 +178,7 @@ public class AccountsTest {
         Accounts accounts = sauceREST.getAccounts();
 
         LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
-            .setRoles(LookupUsersParameter.Roles.ORGADMIN)
+            .setRoles(Roles.ORGADMIN)
             .build();
 
         LookupUsers lookupUsers = accounts.lookupUsers(lookupUsersParameter);
@@ -194,6 +194,27 @@ public class AccountsTest {
 
         LookupUsers lookupUsers = accounts.lookupUsers();
         User user = accounts.getUser(lookupUsers.results.get(0).id);
+
+        assertNotNull(user);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void createUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        CreateUser createUser = new CreateUser.Builder()
+            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
+            .setFirstName(RandomStringUtils.randomAlphabetic(8))
+            .setLastName(RandomStringUtils.randomAlphabetic(8))
+            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%")
+            .setOrganization(accounts.getOrganization().results.get(0).id)
+            .setRole(Roles.MEMBER)
+            .setUserName("saucerest-java-integration-test-user-" + RandomStringUtils.randomAlphabetic(8))
+            .build();
+
+        User user = accounts.createUser(createUser);
 
         assertNotNull(user);
     }

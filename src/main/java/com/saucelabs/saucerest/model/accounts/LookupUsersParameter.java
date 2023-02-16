@@ -13,22 +13,6 @@ public class LookupUsersParameter {
     private final Integer limit;
     private final Integer offset;
 
-    public enum Roles {
-        ORGADMIN(1),
-        TEAMADMIN(4),
-        MEMBER(3);
-
-        private final int value;
-
-        Roles(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
     public enum Status {
         ACTIVE("active"),
         PENDING("pending"),
@@ -142,7 +126,7 @@ public class LookupUsersParameter {
         }
 
         public Builder setRoles(Roles val) {
-            roles = val.value;
+            roles = val.getValue();
             return this;
         }
 

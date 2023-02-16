@@ -203,4 +203,17 @@ public class Accounts extends AbstractEndpoint {
 
         return getResponseClass(getResponseObject(url), User.class);
     }
+
+    /**
+     * Creates a new user in the Sauce Labs platform.
+     *
+     * @param createUser {@link CreateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User createUser(CreateUser createUser) throws IOException {
+        String url = getBaseEndpoint() + "users/";
+
+        return getResponseClass(postResponse(url, createUser.toMap()), User.class);
+    }
 }
