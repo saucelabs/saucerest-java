@@ -218,4 +218,34 @@ public class AccountsTest {
 
         assertNotNull(user);
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void updateUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsers lookupUsers = accounts.lookupUsers();
+        User user = null;
+
+        for (Result result : lookupUsers.results) {
+            if (result.username.startsWith("saucerest-java-integration-test-user")) {
+                user = accounts.getUser(result.id);
+                break;
+            }
+        }
+
+        UpdateUser updateUser = new UpdateUser.Builder()
+            .setUserID(user.id)
+            .setFirstName("Updated" + user.firstName)
+            .setLastName("Updated" + user.lastName)
+            .setPhone("+123456789")
+            .build();
+
+        User updatedUser = accounts.updateUser(updateUser);
+
+        assertEquals("Updated" + user.firstName, updatedUser.firstName);
+        assertEquals("Updated" + user.lastName, updatedUser.lastName);
+        assertEquals(user.phone, updatedUser.phone);
+    }
 }

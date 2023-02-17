@@ -216,4 +216,17 @@ public class Accounts extends AbstractEndpoint {
 
         return getResponseClass(postResponse(url, createUser.toMap()), User.class);
     }
+
+    /**
+     * Replaces all values of the specified user profile with the new set of parameters passed in the request. To update only certain parameters, see Partially Update a User.
+     *
+     * @param updateUser {@link UpdateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User updateUser(UpdateUser updateUser) throws IOException {
+        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+
+        return getResponseClass(putResponse(url, updateUser.toMap()), User.class);
+    }
 }
