@@ -313,17 +313,32 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return response;
     }
 
-    protected <T> T getResponseClass(String jsonResponse, Class<T> clazz) throws IOException {
+    /**
+     * This method is used to deserialize a JSON object response from an API endpoint.
+     *
+     * @param jsonResponse JSON object response from API endpoint
+     * @param clazz        The class to deserialize the JSON object into
+     * @param <T>          The type of the object to deserialize
+     * @return The deserialized object
+     * @throws IOException If the JSON object cannot be deserialized
+     */
+    protected <T> T deserializeJSONObject(String jsonResponse, Class<T> clazz) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
-        // failOnUnknown() will make sure that API changes in SL are caught ASAP so we can update SauceREST
+        // failOnUnknown() will make sure that API changes in SL are caught ASAP, so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
         return jsonAdapter.fromJson(jsonResponse);
     }
 
     /**
-     * Need to use this as the response is a JSON array instead of a JSON object.
+     * This method is used to deserialize a JSON array response from an API endpoint.
+     *
+     * @param jsonResponse JSON array response from API endpoint
+     * @param clazz        The class to deserialize the JSON array into
+     * @param <T>          The type of the object to deserialize
+     * @return The deserialized list of objects
+     * @throws IOException If the JSON array cannot be deserialized
      */
-    protected <T> List<T> getResponseListClass(String jsonResponse, Class<T> clazz) throws IOException {
+    protected <T> List<T> deserializeJSONArray(String jsonResponse, Class<T> clazz) throws IOException {
         Moshi moshi = new Moshi.Builder().build();
 
         Type listPlatform = Types.newParameterizedType(List.class, clazz);

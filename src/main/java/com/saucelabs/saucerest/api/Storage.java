@@ -40,7 +40,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles() throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        return getResponseClass(getResponseObject(url), GetAppFiles.class);
+        return deserializeJSONObject(getResponseObject(url), GetAppFiles.class);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        return getResponseClass(getResponseObject(url, params), GetAppFiles.class);
+        return deserializeJSONObject(getResponseObject(url, params), GetAppFiles.class);
     }
 
     /**
@@ -68,7 +68,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroups getGroups() throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        return getResponseClass(getResponseObject(url), GetAppStorageGroups.class);
+        return deserializeJSONObject(getResponseObject(url), GetAppStorageGroups.class);
     }
 
     /**
@@ -83,7 +83,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroups getGroups(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        return getResponseClass(getResponseObject(url, params), GetAppStorageGroups.class);
+        return deserializeJSONObject(getResponseObject(url, params), GetAppStorageGroups.class);
     }
 
     /**
@@ -97,7 +97,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroupSettings getGroupSettings(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return getResponseClass(getResponseObject(url), GetAppStorageGroupSettings.class);
+        return deserializeJSONObject(getResponseObject(url), GetAppStorageGroupSettings.class);
     }
 
     /**
@@ -112,13 +112,13 @@ public class Storage extends AbstractEndpoint {
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return getResponseClass(putResponse(url, jsonBody), EditAppGroupSettings.class);
+        return deserializeJSONObject(putResponse(url, jsonBody), EditAppGroupSettings.class);
     }
 
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, EditAppGroupSettings editAppGroupSettings) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return getResponseClass(putResponse(url, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
+        return deserializeJSONObject(putResponse(url, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
     }
 
     /**
@@ -159,7 +159,7 @@ public class Storage extends AbstractEndpoint {
     public UploadFileApp uploadFile(File file, String fileName, String description) throws IOException {
         String url = getBaseEndpoint() + "/upload";
 
-        return getResponseClass(postMultipartResponse(url, file, fileName, description), UploadFileApp.class);
+        return deserializeJSONObject(postMultipartResponse(url, file, fileName, description), UploadFileApp.class);
     }
 
     /**
@@ -192,7 +192,7 @@ public class Storage extends AbstractEndpoint {
 
         JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
 
-        return getResponseClass(putResponse(url, json.toString()), EditFileDescription.class);
+        return deserializeJSONObject(putResponse(url, json.toString()), EditFileDescription.class);
     }
 
     /**
@@ -206,7 +206,7 @@ public class Storage extends AbstractEndpoint {
     public DeleteAppFile deleteFile(String fileId) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
-        return getResponseClass(deleteResponse(url), DeleteAppFile.class);
+        return deserializeJSONObject(deleteResponse(url), DeleteAppFile.class);
     }
 
     /**
@@ -220,7 +220,7 @@ public class Storage extends AbstractEndpoint {
     public DeleteAppGroupFiles deleteFileGroup(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId;
 
-        return getResponseClass(deleteResponse(url), DeleteAppGroupFiles.class);
+        return deserializeJSONObject(deleteResponse(url), DeleteAppGroupFiles.class);
     }
 
     /**

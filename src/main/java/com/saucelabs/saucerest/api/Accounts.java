@@ -44,7 +44,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams() throws IOException {
         String url = getBaseEndpoint() + "teams/";
 
-        return getResponseClass(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams(String name) throws IOException {
         String url = getBaseEndpoint() + "teams?name=" + name;
 
-        return getResponseClass(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
     }
 
     /**
@@ -68,7 +68,7 @@ public class Accounts extends AbstractEndpoint {
     public Team getSpecificTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return getResponseClass(getResponseObject(url), Team.class);
+        return deserializeJSONObject(getResponseObject(url), Team.class);
     }
 
     /**
@@ -86,13 +86,13 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/";
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return getResponseClass(postResponse(url, map), CreateTeam.class);
+        return deserializeJSONObject(postResponse(url, map), CreateTeam.class);
     }
 
     public Organizations getOrganization() throws IOException {
         String url = getBaseEndpoint() + "organizations";
 
-        return getResponseClass(getResponseObject(url), Organizations.class);
+        return deserializeJSONObject(getResponseObject(url), Organizations.class);
     }
 
     /**
@@ -123,7 +123,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID;
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return getResponseClass(putResponse(url, map), UpdateTeam.class);
+        return deserializeJSONObject(putResponse(url, map), UpdateTeam.class);
     }
 
     /**
@@ -137,7 +137,7 @@ public class Accounts extends AbstractEndpoint {
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return getResponseClass(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
+        return deserializeJSONObject(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
     }
 
     /**
@@ -150,7 +150,7 @@ public class Accounts extends AbstractEndpoint {
     public TeamMembers getTeamMembers(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/members";
 
-        return getResponseClass(getResponseObject(url), TeamMembers.class);
+        return deserializeJSONObject(getResponseObject(url), TeamMembers.class);
     }
 
     /**
@@ -163,7 +163,7 @@ public class Accounts extends AbstractEndpoint {
     public List<ResetAccessKeyForTeam> resetAccessKeyForTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/reset-access-key";
 
-        return getResponseListClass(postResponse(url), ResetAccessKeyForTeam.class);
+        return deserializeJSONArray(postResponse(url), ResetAccessKeyForTeam.class);
     }
 
     /**
@@ -175,7 +175,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers() throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return getResponseClass(getResponseObject(url), LookupUsers.class);
+        return deserializeJSONObject(getResponseObject(url), LookupUsers.class);
     }
 
     /**
@@ -188,7 +188,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers(LookupUsersParameter lookupUsersParameter) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return getResponseClass(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
+        return deserializeJSONObject(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
     }
 
     /**
@@ -201,7 +201,7 @@ public class Accounts extends AbstractEndpoint {
     public User getUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID;
 
-        return getResponseClass(getResponseObject(url), User.class);
+        return deserializeJSONObject(getResponseObject(url), User.class);
     }
 
     /**
@@ -214,7 +214,7 @@ public class Accounts extends AbstractEndpoint {
     public User createUser(CreateUser createUser) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return getResponseClass(postResponse(url, createUser.toMap()), User.class);
+        return deserializeJSONObject(postResponse(url, createUser.toMap()), User.class);
     }
 
     /**
@@ -227,6 +227,6 @@ public class Accounts extends AbstractEndpoint {
     public User updateUser(UpdateUser updateUser) throws IOException {
         String url = getBaseEndpoint() + "users/" + updateUser.userID;
 
-        return getResponseClass(putResponse(url, updateUser.toMap()), User.class);
+        return deserializeJSONObject(putResponse(url, updateUser.toMap()), User.class);
     }
 }

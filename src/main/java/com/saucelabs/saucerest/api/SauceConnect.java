@@ -45,7 +45,7 @@ public class SauceConnect extends AbstractEndpoint {
     public List<String> getTunnelsForAUser(String username) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels";
 
-        return getResponseListClass(getResponseObject(url), String.class);
+        return deserializeJSONArray(getResponseObject(url), String.class);
     }
 
     /**
@@ -59,7 +59,7 @@ public class SauceConnect extends AbstractEndpoint {
     public TunnelInformation getTunnelInformation(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return getResponseClass(getResponseObject(url), TunnelInformation.class);
+        return deserializeJSONObject(getResponseObject(url), TunnelInformation.class);
     }
 
     /**
@@ -84,7 +84,7 @@ public class SauceConnect extends AbstractEndpoint {
     public JobsForATunnel getCurrentJobsForATunnel(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID + "/num_jobs";
 
-        return getResponseClass(getResponseObject(url), JobsForATunnel.class);
+        return deserializeJSONObject(getResponseObject(url), JobsForATunnel.class);
     }
 
     /**
@@ -109,7 +109,7 @@ public class SauceConnect extends AbstractEndpoint {
     public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return getResponseClass(deleteResponse(url), StopTunnel.class);
+        return deserializeJSONObject(deleteResponse(url), StopTunnel.class);
     }
 
     /**
@@ -132,7 +132,7 @@ public class SauceConnect extends AbstractEndpoint {
     public Versions getLatestVersions() throws IOException {
         String url = getBaseEndpoint() + "public/tunnels/info/versions";
 
-        return getResponseClass(getResponseObject(url), Versions.class);
+        return deserializeJSONObject(getResponseObject(url), Versions.class);
     }
 
     /**

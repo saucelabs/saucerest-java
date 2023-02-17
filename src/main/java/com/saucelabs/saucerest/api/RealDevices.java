@@ -33,7 +33,7 @@ public class RealDevices extends AbstractEndpoint {
     public Devices getDevices() throws IOException {
         String url = getBaseEndpoint() + "/devices";
 
-        return new Devices(getResponseListClass(getResponseObject(url), Device.class));
+        return new Devices(deserializeJSONArray(getResponseObject(url), Device.class));
     }
 
     /**
@@ -46,7 +46,7 @@ public class RealDevices extends AbstractEndpoint {
     public Device getSpecificDevice(String deviceID) throws IOException {
         String url = getBaseEndpoint() + "/devices/" + deviceID;
 
-        return getResponseClass(getResponseObject(url), Device.class);
+        return deserializeJSONObject(getResponseObject(url), Device.class);
     }
 
     /**
@@ -59,7 +59,7 @@ public class RealDevices extends AbstractEndpoint {
     public AvailableDevices getAvailableDevices() throws IOException {
         String url = getBaseEndpoint() + "/devices/available";
 
-        return new AvailableDevices(getResponseListClass(getResponseObject(url), String.class));
+        return new AvailableDevices(deserializeJSONArray(getResponseObject(url), String.class));
     }
 
     /**
@@ -72,7 +72,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs() throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return getResponseClass(getResponseObject(url), DeviceJobs.class);
+        return deserializeJSONObject(getResponseObject(url), DeviceJobs.class);
     }
 
     /**
@@ -87,7 +87,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return getResponseClass(getResponseObject(url, params), DeviceJobs.class);
+        return deserializeJSONObject(getResponseObject(url, params), DeviceJobs.class);
     }
 
     /**
@@ -102,7 +102,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJob getSpecificDeviceJob(String jobID) throws IOException {
         String url = getBaseEndpoint() + "/jobs/" + jobID;
 
-        return getResponseClass(getResponseObject(url), DeviceJob.class);
+        return deserializeJSONObject(getResponseObject(url), DeviceJob.class);
     }
 
     /**
