@@ -50,28 +50,15 @@ public class SauceREST implements Serializable {
     private static final long HTTP_CONNECT_TIMEOUT_SECONDS = TimeUnit.SECONDS.toMillis(10);
     private static final int DEFAULT_BUILDS_LIMIT = 50;
     /**
-     * The username to use when performing HTTP requests to the Sauce REST API.
-     */
-    protected String username;
-    /**
-     * The access key to use when performing HTTP requests to the Sauce REST API.
-     */
-    protected String accessKey;
-
-    /**
      * Date format used as part of the file name for downloaded files.
      */
     private static final String DATE_FORMAT = "yyyyMMdd_HHmmSS";
-
     private static String extraUserAgent = "";
-
     private final String server;
     private final String apiServer;
     private final String edsServer;
     private final String appServer;
-
     private final String restApiEndpoint;
-
     /**
      * Retry policy default values.
      */
@@ -82,6 +69,14 @@ public class SauceREST implements Serializable {
     private final int delayFactor;
     private final ChronoUnit chronoUnit;
     private final List<Class<? extends Throwable>> throwableList;
+    /**
+     * The username to use when performing HTTP requests to the Sauce REST API.
+     */
+    protected String username;
+    /**
+     * The access key to use when performing HTTP requests to the Sauce REST API.
+     */
+    protected String accessKey;
 
     /**
      * Constructs a new instance of the SauceREST class.
@@ -134,6 +129,14 @@ public class SauceREST implements Serializable {
         this.throwableList = throwableList;
     }
 
+    public static String getExtraUserAgent() {
+        return extraUserAgent;
+    }
+
+    public static void setExtraUserAgent(String extraUserAgent) {
+        SauceREST.extraUserAgent = extraUserAgent;
+    }
+
     /**
      * Build URL with environment variable, or system property, or default URL.
      *
@@ -155,62 +158,86 @@ public class SauceREST implements Serializable {
             .withBackoff(this.delay, this.maxDelay, this.chronoUnit, this.delayFactor);
     }
 
-    public static String getExtraUserAgent() {
-        return extraUserAgent;
-    }
-
-    public static void setExtraUserAgent(String extraUserAgent) {
-        SauceREST.extraUserAgent = extraUserAgent;
-    }
-
     public Job getJob(DataCenter dataCenter, String sessionId) {
-        return new Job(dataCenter, sessionId);
+        return new Job(this.username, this.accessKey, dataCenter, sessionId);
     }
 
     public Job getJob(String sessionId) {
-        return new Job(this.apiServer, sessionId);
+        return new Job(this.username, this.accessKey, this.apiServer, sessionId);
     }
 
-    public Storage getStorage(DataCenter dataCenter) {
-        return new Storage(dataCenter);
+    public Job getJob(String apiServer, String sessionId) {
+        return new Job(this.username, this.accessKey, apiServer, sessionId);
     }
 
     public Storage getStorage() {
-        return new Storage(this.apiServer);
+        return new Storage(this.username, this.accessKey, this.apiServer);
     }
 
-    public Platform getPlatform(DataCenter dataCenter) {
-        return new Platform(dataCenter);
+    public Storage getStorage(DataCenter dataCenter) {
+        return new Storage(this.username, this.accessKey, dataCenter);
+    }
+
+    public Storage getStorage(String apiServer) {
+        return new Storage(this.username, this.accessKey, apiServer);
     }
 
     public Platform getPlatform() {
-        return new Platform(this.apiServer);
+        return new Platform(this.username, this.accessKey, this.apiServer);
+    }
+
+    public Platform getPlatform(DataCenter dataCenter) {
+        return new Platform(this.username, this.accessKey, dataCenter);
+    }
+
+    public Platform getPlatform(String apiServer) {
+        return new Platform(this.username, this.accessKey, apiServer);
     }
 
     public RealDevices getRealDevices(DataCenter dataCenter) {
-      return new RealDevices(dataCenter);
+        return new RealDevices(this.username, this.accessKey, dataCenter);
     }
 
-  public RealDevices getRealDevices() {
-    return new RealDevices(this.apiServer);
-  }
+    public RealDevices getRealDevices() {
+        return new RealDevices(this.username, this.accessKey, this.apiServer);
+    }
 
-  public SauceConnect getSauceConnect() {
-    return new SauceConnect(this.username, this.accessKey, this.apiServer);
-  }
+    public RealDevices getRealDevices(String apiServer) {
+        return new RealDevices(this.username, this.accessKey, apiServer);
+    }
 
-  public Accounts getAccounts() {
-    return new Accounts(this.username, this.accessKey, this.apiServer);
-  }
+    public SauceConnect getSauceConnect() {
+        return new SauceConnect(this.username, this.accessKey, this.apiServer);
+    }
 
-  /**
-   * Returns username assigned to this interface
-   *
-   * @return Returns username assigned to this interface
-   */
-  public String getUsername() {
-    return this.username;
-  }
+    public SauceConnect getSauceConnect(String apiServer) {
+        return new SauceConnect(this.username, this.accessKey, apiServer);
+    }
+
+    public SauceConnect getSauceConnect(DataCenter dataCenter) {
+        return new SauceConnect(this.username, this.accessKey, dataCenter);
+    }
+
+    public Accounts getAccounts() {
+        return new Accounts(this.username, this.accessKey, this.apiServer);
+    }
+
+    public Accounts getAccounts(String apiServer) {
+        return new Accounts(this.username, this.accessKey, apiServer);
+    }
+
+    public Accounts getAccounts(DataCenter dataCenter) {
+        return new Accounts(this.username, this.accessKey, dataCenter);
+    }
+
+    /**
+     * Returns username assigned to this interface
+     *
+     * @return Returns username assigned to this interface
+     */
+    public String getUsername() {
+        return this.username;
+    }
 
     /**
      * Returns server assigned to this interface
@@ -1021,14 +1048,14 @@ public class SauceREST implements Serializable {
     /**
      * Returns a String (in JSON format) representing the details for Sauce jobs.
      *
-     * @param ids   iterable of job ids
-     * @param full  should return full jobs response
+     * @param ids  iterable of job ids
+     * @param full should return full jobs response
      * @return String (in JSON format) representing the jobID for sauce jobs
      * @deprecated
      */
     public String getJobsByIds(Iterable<String> ids, boolean full) {
         List<String> params = new ArrayList<String>();
-        for (String jobId: ids) {
+        for (String jobId : ids) {
             params.add("id=" + jobId);
         }
         if (params.size() == 0) {
@@ -1044,7 +1071,7 @@ public class SauceREST implements Serializable {
     /**
      * Returns a String (in JSON format) representing the details for Sauce jobs.
      *
-     * @param ids   iterable of job ids
+     * @param ids iterable of job ids
      * @return String (in JSON format) representing the jobID for full sauce jobs
      * @deprecated
      */
@@ -1107,7 +1134,7 @@ public class SauceREST implements Serializable {
      * @throws IOException                  when something goes wrong fetching the data
      */
     private BufferedInputStream downloadFileData(String jobId, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
-        logger.log(Level.FINE, "Downloading asset {0} For Job {1}", new Object[] { restEndpoint, jobId });
+        logger.log(Level.FINE, "Downloading asset {0} For Job {1}", new Object[]{restEndpoint, jobId});
         logger.log(Level.FINEST, "Opening connection for Job {0}", jobId);
 
         HttpURLConnection connection = null;
@@ -1135,7 +1162,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection connection = openConnection(method, restEndpoint);
 
         int responseCode = connection.getResponseCode();
-        logger.log(Level.FINEST, "{0} - {1} for: {2}", new Object[] { responseCode, restEndpoint, jobId });
+        logger.log(Level.FINEST, "{0} - {1} for: {2}", new Object[]{responseCode, restEndpoint, jobId});
         switch (responseCode) {
             case HttpURLConnection.HTTP_NOT_FOUND:
 
@@ -1236,12 +1263,12 @@ public class SauceREST implements Serializable {
 
     private void saveFileOrThrowException(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         logger.log(Level.FINEST, "Attempting to save asset {0} for Job {1} to {2}",
-            new Object[] { restEndpoint, jobId, location });
+            new Object[]{restEndpoint, jobId, location});
 
         fileName = getFileName(fileName, jobId, restEndpoint);
         File targetFile = new File(location, fileName);
         System.out.println("Saving " + restEndpoint + " for Job " + jobId + " as " + targetFile);
-        logger.log(Level.FINEST, "Saving {0} for Job {1} as {2}", new Object[] { restEndpoint, jobId, targetFile });
+        logger.log(Level.FINEST, "Saving {0} for Job {1} as {2}", new Object[]{restEndpoint, jobId, targetFile});
 
         try (BufferedInputStream in = downloadFileData(jobId, restEndpoint)) {
             FileUtils.copyInputStreamToFile(in, targetFile);
@@ -1262,7 +1289,7 @@ public class SauceREST implements Serializable {
      */
     private void saveServerLogFileOrThrow(String jobId, String location, String fileName, URL restEndpoint) throws SauceException.NotAuthorized, IOException {
         logger.log(Level.FINEST, "Attempting to save asset {0} for Job {1} to {2}",
-            new Object[] { restEndpoint, jobId, location });
+            new Object[]{restEndpoint, jobId, location});
         byte[] bytes;
         try (BufferedInputStream in = downloadFileData(jobId, restEndpoint)) {
             bytes = IOUtils.toByteArray(in);
@@ -1277,7 +1304,7 @@ public class SauceREST implements Serializable {
         }
 
         File targetFile = new File(location, fileName);
-        logger.log(Level.FINEST, "Saving {0} for Job {1} as {2}", new Object[] { restEndpoint, jobId, targetFile });
+        logger.log(Level.FINEST, "Saving {0} for Job {1} as {2}", new Object[]{restEndpoint, jobId, targetFile});
 
         FileUtils.writeByteArrayToFile(targetFile, bytes);
     }
@@ -1405,7 +1432,7 @@ public class SauceREST implements Serializable {
         HttpURLConnection con;
         if ("true".equals(System.getenv("USE_PROXY"))) {
             logger.log(Level.SEVERE, "Using proxy: {0}:{1}",
-                new Object[] { System.getenv("http.proxyHost"), System.getenv("http.proxyPort") });
+                new Object[]{System.getenv("http.proxyHost"), System.getenv("http.proxyPort")});
 
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(System.getenv("http.proxyHost"),
                 Integer.parseInt(System.getenv("http.proxyPort"))));
@@ -1424,6 +1451,7 @@ public class SauceREST implements Serializable {
      * RFC 2616: https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9
      * However, to better prevent typos and errors we opt to use an Enum and live with the possibility to have to extend it
      * should the specification change.
+     *
      * @param method
      * @param url
      * @return
@@ -1551,7 +1579,7 @@ public class SauceREST implements Serializable {
      * Retrieve jobs associated with a build
      *
      * @param source JobSource enum
-     * @param build Build ID
+     * @param build  Build ID
      * @return String (in JSON format) representing jobs associated with a build
      */
     public String getBuildJobs(JobSource source, String build) {
@@ -1563,7 +1591,7 @@ public class SauceREST implements Serializable {
      * Retrieve build info
      *
      * @param source JobSource enum
-     * @param build Build ID
+     * @param build  Build ID
      * @return String (in JSON format) representing the build
      */
     public String getBuild(JobSource source, String build) {
@@ -1585,7 +1613,7 @@ public class SauceREST implements Serializable {
      * Retrieve recent builds
      *
      * @param source JobSource enum
-     * @param limit Max number of builds returned
+     * @param limit  Max number of builds returned
      * @return String (in JSON format) representing the latest builds
      */
     public String getBuilds(JobSource source, int limit) {
@@ -1597,7 +1625,7 @@ public class SauceREST implements Serializable {
      * Retrieve recent builds
      *
      * @param source JobSource enum
-     * @param jobId the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
+     * @param jobId  the Sauce job ID, typically equal to the Selenium/WebDriver sessionId
      * @return String (in JSON format) representing the latest builds
      */
     public String getBuildForJob(JobSource source, String jobId) {
@@ -1609,7 +1637,7 @@ public class SauceREST implements Serializable {
      * Retrieve builds by name
      *
      * @param source JobSource enum
-     * @param name Name of desired builds
+     * @param name   Name of desired builds
      * @return String (in JSON format) representing the latest builds
      */
     public String getBuildsByName(JobSource source, String name) throws java.io.UnsupportedEncodingException {
@@ -1620,8 +1648,8 @@ public class SauceREST implements Serializable {
      * Retrieve builds by name
      *
      * @param source JobSource enum
-     * @param name Name of desired builds
-     * @param limit Max number of builds returned
+     * @param name   Name of desired builds
+     * @param limit  Max number of builds returned
      * @return String (in JSON format) representing the latest builds
      */
     public String getBuildsByName(JobSource source, String name, int limit) throws java.io.UnsupportedEncodingException {

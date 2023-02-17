@@ -30,14 +30,14 @@ public class Job extends AbstractEndpoint {
         this.jobID = sessionId;
     }
 
-    public Job(String username, String accessKey, DataCenter dataCenter, String jobID) {
+    public Job(String username, String accessKey, DataCenter dataCenter, String sessionId) {
         super(username, accessKey, dataCenter);
-        this.jobID = jobID;
+        this.jobID = sessionId;
     }
 
-    public Job(String username, String accessKey, String apiServer, String jobID) {
+    public Job(String username, String accessKey, String apiServer, String sessionId) {
         super(username, accessKey, apiServer);
-        this.jobID = jobID;
+        this.jobID = sessionId;
     }
 
     public JSONObject getDetails() throws IOException {
@@ -120,9 +120,7 @@ public class Job extends AbstractEndpoint {
         JSONObject jsonObject = availableAssets();
         jsonObject.toMap().values().stream()
             .map(asset -> asset instanceof ArrayList ? "screenshots.zip" : (String) asset)
-            .forEach((assetName) -> {
-                downloadKnownAsset(TestAsset.get(assetName).get(), location, prepend);
-            });
+            .forEach((assetName) -> downloadKnownAsset(TestAsset.get(assetName).get(), location, prepend));
     }
 
     public void deleteAllAssets() throws IOException {
