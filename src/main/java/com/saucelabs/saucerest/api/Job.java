@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.JobVisibility;
 import com.saucelabs.saucerest.TestAsset;
 import okio.BufferedSink;
@@ -81,13 +82,13 @@ public class Job extends AbstractEndpoint {
     public JSONObject stop() throws IOException {
         String url = getBaseEndpoint() + "/stop";
 
-        return new JSONObject(putResponse(url, new HashMap<>()));
+        return new JSONObject(request(url, HttpMethod.PUT, new HashMap<>()).body().string());
     }
 
     // Note: This works, but docs indicate it should be /rest/v1.1/jobs/{job_id} which doesn't work
     public void delete() throws IOException {
         waitForFinishedTest();
-        deleteResponse(getBaseEndpoint());
+        request(getBaseEndpoint(), HttpMethod.DELETE);
     }
 
     public JSONObject availableAssets() throws IOException {
@@ -126,11 +127,11 @@ public class Job extends AbstractEndpoint {
     public void deleteAllAssets() throws IOException {
         String url = getBaseEndpoint() + "/assets";
 
-        deleteResponse(url);
+        request(url, HttpMethod.DELETE);
     }
 
     private JSONObject updateDetails(Map<String, Object> updates) throws IOException {
-        return new JSONObject(putResponse(getBaseEndpoint(), updates));
+        return new JSONObject(request(getBaseEndpoint(), HttpMethod.PUT, updates).body().string());
     }
 
     @Override

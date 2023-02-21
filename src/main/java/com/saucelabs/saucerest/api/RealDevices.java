@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.realdevices.*;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return deserializeJSONObject(getResponseObject(url, params), DeviceJobs.class);
+        return deserializeJSONObject(getResponseObject(url, params).body().string(), DeviceJobs.class);
     }
 
     /**
@@ -118,7 +119,7 @@ public class RealDevices extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/jobs/" + jobID;
 
         try {
-            deleteResponse(url);
+            request(url, HttpMethod.DELETE);
         } catch (Exception e) {
             // do nothing
         }

@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.accounts.*;
 
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/";
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return deserializeJSONObject(postResponse(url, map), CreateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, map).body().string(), CreateTeam.class);
     }
 
     public Organizations getOrganization() throws IOException {
@@ -104,7 +105,7 @@ public class Accounts extends AbstractEndpoint {
     public void deleteTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        deleteResponse(url);
+        request(url, HttpMethod.DELETE);
     }
 
     /**
@@ -123,7 +124,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID;
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return deserializeJSONObject(putResponse(url, map), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, map).body().string(), UpdateTeam.class);
     }
 
     /**
@@ -137,7 +138,7 @@ public class Accounts extends AbstractEndpoint {
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return deserializeJSONObject(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam.toJson()).body().string(), UpdateTeam.class);
     }
 
     /**
@@ -163,7 +164,7 @@ public class Accounts extends AbstractEndpoint {
     public List<ResetAccessKeyForTeam> resetAccessKeyForTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/reset-access-key";
 
-        return deserializeJSONArray(postResponse(url), ResetAccessKeyForTeam.class);
+        return deserializeJSONArray(request(url, HttpMethod.POST, "").body().string(), ResetAccessKeyForTeam.class);
     }
 
     /**
@@ -188,7 +189,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers(LookupUsersParameter lookupUsersParameter) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return deserializeJSONObject(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
+        return deserializeJSONObject(getResponseObject(url, lookupUsersParameter.toMap()).body().string(), LookupUsers.class);
     }
 
     /**
@@ -214,7 +215,7 @@ public class Accounts extends AbstractEndpoint {
     public User createUser(CreateUser createUser) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return deserializeJSONObject(postResponse(url, createUser.toMap()), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, createUser.toMap()).body().string(), User.class);
     }
 
     /**
@@ -227,6 +228,6 @@ public class Accounts extends AbstractEndpoint {
     public User updateUser(UpdateUser updateUser) throws IOException {
         String url = getBaseEndpoint() + "users/" + updateUser.userID;
 
-        return deserializeJSONObject(putResponse(url, updateUser.toMap()), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()).body().string(), User.class);
     }
 }

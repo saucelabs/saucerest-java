@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -208,7 +209,7 @@ public class AccountsTest {
             .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
             .setFirstName(RandomStringUtils.randomAlphabetic(8))
             .setLastName(RandomStringUtils.randomAlphabetic(8))
-            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%")
+            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
             .setOrganization(accounts.getOrganization().results.get(0).id)
             .setRole(Roles.MEMBER)
             .setUserName("saucerest-java-integration-test-user-" + RandomStringUtils.randomAlphabetic(8))
@@ -235,17 +236,19 @@ public class AccountsTest {
             }
         }
 
+        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
+
         UpdateUser updateUser = new UpdateUser.Builder()
             .setUserID(user.id)
-            .setFirstName("Updated" + user.firstName)
-            .setLastName("Updated" + user.lastName)
+            .setFirstName("Updated " + timeStamp)
+            .setLastName("Updated " + timeStamp)
             .setPhone("+123456789")
             .build();
 
         User updatedUser = accounts.updateUser(updateUser);
 
-        assertEquals("Updated" + user.firstName, updatedUser.firstName);
-        assertEquals("Updated" + user.lastName, updatedUser.lastName);
+        assertEquals("Updated " + timeStamp, updatedUser.firstName);
+        assertEquals("Updated " + timeStamp, updatedUser.lastName);
         assertEquals(user.phone, updatedUser.phone);
     }
 }

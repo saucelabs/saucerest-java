@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -100,7 +101,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @return
      * @throws IOException
      */
-    public String getResponseObject(String url, Map<String, Object> params) throws IOException {
+    public Response getResponseObject(String url, Map<String, Object> params) throws IOException {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
         for (Map.Entry<String, Object> param : params.entrySet()) {
@@ -114,20 +115,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
             }
         }
 
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .header("User-Agent", userAgent)
-            .url(urlBuilder.build().toString())
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
+        return request(urlBuilder.build().toString(), HttpMethod.GET);
     }
 
     public okio.BufferedSource getStream(String url) throws IOException {
@@ -135,146 +123,45 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return response.body().source();
     }
 
-    public String postResponse(String url, Map<String, Object> payload) throws IOException {
-        return postResponse(url, payload, MediaType.parse("application/json"));
-    }
-
-    public String postResponse(String url, Map<String, Object> payload, MediaType mediaType) throws IOException {
-        String json = new JSONObject(payload).toString();
-
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .header("User-Agent", userAgent)
-            .url(url)
-            .post(RequestBody.create(json, mediaType))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String postResponse(String url) throws IOException {
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .header("User-Agent", userAgent)
-            .url(url)
-            .post(RequestBody.create("", MediaType.parse("application/json")))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String putResponse(String url, Map<String, Object> payload) throws IOException {
-        String json = new JSONObject(payload).toString();
-
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .put(RequestBody.create(json, MediaType.parse("application/json")))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String putResponse(String url, String payload) throws IOException {
-        String json = new JSONObject(payload).toString();
-
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .put(RequestBody.create(json, MediaType.parse("application/json")))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String patchResponse(String url, Map<String, Object> payload) throws IOException {
-        String json = new JSONObject(payload).toString();
-
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .patch(RequestBody.create(json, MediaType.parse("application/json")))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String patchResponse(String url, String payload) throws IOException {
-        String json = new JSONObject(payload).toString();
-
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .patch(RequestBody.create(json, MediaType.parse("application/json")))
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
-    public String deleteResponse(String url) throws IOException {
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .delete()
-            .build();
-
-        try (Response response = makeRequest(request)) {
-            return response.body().string();
-        }
-    }
-
     private Response getResponse(String url) throws IOException {
         Request.Builder chain = new Request.Builder();
 
         if (credentials != null) {
             chain = chain.header("Authorization", credentials);
+        }
+
+        Request request = chain
+            .url(url)
+            .get()
+            .build();
+
+        return makeRequest(request);
+    }
+
+    public Response request(String url, HttpMethod httpMethod) throws IOException {
+        return request(url, httpMethod, (String) null);
+    }
+
+    public Response request(String url, HttpMethod httpMethod, Map<String, Object> body) throws IOException {
+        return request(url, httpMethod, new JSONObject(body).toString());
+    }
+
+    public Response request(String url, HttpMethod httpMethod, String body) throws IOException {
+        Request.Builder chain = new Request.Builder();
+
+        if (credentials != null) {
+            chain.header("Authorization", credentials);
+        }
+
+        if (body != null) {
+            if (body.equals("")) {
+                chain.method(httpMethod.label, RequestBody.create(body, MediaType.parse("application/json")));
+            } else {
+                String json = new JSONObject(body).toString();
+                chain.method(httpMethod.label, RequestBody.create(json, MediaType.parse("application/json")));
+            }
+        } else {
+            chain.method(httpMethod.label, null);
         }
 
         Request request = chain
@@ -300,14 +187,16 @@ public abstract class AbstractEndpoint extends AbstractModel {
             Response finalResponse = response;
             response = Failsafe.with(
                     new RetryPolicy<>()
-                        .handle(RuntimeException.class)
-                        .withBackoff(30, 500, ChronoUnit.MILLIS)
+                        .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
+                        .withBackoff(30, 500, ChronoUnit.SECONDS)
                         .withMaxRetries(2)
                         .onRetry(e -> logger.log(Level.WARNING, () -> "Retrying because of " + finalResponse.code())))
                 .get(() -> client.newCall(request).execute());
         }
 
         if (!response.isSuccessful()) {
+            Response finalResponse1 = response;
+            logger.log(Level.INFO, () -> "Request " + request.method() + " " + request.url() + " failed with response code " + finalResponse1.code() + " and message " + finalResponse1.message());
             responseHandler(this, response);
         }
         return response;

@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.sauceconnect.JobsForATunnel;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
@@ -109,7 +110,7 @@ public class SauceConnect extends AbstractEndpoint {
     public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return deserializeJSONObject(deleteResponse(url), StopTunnel.class);
+        return deserializeJSONObject(request(url, HttpMethod.DELETE).body().string(), StopTunnel.class);
     }
 
     /**

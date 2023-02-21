@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.integration;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.Storage;
 import com.saucelabs.saucerest.model.storage.*;
@@ -17,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
@@ -349,5 +352,21 @@ private Path tempDir;
         DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
         int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
         Assertions.assertEquals(groupIdOfDeletedGroup, groupId);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void appNotFoundTest(Region region) throws IOException {
+        setup(region);
+
+        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFile("abc123"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void appGroupNotFoundTest(Region region) throws IOException {
+        setup(region);
+
+        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFileGroup(123456789));
     }
 }
