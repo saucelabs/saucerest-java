@@ -113,14 +113,12 @@ public class Storage extends AbstractEndpoint {
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        //return deserializeJSONObject(putResponse(url, jsonBody), EditAppGroupSettings.class);
         return deserializeJSONObject(request(url, HttpMethod.PUT, jsonBody).body().string(), EditAppGroupSettings.class);
     }
 
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, EditAppGroupSettings editAppGroupSettings) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        //return deserializeJSONObject(putResponse(url, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
         return deserializeJSONObject(request(url, HttpMethod.PUT, editAppGroupSettings.toJson()).body().string(), EditAppGroupSettings.class);
 
     }
@@ -196,7 +194,6 @@ public class Storage extends AbstractEndpoint {
 
         JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
 
-        //return deserializeJSONObject(putResponse(url, json.toString()), EditFileDescription.class);
         return deserializeJSONObject(request(url, HttpMethod.PUT, json.toString()).body().string(), EditFileDescription.class);
     }
 
