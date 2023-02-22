@@ -64,8 +64,10 @@ public class UpdateUser {
         }
 
         public UpdateUser build() {
-            if (!phone.matches("^\\+?1?\\d{8,15}$")) {
-                throw new IllegalArgumentException("Phone number must be in international format, e.g. +1 1234567890");
+            if (phone != null) {
+                if (!phone.matches("^\\+?1?\\d{8,15}$")) {
+                    throw new IllegalArgumentException("Phone number must be in international format, e.g. +1 1234567890");
+                }
             }
 
             return new UpdateUser(this);
