@@ -5,6 +5,7 @@ import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.Accounts;
 import com.saucelabs.saucerest.model.accounts.*;
+import com.saucelabs.saucerest.model.realdevices.Concurrency;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -289,5 +290,18 @@ public class AccountsTest {
         User updatedUser = accounts.partiallyUpdateUser(updateUser);
 
         assertEquals("Updated " + timeStamp, updatedUser.firstName);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getUserConcurrencyTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        UserConcurrency userConcurrency = accounts.getUserConcurrency(sauceREST.getUsername());
+        Concurrency realDeviceConcurrency = sauceREST.getRealDevices().getConcurrency();
+
+        assertNotNull(userConcurrency);
+        assertNotNull(realDeviceConcurrency);
     }
 }

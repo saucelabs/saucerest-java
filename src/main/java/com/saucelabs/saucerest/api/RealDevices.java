@@ -126,6 +126,18 @@ public class RealDevices extends AbstractEndpoint {
     }
 
     /**
+     * Returns details about the current in-use real devices along with the maximum allowed values.
+     *
+     * @return {@link Concurrency}
+     * @throws IOException
+     */
+    public Concurrency getConcurrency() throws IOException {
+        String url = getBaseEndpoint() + "/concurrency";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), Concurrency.class);
+    }
+
+    /**
      * The base endpoint of the Platform endpoint APIs.
      */
     @Override

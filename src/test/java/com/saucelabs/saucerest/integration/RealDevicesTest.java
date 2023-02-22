@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class RealDevicesTest {
     private final ThreadLocal<RealDevices> realDevices = new ThreadLocal<>();
 
@@ -62,7 +64,7 @@ public class RealDevicesTest {
 
         Devices devices = realDevices.get().getDevices();
 
-        Assertions.assertNotNull(devices);
+        assertNotNull(devices);
     }
 
     @ParameterizedTest
@@ -74,7 +76,7 @@ public class RealDevicesTest {
         String deviceId = devices.deviceList.get(0).id;
         Device device = realDevices.get().getSpecificDevice(deviceId);
 
-        Assertions.assertNotNull(device);
+        assertNotNull(device);
     }
 
     @ParameterizedTest
@@ -84,7 +86,7 @@ public class RealDevicesTest {
 
         AvailableDevices availableDevices = realDevices.get().getAvailableDevices();
 
-        Assertions.assertNotNull(availableDevices);
+        assertNotNull(availableDevices);
     }
 
     @ParameterizedTest
@@ -94,7 +96,7 @@ public class RealDevicesTest {
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
 
-        Assertions.assertNotNull(deviceJobs);
+        assertNotNull(deviceJobs);
     }
 
     @ParameterizedTest
@@ -104,7 +106,7 @@ public class RealDevicesTest {
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("limit", 5));
 
-        Assertions.assertNotNull(deviceJobs);
+        assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.limit);
     }
 
@@ -115,7 +117,7 @@ public class RealDevicesTest {
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("offset", 5));
 
-        Assertions.assertNotNull(deviceJobs);
+        assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.offset);
     }
 
@@ -126,7 +128,7 @@ public class RealDevicesTest {
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("offset", 5, "limit", 6));
 
-        Assertions.assertNotNull(deviceJobs);
+        assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.offset);
         Assertions.assertEquals(6, deviceJobs.metaData.limit);
     }
@@ -139,6 +141,16 @@ public class RealDevicesTest {
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
         DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
 
-        Assertions.assertNotNull(deviceJob);
+        assertNotNull(deviceJob);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void getConcurrency(Region region) throws IOException {
+        setup(region);
+
+        Concurrency concurrency = realDevices.get().getConcurrency();
+
+        assertNotNull(concurrency);
     }
 }

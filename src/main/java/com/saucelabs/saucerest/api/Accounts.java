@@ -243,4 +243,19 @@ public class Accounts extends AbstractEndpoint {
 
         return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()).body().string(), User.class);
     }
+
+    /**
+     * Returns details about the current in-use virtual machines and real devices along with the maximum allowed values. <br> <br>
+     * NOTE:
+     * At this time, the current usage for real devices is not accurately returned in the response. As a workaround, use the following endpoint: {@link RealDevices#getConcurrency()}
+     *
+     * @param username The username of the user whose concurrency you are looking up. You can look up a user's name using a variety of filtering parameters with the {@link LookupUsers} endpoint.
+     * @return {@link UserConcurrency}
+     * @throws IOException API request failed
+     */
+    public UserConcurrency getUserConcurrency(String username) throws IOException {
+        String url = super.getBaseEndpoint() + "rest/v1.2/users/" + username + "/concurrency";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), UserConcurrency.class);
+    }
 }
