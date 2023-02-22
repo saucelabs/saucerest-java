@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -227,14 +228,19 @@ public class AccountsTest {
         Accounts accounts = sauceREST.getAccounts();
 
         LookupUsers lookupUsers = accounts.lookupUsers();
-        User user = null;
+        User user;
+        Random rand = new Random();
 
-        for (Result result : lookupUsers.results) {
-            if (result.username.startsWith("saucerest-java-integration-test-user")) {
-                user = accounts.getUser(result.id);
-                break;
-            }
-        }
+        List<Result> validResults = lookupUsers.results.stream()
+            .filter(r -> r.username.startsWith("saucerest-java-integration-test-user"))
+            .collect(Collectors.toList());
+
+        Result result = validResults.stream()
+            .skip(rand.nextInt(validResults.size()))
+            .findFirst()
+            .get();
+
+        user = accounts.getUser(result.id);
 
         String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
@@ -250,5 +256,38 @@ public class AccountsTest {
         assertEquals("Updated " + timeStamp, updatedUser.firstName);
         assertEquals("Updated " + timeStamp, updatedUser.lastName);
         assertEquals(user.phone, updatedUser.phone);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void partiallyUpdateUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsers lookupUsers = accounts.lookupUsers();
+        User user;
+        Random rand = new Random();
+
+        List<Result> validResults = lookupUsers.results.stream()
+            .filter(r -> r.username.startsWith("saucerest-java-integration-test-user"))
+            .collect(Collectors.toList());
+
+        Result result = validResults.stream()
+            .skip(rand.nextInt(validResults.size()))
+            .findFirst()
+            .get();
+
+        user = accounts.getUser(result.id);
+
+        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
+
+        UpdateUser updateUser = new UpdateUser.Builder()
+            .setUserID(user.id)
+            .setFirstName("Updated " + timeStamp)
+            .build();
+
+        User updatedUser = accounts.partiallyUpdateUser(updateUser);
+
+        assertEquals("Updated " + timeStamp, updatedUser.firstName);
     }
 }

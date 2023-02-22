@@ -230,4 +230,17 @@ public class Accounts extends AbstractEndpoint {
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()).body().string(), User.class);
     }
+
+    /**
+     * Allows you to update individual user values without replacing the entire profile.
+     *
+     * @param updateUser {@link UpdateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User partiallyUpdateUser(UpdateUser updateUser) throws IOException {
+        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()).body().string(), User.class);
+    }
 }
