@@ -5,6 +5,8 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
+  schedule:
+    - cron: '0 */8 * * *'
 
 permissions:
   contents: write
@@ -120,3 +122,16 @@ jobs:
       - name: Build with Maven
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
+
+  slackNotification:
+    name: Slack Notification
+    if: |
+      failure() &&
+      (${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
