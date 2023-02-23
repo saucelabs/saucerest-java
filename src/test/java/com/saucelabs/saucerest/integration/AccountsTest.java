@@ -256,7 +256,7 @@ public class AccountsTest {
 
         assertEquals("Updated " + timeStamp, updatedUser.firstName);
         assertEquals("Updated " + timeStamp, updatedUser.lastName);
-        assertEquals(user.phone, updatedUser.phone);
+        assertEquals("+123456789", updatedUser.phone);
     }
 
     @ParameterizedTest
