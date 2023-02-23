@@ -24,16 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
 
-@TempDir
-private Path tempDir;
-
-    /**
-     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
-     * app files yet.
-     */
-    enum Region {
-        EU_CENTRAL, US_WEST
-    }
+    @TempDir
+    private Path tempDir;
 
     private EditAppGroupSettings getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform platform) {
         if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
@@ -368,5 +360,13 @@ private Path tempDir;
         setup(region);
 
         assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFileGroup(123456789));
+    }
+
+    /**
+     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
+     * app files yet.
+     */
+    enum Region {
+        EU_CENTRAL, US_WEST
     }
 }

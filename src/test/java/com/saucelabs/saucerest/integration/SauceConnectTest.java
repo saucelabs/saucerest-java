@@ -21,6 +21,25 @@ import java.util.List;
  */
 public class SauceConnectTest {
 
+    @AfterAll
+    @SuppressWarnings("all")
+    public static void tearDown() throws IOException {
+        for (DataCenter dataCenter : DataCenter.values()) {
+            SauceREST sauceREST = new SauceREST(dataCenter);
+            SauceConnect sauceConnect = sauceREST.getSauceConnect();
+
+            List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+
+            for (String tunnelID : tunnelIDs) {
+                StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
+
+                Assertions.assertTrue(stopTunnel.result);
+                Assertions.assertFalse(stopTunnel.id.isEmpty());
+                Assertions.assertNotNull(stopTunnel.jobsRunning);
+            }
+        }
+    }
+
     @ParameterizedTest
     @EnumSource(DataCenter.class)
     public void getLatestVersionTest(DataCenter dataCenter) throws IOException {
@@ -59,25 +78,6 @@ public class SauceConnectTest {
         Assertions.assertFalse(versions.downloads.osx.sha1.isEmpty());
         Assertions.assertFalse(versions.downloads.win32.downloadUrl.isEmpty());
         Assertions.assertFalse(versions.downloads.win32.sha1.isEmpty());
-    }
-
-    @AfterAll
-    @SuppressWarnings("all")
-    public static void tearDown() throws IOException {
-        for (DataCenter dataCenter : DataCenter.values()) {
-            SauceREST sauceREST = new SauceREST(dataCenter);
-            SauceConnect sauceConnect = sauceREST.getSauceConnect();
-
-            List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
-
-            for (String tunnelID : tunnelIDs) {
-                StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
-
-                Assertions.assertTrue(stopTunnel.result);
-                Assertions.assertFalse(stopTunnel.id.isEmpty());
-                Assertions.assertNotNull(stopTunnel.jobsRunning);
-            }
-        }
     }
 
     @ParameterizedTest

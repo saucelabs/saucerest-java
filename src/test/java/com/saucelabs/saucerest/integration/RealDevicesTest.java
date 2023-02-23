@@ -22,14 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class RealDevicesTest {
     private final ThreadLocal<RealDevices> realDevices = new ThreadLocal<>();
 
-    /**
-     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
-     * app files yet.
-     */
-    enum Region {
-        EU_CENTRAL, US_WEST
-    }
-
     @BeforeAll
     public static void runRealDeviceTest() throws MalformedURLException {
         MutableCapabilities capabilities = new MutableCapabilities();
@@ -152,5 +144,13 @@ public class RealDevicesTest {
         Concurrency concurrency = realDevices.get().getConcurrency();
 
         assertNotNull(concurrency);
+    }
+
+    /**
+     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
+     * app files yet.
+     */
+    enum Region {
+        EU_CENTRAL, US_WEST
     }
 }
