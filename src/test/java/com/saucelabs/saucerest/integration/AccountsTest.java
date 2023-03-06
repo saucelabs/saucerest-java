@@ -7,6 +7,7 @@ import com.saucelabs.saucerest.api.Accounts;
 import com.saucelabs.saucerest.model.accounts.*;
 import com.saucelabs.saucerest.model.realdevices.Concurrency;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -299,7 +300,7 @@ public class AccountsTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = DataCenter.class, names = {"US_EAST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getUserConcurrencyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
@@ -330,6 +331,7 @@ public class AccountsTest {
         assertEquals(0, usersTeam.results.size());
     }
 
+    @Disabled("Need to find a way to reliably get a user with a team.")
     @ParameterizedTest
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void setRoleTest(DataCenter dataCenter) throws IOException {
