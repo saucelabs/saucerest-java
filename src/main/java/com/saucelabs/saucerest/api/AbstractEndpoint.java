@@ -161,7 +161,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
                 chain.method(httpMethod.label, RequestBody.create(json, MediaType.parse("application/json")));
             }
         } else {
-            chain.method(httpMethod.label, null);
+            if (httpMethod.equals(HttpMethod.GET)) {
+                chain.method(httpMethod.label, null);
+            } else if (httpMethod.equals(HttpMethod.POST)) {
+                chain.method(httpMethod.label, RequestBody.create(null, "application/json"));
+            } else {
+                chain.method(httpMethod.label, null);
+            }
         }
 
         Request request = chain

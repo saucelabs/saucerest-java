@@ -94,7 +94,7 @@ public class AccountsTest {
         assertNotNull(createTeam);
         assertEquals(teamName, createTeam.name);
 
-        accounts.deleteTeam(createTeam.id);
+        assertEquals(204, accounts.deleteTeam(createTeam.id).code());
     }
 
     @ParameterizedTest
@@ -118,7 +118,7 @@ public class AccountsTest {
         assertEquals("Updated description", updateTeam.description);
         assertEquals("Updated" + teamName, updateTeam.name);
         assertEquals(0, updateTeam.settings.virtualMachines);
-        accounts.deleteTeam(createTeam.id);
+        assertEquals(204, accounts.deleteTeam(createTeam.id).code());
     }
 
     @ParameterizedTest
@@ -144,7 +144,7 @@ public class AccountsTest {
         UpdateTeam updateTeam = accounts.partiallyUpdateTeam(createTeam.id, partiallyUpdateTeam);
 
         assertEquals("Updated" + teamName, updateTeam.name);
-        accounts.deleteTeam(createTeam.id);
+        assertEquals(204, accounts.deleteTeam(createTeam.id).code());
     }
 
     @ParameterizedTest
@@ -207,6 +207,13 @@ public class AccountsTest {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
 
+        User user = createTestUser(accounts);
+
+        assertNotNull(user);
+        assertTrue(user.id.length() > 0);
+    }
+
+    private static User createTestUser(Accounts accounts) throws IOException {
         CreateUser createUser = new CreateUser.Builder()
             .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
             .setFirstName(RandomStringUtils.randomAlphabetic(8))
@@ -218,8 +225,7 @@ public class AccountsTest {
             .build();
 
         User user = accounts.createUser(createUser);
-
-        assertNotNull(user);
+        return user;
     }
 
     @ParameterizedTest
@@ -303,5 +309,139 @@ public class AccountsTest {
 
         assertNotNull(userConcurrency);
         assertNotNull(realDeviceConcurrency);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getUsersTeamTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
+            .setUsername(sauceREST.getUsername())
+            .build();
+
+        LookupUsers lookupUsers = accounts.lookupUsers(lookupUsersParameter);
+
+        UsersTeam usersTeam = accounts.getUsersTeam(lookupUsers.results.get(0).id);
+
+        assertNotNull(usersTeam);
+        // Integration test user is and should not be part of a non-default team
+        assertEquals(0, usersTeam.results.size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void setRoleTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
+            .setUsername("saucerest-java-integration-test-user")
+            .setRoles(Roles.MEMBER)
+            .build();
+
+        LookupUsers lookupUsers = accounts.lookupUsers(lookupUsersParameter);
+
+        List<Result> validResults = lookupUsers.results.stream()
+            .filter(r -> r.teams.size() > 0)
+            .collect(Collectors.toList());
+
+        Result result = validResults.stream()
+            .skip(new Random().nextInt(validResults.size()))
+            .findFirst()
+            .get();
+
+        User user = accounts.getUser(result.id);
+        CreateTeam createTeam = accounts.createTeam("001-" + RandomStringUtils.randomAlphabetic(8), 0, "Test team created as part of integration tests");
+
+        // Assign fetched user to newly created team
+        SetTeam setTeam = accounts.setUsersTeam(user.id, createTeam.id);
+        assertEquals(createTeam.id, setTeam.team.id);
+
+        user = accounts.setTeamAdmin(user.id);
+        assertTrue(user.roles.get(0).role.equals(Roles.TEAMADMIN.getValue()));
+
+        user = accounts.setAdmin(user.id);
+        assertTrue(user.roles.get(0).role.equals(Roles.ORGADMIN.getValue()));
+
+        user = accounts.setMember(user.id);
+        assertTrue(user.roles.get(0).role.equals(Roles.MEMBER.getValue()));
+
+        accounts.deleteTeam(createTeam.id);
+
+        assertThrows(SauceException.class, () -> {
+            accounts.getSpecificTeam(createTeam.id);
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void deactivateUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        User user = createTestUser(accounts);
+
+        if (user.id != null) {
+            assertTrue(user.isActive);
+            User deactivatedUser = accounts.deactivateUser(user.id);
+            assertFalse(deactivatedUser.isActive);
+        } else {
+            fail("Test user was not created");
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void activateUserTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        User user = createTestUser(accounts);
+
+        if (user.id != null) {
+            assertTrue(user.isActive);
+            User deactivatedUser = accounts.deactivateUser(user.id);
+            assertFalse(deactivatedUser.isActive);
+            User activatedUser = accounts.activateUser(user.id);
+            assertTrue(activatedUser.isActive);
+        } else {
+            fail("Test user was not created");
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void resetAccessKeyTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        User user = createTestUser(accounts);
+
+        if (user.id != null) {
+            String oldAccessKey = user.accessKey;
+            List<User> updatedUser = accounts.resetAccessKey(user.id);
+            String newAccessKey = updatedUser.get(0).accessKey;
+            assertNotEquals(oldAccessKey, newAccessKey);
+        } else {
+            fail("Test user was not created");
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getAccessKeyTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        User user = createTestUser(accounts);
+
+        if (user.id != null) {
+            String accessKey = accounts.getAccessKey(user.id).accessKey;
+            assertTrue(accessKey.length() > 0);
+        } else {
+            fail("Test user was not created");
+        }
     }
 }
