@@ -42,6 +42,8 @@ public class User {
     public String updatedAt;
     @Json(name = "user_type")
     public String userType;
+    @Json(name = "access_key")
+    public String accessKey;
 
     /**
      * No args constructor for use in serialization
@@ -49,7 +51,7 @@ public class User {
     public User() {
     }
 
-    public User(String id, String email, String firstName, String lastName, String username, String createdAt, List<Group> groups, Boolean isActive, Boolean isOrganizationAdmin, Boolean isTeamAdmin, Boolean isStaff, Boolean isSuperuser, Organization organization, String phone, List<Role> roles, List<Team> teams, String updatedAt, String userType) {
+    public User(String id, String email, String firstName, String lastName, String username, String createdAt, List<Group> groups, Boolean isActive, Boolean isOrganizationAdmin, Boolean isTeamAdmin, Boolean isStaff, Boolean isSuperuser, Organization organization, String phone, List<Role> roles, List<Team> teams, String updatedAt, String userType, String accessKey) {
         super();
         this.id = id;
         this.email = email;
@@ -69,5 +71,6 @@ public class User {
         this.teams = teams;
         this.updatedAt = updatedAt;
         this.userType = userType;
+        this.accessKey = accessKey;
     }
 }

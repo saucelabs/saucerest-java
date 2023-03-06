@@ -20,9 +20,12 @@ public class ResponseHandler {
             case HTTP_NOT_FOUND:
                 if (endpoint instanceof SauceConnect) {
                     if (response.request().method().equals(HttpMethod.DELETE.label)) {
-                        String tunnelID = response.request().url().pathSegments().get(response.request().url().pathSegments().size() - 1);
+                        String tunnelID = getID(response);
                         throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.TunnelNotFound(tunnelID)));
                     }
+                } else if (endpoint instanceof Storage) {
+                    String appFileID = getID(response);
+                    throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AppNotFound(appFileID)));
                 } else {
                     throw new SauceException.NotFound();
                 }
@@ -39,6 +42,28 @@ public class ResponseHandler {
             default:
                 throw new RuntimeException("Unexpected code " + response);
         }
+    }
+
+    /**
+     * Returns the ID of the resource from the URL.
+     */
+    private static String getID(Response response) {
+        String ID = getLastPathSegment(response, 1);
+
+        // if ID is not a UUID
+        if (!ID.matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}") || !ID.matches("\\d+")) {
+            return getLastPathSegment(response, 2);
+        }
+
+        return ID;
+    }
+
+    private static String getLastPathSegment(Response response, int offset) {
+        if (offset == 0) {
+            offset = 1;
+        }
+
+        return response.request().url().pathSegments().get(response.request().url().pathSegments().size() - offset);
     }
 
     private static String checkCredentials(AbstractEndpoint endpoint) {

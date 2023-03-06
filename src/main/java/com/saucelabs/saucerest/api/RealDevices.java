@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.realdevices.*;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class RealDevices extends AbstractEndpoint {
     public Devices getDevices() throws IOException {
         String url = getBaseEndpoint() + "/devices";
 
-        return new Devices(getResponseListClass(getResponseObject(url), Device.class));
+        return new Devices(deserializeJSONArray(getResponseObject(url), Device.class));
     }
 
     /**
@@ -46,7 +47,7 @@ public class RealDevices extends AbstractEndpoint {
     public Device getSpecificDevice(String deviceID) throws IOException {
         String url = getBaseEndpoint() + "/devices/" + deviceID;
 
-        return getResponseClass(getResponseObject(url), Device.class);
+        return deserializeJSONObject(getResponseObject(url), Device.class);
     }
 
     /**
@@ -59,7 +60,7 @@ public class RealDevices extends AbstractEndpoint {
     public AvailableDevices getAvailableDevices() throws IOException {
         String url = getBaseEndpoint() + "/devices/available";
 
-        return new AvailableDevices(getResponseListClass(getResponseObject(url), String.class));
+        return new AvailableDevices(deserializeJSONArray(getResponseObject(url), String.class));
     }
 
     /**
@@ -72,7 +73,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs() throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return getResponseClass(getResponseObject(url), DeviceJobs.class);
+        return deserializeJSONObject(getResponseObject(url), DeviceJobs.class);
     }
 
     /**
@@ -87,7 +88,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return getResponseClass(getResponseObject(url, params), DeviceJobs.class);
+        return deserializeJSONObject(getResponseObject(url, params).body().string(), DeviceJobs.class);
     }
 
     /**
@@ -102,7 +103,7 @@ public class RealDevices extends AbstractEndpoint {
     public DeviceJob getSpecificDeviceJob(String jobID) throws IOException {
         String url = getBaseEndpoint() + "/jobs/" + jobID;
 
-        return getResponseClass(getResponseObject(url), DeviceJob.class);
+        return deserializeJSONObject(getResponseObject(url), DeviceJob.class);
     }
 
     /**
@@ -118,10 +119,22 @@ public class RealDevices extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/jobs/" + jobID;
 
         try {
-            deleteResponse(url);
+            request(url, HttpMethod.DELETE);
         } catch (Exception e) {
             // do nothing
         }
+    }
+
+    /**
+     * Returns details about the current in-use real devices along with the maximum allowed values.
+     *
+     * @return {@link Concurrency}
+     * @throws IOException
+     */
+    public Concurrency getConcurrency() throws IOException {
+        String url = getBaseEndpoint() + "/concurrency";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), Concurrency.class);
     }
 
     /**

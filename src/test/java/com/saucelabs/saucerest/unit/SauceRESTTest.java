@@ -30,6 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.*;
+
 @Execution(ExecutionMode.SAME_THREAD)
 class SauceRESTTest {
 
@@ -453,7 +454,7 @@ class SauceRESTTest {
     @Test
     void testDownloadServerLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "foobar.log");
@@ -471,7 +472,7 @@ class SauceRESTTest {
     @Test
     void testDownloadServerLogWithCustomFileNameEmptyDefaultFallback(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "");
@@ -489,7 +490,7 @@ class SauceRESTTest {
     @Test
     void testDownloadServerLogWithCustomFileNameSlashed(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         boolean downloaded = sauceREST.downloadServerLog("1234", absolutePath, "foo/bar.log");
@@ -532,7 +533,7 @@ class SauceRESTTest {
     @Test
     void testDownloadAutomatorLogWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         boolean downloaded = sauceREST.downloadAutomatorLog("1234", absolutePath, "foobar.log");
@@ -610,7 +611,7 @@ class SauceRESTTest {
     @Test
     void testDownloadScreenshotsWithCustomFileName(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         String absolutePath = tempDir.toAbsolutePath().toString();
         boolean downloaded = sauceREST.downloadScreenshots("1234", absolutePath, "foobar.zip");
@@ -695,7 +696,7 @@ class SauceRESTTest {
     @Test
     void testDownloadSauceLabsLog(@TempDir Path tempDir) throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         boolean downloaded = sauceREST.downloadSauceLabsLog("1234", tempDir.toAbsolutePath().toString());
         assertEquals(
@@ -713,7 +714,7 @@ class SauceRESTTest {
     @Test
     void testDownloadSauceLabsLogStream() throws Exception {
         urlConnection.setResponseCode(200);
-        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8.name())));
+        urlConnection.setInputStream(new ByteArrayInputStream("{ }".getBytes(StandardCharsets.UTF_8)));
 
         byte[] targetArray;
         try (BufferedInputStream stream = sauceREST.downloadSauceLabsLog("1234")) {

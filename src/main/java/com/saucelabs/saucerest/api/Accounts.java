@@ -2,7 +2,9 @@ package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.accounts.*;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +46,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams() throws IOException {
         String url = getBaseEndpoint() + "teams/";
 
-        return getResponseClass(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
     }
 
     /**
@@ -55,7 +57,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams(String name) throws IOException {
         String url = getBaseEndpoint() + "teams?name=" + name;
 
-        return getResponseClass(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
     }
 
     /**
@@ -68,7 +70,7 @@ public class Accounts extends AbstractEndpoint {
     public Team getSpecificTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return getResponseClass(getResponseObject(url), Team.class);
+        return deserializeJSONObject(getResponseObject(url), Team.class);
     }
 
     /**
@@ -86,25 +88,30 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/";
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return getResponseClass(postResponse(url, map), CreateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, map).body().string(), CreateTeam.class);
+    }
+
+    public CreateTeam createTeam(String name, Integer VMConcurrency, String description) throws IOException {
+        return createTeam(name, new Settings.Builder().setVirtualMachines(VMConcurrency).build(), description);
     }
 
     public Organizations getOrganization() throws IOException {
         String url = getBaseEndpoint() + "organizations";
 
-        return getResponseClass(getResponseObject(url), Organizations.class);
+        return deserializeJSONObject(getResponseObject(url), Organizations.class);
     }
 
     /**
      * Deletes the specified team from the organization of the requesting account.
      *
      * @param teamID The unique identifier of the team. You can look up the IDs of teams in your organization using the {@link LookupTeams} endpoint.
+     * @return
      * @throws IOException API request failed
      */
-    public void deleteTeam(String teamID) throws IOException {
+    public Response deleteTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        deleteResponse(url);
+        return request(url, HttpMethod.DELETE);
     }
 
     /**
@@ -123,7 +130,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID;
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return getResponseClass(putResponse(url, map), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, map).body().string(), UpdateTeam.class);
     }
 
     /**
@@ -137,7 +144,7 @@ public class Accounts extends AbstractEndpoint {
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return getResponseClass(patchResponse(url, updateTeam.toJson()), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam.toJson()).body().string(), UpdateTeam.class);
     }
 
     /**
@@ -150,7 +157,7 @@ public class Accounts extends AbstractEndpoint {
     public TeamMembers getTeamMembers(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/members";
 
-        return getResponseClass(getResponseObject(url), TeamMembers.class);
+        return deserializeJSONObject(getResponseObject(url), TeamMembers.class);
     }
 
     /**
@@ -163,7 +170,7 @@ public class Accounts extends AbstractEndpoint {
     public List<ResetAccessKeyForTeam> resetAccessKeyForTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/reset-access-key";
 
-        return getResponseListClass(postResponse(url), ResetAccessKeyForTeam.class);
+        return deserializeJSONArray(request(url, HttpMethod.POST, "").body().string(), ResetAccessKeyForTeam.class);
     }
 
     /**
@@ -175,7 +182,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers() throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return getResponseClass(getResponseObject(url), LookupUsers.class);
+        return deserializeJSONObject(getResponseObject(url), LookupUsers.class);
     }
 
     /**
@@ -188,7 +195,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers(LookupUsersParameter lookupUsersParameter) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return getResponseClass(getResponseObject(url, lookupUsersParameter.toMap()), LookupUsers.class);
+        return deserializeJSONObject(getResponseObject(url, lookupUsersParameter.toMap()).body().string(), LookupUsers.class);
     }
 
     /**
@@ -201,6 +208,182 @@ public class Accounts extends AbstractEndpoint {
     public User getUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID;
 
-        return getResponseClass(getResponseObject(url), User.class);
+        return deserializeJSONObject(getResponseObject(url), User.class);
+    }
+
+    /**
+     * Creates a new user in the Sauce Labs platform.
+     *
+     * @param createUser {@link CreateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User createUser(CreateUser createUser) throws IOException {
+        String url = getBaseEndpoint() + "users/";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST, createUser.toMap()).body().string(), User.class);
+    }
+
+    /**
+     * Replaces all values of the specified user profile with the new set of parameters passed in the request. To update only certain parameters, see Partially Update a User.
+     *
+     * @param updateUser {@link UpdateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User updateUser(UpdateUser updateUser) throws IOException {
+        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+
+        return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()).body().string(), User.class);
+    }
+
+    /**
+     * Allows you to update individual user values without replacing the entire profile.
+     *
+     * @param updateUser {@link UpdateUser}
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User partiallyUpdateUser(UpdateUser updateUser) throws IOException {
+        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()).body().string(), User.class);
+    }
+
+    /**
+     * Returns details about the current in-use virtual machines and real devices along with the maximum allowed values. <br> <br>
+     * NOTE:
+     * At this time, the current usage for real devices is not accurately returned in the response. As a workaround, use the following endpoint: {@link RealDevices#getConcurrency()}
+     *
+     * @param username The username of the user whose concurrency you are looking up. You can look up a user's name using a variety of filtering parameters with the {@link LookupUsers} endpoint.
+     * @return {@link UserConcurrency}
+     * @throws IOException API request failed
+     */
+    public UserConcurrency getUserConcurrency(String username) throws IOException {
+        String url = super.getBaseEndpoint() + "rest/v1.2/users/" + username + "/concurrency";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), UserConcurrency.class);
+    }
+
+    /**
+     * Returns the number of teams a user belongs to and provides information about each team, including whether it is the default and its concurrency settings.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link UsersTeam}
+     * @throws IOException API request failed
+     */
+    public UsersTeam getUsersTeam(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/teams/";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), UsersTeam.class);
+    }
+
+    /**
+     * Set a user's team affiliation. Users are limited to one team affiliation, so if the user is already a member of a different team, this call will remove them from that team.
+     * Also, By default, the user will not have team-admin privileges, even if they did on a prior team.
+     *
+     * @param userID The unique identifier of the Sauce Labs user to be added to the team.You can look up the ID of a user in your organization using the {@link LookupUsers} endpoint.
+     * @param teamID The identifier of the team to which the user will be added. You can look up the ID of a team in your organization using the {@link LookupTeams} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public SetTeam setUsersTeam(String userID, String teamID) throws IOException {
+        String url = getBaseEndpoint() + "membership";
+
+        Map map = ImmutableMap.of("user", userID, "team", teamID);
+
+        return deserializeJSONObject(request(url, HttpMethod.POST, map).body().string(), SetTeam.class);
+    }
+
+    /**
+     * Assigns administrator rights to the user within their organization. Organization Admins automatically have Team Admin rights in all the teams in the Organization.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User setAdmin(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/set-admin";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+    }
+
+    /**
+     * Assigns team administrator rights to the user within their current team. If the user is currently assigned an Org Admin role, this call would reduce the rights to only those of a Team Admin.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User setTeamAdmin(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/set-team-admin";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+    }
+
+    /**
+     * Assigns the member role to the user. If the user is currently assigned any Admin rights, this call removes those rights.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User setMember(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/set-member";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+    }
+
+    /**
+     * Retrieves the Sauce Labs access key for the specified user.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User getAccessKey(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/access-key";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), User.class);
+    }
+
+    /**
+     * Creates a new auto-generated access key for the specified user. <br> <br>
+     * Regenerating an access key invalidates the previous value and any tests containing the prior value will fail, so make sure you update any tests and credential environment variables with the new value.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public List<User> resetAccessKey(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/reset-access-key";
+
+        return deserializeJSONArray(request(url, HttpMethod.POST).body().string(), User.class);
+    }
+
+    /**
+     * Suspends the specified user's account, preventing all access to Sauce Labs while deactivated.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User deactivateUser(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/deactivate";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+    }
+
+    /**
+     * Re-activates the specified user's account, if it had been previously deactivated.
+     *
+     * @param userID The unique identifier of the user. You can look up a user's ID using the {@link LookupUsers} endpoint.
+     * @return {@link User}
+     * @throws IOException API request failed
+     */
+    public User activateUser(String userID) throws IOException {
+        String url = getBaseEndpoint() + "users/" + userID + "/activate";
+
+        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
     }
 }

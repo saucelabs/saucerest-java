@@ -35,7 +35,7 @@ public class Platform extends AbstractEndpoint {
     public TestStatus getTestStatus() throws IOException {
         String url = getBaseEndpoint() + "/status";
 
-        return getResponseClass(getResponseObject(url), TestStatus.class);
+        return deserializeJSONObject(getResponseObject(url), TestStatus.class);
     }
 
     /**
@@ -49,7 +49,7 @@ public class Platform extends AbstractEndpoint {
     public SupportedPlatforms getSupportedPlatforms(String automationApi) throws IOException {
         String url = getBaseEndpoint() + "/platforms/" + automationApi;
 
-        return new SupportedPlatforms(getResponseListClass(getResponseObject(url), com.saucelabs.saucerest.model.platform.Platform.class));
+        return new SupportedPlatforms(deserializeJSONArray(getResponseObject(url), com.saucelabs.saucerest.model.platform.Platform.class));
     }
 
     /**

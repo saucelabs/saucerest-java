@@ -22,6 +22,10 @@ public class Team {
     public String orgUuid;
     @Json(name = "updated_at")
     public String updatedAt;
+    @Json(name = "current")
+    public Current current;
+    @Json(name = "allowed")
+    public Allowed allowed;
 
     /**
      * No args constructor for use in serialization
@@ -40,7 +44,7 @@ public class Team {
      * @param orgUuid
      * @param updatedAt
      */
-    public Team(String id, Settings settings, String createdAt, String description, Group group, Boolean isDefault, String name, String orgUuid, String updatedAt) {
+    public Team(String id, Settings settings, String createdAt, String description, Group group, Boolean isDefault, String name, String orgUuid, String updatedAt, Current current, Allowed allowed) {
         super();
         this.id = id;
         this.settings = settings;
@@ -51,5 +55,7 @@ public class Team {
         this.name = name;
         this.orgUuid = orgUuid;
         this.updatedAt = updatedAt;
+        this.current = current;
+        this.allowed = allowed;
     }
 }

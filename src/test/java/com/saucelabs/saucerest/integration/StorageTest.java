@@ -2,7 +2,9 @@ package com.saucelabs.saucerest.integration;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
+import com.saucelabs.saucerest.api.AbstractEndpoint;
 import com.saucelabs.saucerest.api.Storage;
 import com.saucelabs.saucerest.model.storage.*;
 import org.junit.jupiter.api.AfterEach;
@@ -17,22 +19,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.logging.Logger;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StorageTest {
     private final ThreadLocal<Storage> storage = new ThreadLocal<>();
+    private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
 
-//    private static final Storage euCentralStorage = new SauceREST(DataCenter.EU_CENTRAL).getStorage();
-//    private static final Storage usWestStorage = new SauceREST(DataCenter.US_WEST).getStorage();
-@TempDir
-private Path tempDir;
-
-    /**
-     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
-     * app files yet.
-     */
-    enum Region {
-        EU_CENTRAL, US_WEST
-    }
+    @TempDir
+    private Path tempDir;
 
     private EditAppGroupSettings getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform platform) {
         if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
@@ -75,54 +71,26 @@ private Path tempDir;
     }
 
     @AfterEach
-    public void resetAppGroupSettings() throws IOException {
-        for (ItemInteger itemInteger : storage.get().getGroups().items) {
-            if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-                try {
-                    storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
-                } catch (IOException ignored) {
-                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
-                }
-            } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-                try {
-                    storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
-                } catch (IOException ignored) {
-                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+    public void resetAppGroupSettings() {
+        try {
+            for (ItemInteger itemInteger : storage.get().getGroups().items) {
+                if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
+                    try {
+                        storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
+                    } catch (IOException ignored) {
+                        System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                    }
+                } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+                    try {
+                        storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
+                    } catch (IOException ignored) {
+                        System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
+                    }
                 }
             }
+        } catch (IOException | SauceException e) {
+            logger.warning("Failed to reset app group settings" + e.getMessage());
         }
-
-//        for (ItemInteger itemInteger : euCentralStorage.getGroups().items) {
-//            if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-//                try {
-//                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
-//                } catch (IOException ignored) {
-//                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
-//                }
-//            } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-//                try {
-//                    euCentralStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
-//                } catch (IOException ignored) {
-//                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
-//                }
-//            }
-//        }
-//
-//        for (ItemInteger itemInteger : usWestStorage.getGroups().items) {
-//            if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-//                try {
-//                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
-//                } catch (IOException ignored) {
-//                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
-//                }
-//            } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-//                try {
-//                    usWestStorage.updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
-//                } catch (IOException ignored) {
-//                    System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in US West");
-//                }
-//            }
-//        }
     }
 
     @ParameterizedTest
@@ -383,5 +351,29 @@ private Path tempDir;
         DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
         int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
         Assertions.assertEquals(groupIdOfDeletedGroup, groupId);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void appNotFoundTest(Region region) throws IOException {
+        setup(region);
+
+        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFile("abc123"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void appGroupNotFoundTest(Region region) throws IOException {
+        setup(region);
+
+        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFileGroup(123456789));
+    }
+
+    /**
+     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
+     * app files yet.
+     */
+    enum Region {
+        EU_CENTRAL, US_WEST
     }
 }

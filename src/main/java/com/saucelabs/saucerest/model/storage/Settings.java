@@ -120,21 +120,4 @@ public class Settings extends AbstractModel {
             return new Settings(this);
         }
     }
-
-//    public Settings() {
-//    }
-//
-//    public Settings(Proxy proxy, Boolean audioCapture, Boolean proxyEnabled, String lang, String orientation, Boolean resigningEnabled, Resigning resigning, Instrumentation instrumentation, Boolean setupDeviceLock, Boolean instrumentationEnabled) {
-//        super();
-//        this.proxy = proxy;
-//        this.audioCapture = audioCapture;
-//        this.proxyEnabled = proxyEnabled;
-//        this.lang = lang;
-//        this.orientation = orientation;
-//        this.resigningEnabled = resigningEnabled;
-//        this.resigning = resigning;
-//        this.instrumentation = instrumentation;
-//        this.setupDeviceLock = setupDeviceLock;
-//        this.instrumentationEnabled = instrumentationEnabled;
-//    }
 }

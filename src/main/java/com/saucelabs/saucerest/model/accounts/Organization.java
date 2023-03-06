@@ -16,6 +16,10 @@ public class Organization {
     public String createdAt;
     @Json(name = "updated_at")
     public String updatedAt;
+    @Json(name = "current")
+    public Current current;
+    @Json(name = "allowed")
+    public Allowed allowed;
 
     /**
      * No args constructor for use in serialization
@@ -23,7 +27,7 @@ public class Organization {
     public Organization() {
     }
 
-    public Organization(String id, Settings settings, Integer totalVmConcurrency, String name, String createdAt, String updatedAt) {
+    public Organization(String id, Settings settings, Integer totalVmConcurrency, String name, String createdAt, String updatedAt, Current current, Allowed allowed) {
         super();
         this.id = id;
         this.settings = settings;
@@ -31,5 +35,7 @@ public class Organization {
         this.name = name;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.current = current;
+        this.allowed = allowed;
     }
 }
