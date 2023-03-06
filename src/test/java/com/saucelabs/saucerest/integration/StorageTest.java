@@ -88,7 +88,7 @@ public class StorageTest {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | SauceException e) {
             logger.warning("Failed to reset app group settings" + e.getMessage());
         }
     }
