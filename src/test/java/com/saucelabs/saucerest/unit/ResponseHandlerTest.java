@@ -51,7 +51,7 @@ class ResponseHandlerTest {
         return Mockito.mock(
             AbstractEndpoint.class,
             Mockito.withSettings()
-                .useConstructor(username, accessKey, null)
+                .useConstructor(username, accessKey, "null")
                 .defaultAnswer(Mockito.CALLS_REAL_METHODS)
         );
     }
