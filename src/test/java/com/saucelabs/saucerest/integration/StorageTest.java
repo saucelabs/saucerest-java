@@ -86,6 +86,8 @@ public class StorageTest {
                     } catch (IOException ignored) {
                         System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
                     }
+                } else {
+                    System.out.println("Not an app - do nothing");
                 }
             }
         } catch (IOException | SauceException e) {
