@@ -25,10 +25,10 @@ public class EditAppGroupSettings extends AbstractModel {
         private final Platform platform;
 
         public enum Platform {
-            IOS, ANDROID;
+            IOS, ANDROID, OTHER;
 
             public static Platform fromString(String platform) {
-                return Stream.of(values()).filter(p -> p.name().equalsIgnoreCase(platform)).findFirst().orElse(null);
+                return Stream.of(values()).filter(p -> p.name().equalsIgnoreCase(platform)).findFirst().orElse(OTHER);
             }
         }
 

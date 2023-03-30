@@ -28,11 +28,13 @@ public class Recent {
     public Access access;
     @Json(name = "sha256")
     public String sha256;
+    @Json(name = "tags")
+    public String[] tags;
 
     public Recent() {
     }
 
-    public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, String description, Metadata metadata, Access access, String sha256) {
+    public Recent(String id, Owner owner, String name, Integer uploadTimestamp, String etag, String kind, Integer groupId, Integer size, String description, Metadata metadata, Access access, String sha256, String[] tags) {
         super();
         this.id = id;
         this.owner = owner;
@@ -46,5 +48,6 @@ public class Recent {
         this.metadata = metadata;
         this.access = access;
         this.sha256 = sha256;
+        this.tags = tags;
     }
 }
