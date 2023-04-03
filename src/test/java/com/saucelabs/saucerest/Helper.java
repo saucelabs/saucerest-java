@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Helper {
@@ -16,12 +17,19 @@ public class Helper {
      * @see <a href="https://stackoverflow.com/a/46613809">https://stackoverflow.com/a/46613809</a>
      */
     public String getResourceFileAsString(String fileName) throws IOException {
-        try (InputStream is = getClass().getResource(fileName).openStream()) {
-            if (is == null) return null;
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("File name cannot be null or empty.");
+        }
+
+        try (InputStream is = Objects.requireNonNull(getClass().getResource(fileName), "File not found: " + fileName).openStream()) {
+
             try (InputStreamReader isr = new InputStreamReader(is);
                  BufferedReader reader = new BufferedReader(isr)) {
                 return reader.lines().collect(Collectors.joining(System.lineSeparator()));
             }
+        } catch (IOException e) {
+            String errorMessage = String.format("Error reading file %s: %s", fileName, e.getMessage());
+            throw new IOException(errorMessage, e);
         }
     }
 }
