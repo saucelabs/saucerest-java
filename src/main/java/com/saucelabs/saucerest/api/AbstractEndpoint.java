@@ -43,53 +43,36 @@ public abstract class AbstractEndpoint extends AbstractModel {
     public AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-
-        if (username == null || accessKey == null) {
-            this.credentials = null;
-        } else {
-            this.credentials = Credentials.basic(username, accessKey);
-        }
-
+        this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
     }
 
     public AbstractEndpoint(String apiServer) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-
-        if (username == null || accessKey == null) {
-            this.credentials = null;
-        } else {
-            this.credentials = Credentials.basic(username, accessKey);
-        }
-
+        this.credentials = initializeCredentials();
         this.baseURL = apiServer;
     }
 
     public AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
-
-        if (username == null || accessKey == null) {
-            this.credentials = null;
-        } else {
-            this.credentials = Credentials.basic(username, accessKey);
-        }
-
+        this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
     }
 
     public AbstractEndpoint(String username, String accessKey, String apiServer) {
         this.username = username;
         this.accessKey = accessKey;
-
-        if (username == null || accessKey == null) {
-            this.credentials = null;
-        } else {
-            this.credentials = Credentials.basic(username, accessKey);
-        }
-
+        this.credentials = initializeCredentials();
         this.baseURL = apiServer;
+    }
+
+    private String initializeCredentials() {
+        if (username == null || accessKey == null) {
+            return null;
+        }
+        return Credentials.basic(username, accessKey);
     }
 
     protected String getBaseEndpoint() {
