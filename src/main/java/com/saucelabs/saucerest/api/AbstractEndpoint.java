@@ -3,6 +3,7 @@ package com.saucelabs.saucerest.api;
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.MoshiSingleton;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -25,6 +26,14 @@ import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
 public abstract class AbstractEndpoint extends AbstractModel {
     private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
+    private static final int MAX_RETRIES = 2;
+    private static final int BACKOFF_INITIAL_DELAY = 30;
+    private static final int BACKOFF_MULTIPLIER = 500;
+    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+        .connectTimeout(300, TimeUnit.SECONDS)
+        .readTimeout(300, TimeUnit.SECONDS)
+        .writeTimeout(300, TimeUnit.SECONDS)
+        .build();
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
@@ -178,35 +187,68 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     protected Response makeRequest(Request request) throws IOException {
-        OkHttpClient client;
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(300, TimeUnit.SECONDS);
-        builder.readTimeout(300, TimeUnit.SECONDS);
-        builder.writeTimeout(300, TimeUnit.SECONDS);
-        client = builder.build();
-        Response response = client.newCall(request).execute();
-
-        Integer responseCode = response.code();
-        Integer responseCodeLength = String.valueOf(responseCode).length();
-
-        if (responseCodeLength == 3 && (responseCode == 429 || String.valueOf(responseCode).startsWith("5"))) {
-            Response finalResponse = response;
-            response = Failsafe.with(
-                    new RetryPolicy<>()
-                        .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
-                        .withBackoff(30, 500, ChronoUnit.SECONDS)
-                        .withMaxRetries(2)
-                        .onRetry(e -> logger.log(Level.WARNING, () -> "Retrying because of " + finalResponse.code())))
-                .get(() -> client.newCall(request).execute());
+        Response response;
+        try {
+            response = CLIENT.newCall(request).execute();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error executing request", e);
+            throw e;
         }
 
         if (!response.isSuccessful()) {
-            Response finalResponse1 = response;
-            logger.log(Level.INFO, () -> "Request " + request.method() + " " + request.url() + " failed with response code " + finalResponse1.code() + " and message " + finalResponse1.message());
+            logger.log(Level.INFO, "Request {0} {1} failed with response code {2} and message {3}",
+                new Object[]{request.method(), request.url(), response.code(), response.message()});
             responseHandler(this, response);
+        }
+
+        if (shouldRetryOnHttpError(response)) {
+            response = retryRequest(request);
+        }
+
+        return response;
+    }
+
+    private boolean shouldRetryOnHttpError(Response response) {
+        final int HTTP_TOO_MANY_REQUESTS = 429;
+        final int HTTP_SERVER_ERROR_MIN = 500;
+        final int HTTP_SERVER_ERROR_MAX = 599;
+        int responseCode = response.code();
+        boolean isHttpError = responseCode >= HTTP_SERVER_ERROR_MIN && responseCode <= HTTP_SERVER_ERROR_MAX;
+        boolean isTooManyRequests = responseCode == HTTP_TOO_MANY_REQUESTS;
+        return isHttpError || isTooManyRequests;
+    }
+
+
+    /**
+     * Executes the given HTTP request and retries it if it fails due to a runtime exception, IOException,
+     * or IllegalStateException.
+     *
+     * @param request The HTTP request to execute.
+     * @return The HTTP response.
+     * @throws IOException If an I/O error occurs while executing the request.
+     */
+    private Response retryRequest(Request request) throws IOException {
+        Response response = null;
+        try {
+            response = Failsafe.with(new RetryPolicy<>()
+                    .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
+                    .withBackoff(BACKOFF_INITIAL_DELAY, BACKOFF_MULTIPLIER, ChronoUnit.MILLIS)
+                    .withMaxRetries(MAX_RETRIES)
+                    .onRetry(e -> {
+                        if (e.getLastFailure() != null) {
+                            logger.log(Level.WARNING, "Retrying because of " + e.getLastFailure().getClass().getSimpleName());
+                        } else {
+                            logger.log(Level.WARNING, "Retrying");
+                        }
+                    }))
+                .get(() -> CLIENT.newCall(request).execute());
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error retrying request", e);
+            throw new IOException(e);
         }
         return response;
     }
+
 
     /**
      * This method is used to deserialize a JSON object response from an API endpoint.
@@ -218,10 +260,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @throws IOException If the JSON object cannot be deserialized
      */
     protected <T> T deserializeJSONObject(String jsonResponse, Class<T> clazz) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
+        Moshi moshi = MoshiSingleton.getInstance();
         // failOnUnknown() will make sure that API changes in SL are caught ASAP, so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
-        return jsonAdapter.fromJson(jsonResponse);
+        try {
+            return jsonAdapter.fromJson(jsonResponse);
+        } catch (IOException e) {
+            throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
+        }
     }
 
     /**
@@ -234,10 +280,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @throws IOException If the JSON array cannot be deserialized
      */
     protected <T> List<T> deserializeJSONArray(String jsonResponse, Class<T> clazz) throws IOException {
-        Moshi moshi = new Moshi.Builder().build();
+        Moshi moshi = MoshiSingleton.getInstance();
 
         Type listPlatform = Types.newParameterizedType(List.class, clazz);
-        JsonAdapter<List<T>> adapter = moshi.adapter(listPlatform);
-        return adapter.fromJson(jsonResponse);
+        JsonAdapter<List<T>> jsonAdapter = moshi.adapter(listPlatform);
+        try {
+            return jsonAdapter.fromJson(jsonResponse);
+        } catch (IOException e) {
+            throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
+        }
     }
 }
