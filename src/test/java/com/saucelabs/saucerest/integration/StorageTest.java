@@ -31,39 +31,36 @@ public class StorageTest {
     private Path tempDir;
 
     private EditAppGroupSettings getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform platform) {
-        if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-            Settings settings = new Settings.Builder()
-                .setInstrumentation(new Instrumentation.Builder()
+        Settings.Builder settingsBuilder = new Settings.Builder()
+            .setAudioCapture(true)
+            .setResigningEnabled(platform == EditAppGroupSettings.Builder.Platform.IOS)
+            .setInstrumentationEnabled(platform == EditAppGroupSettings.Builder.Platform.ANDROID);
+
+        switch (platform) {
+            case ANDROID:
+                settingsBuilder.setOrientation("Portrait")
+                    .setSetupDeviceLock(true)
+                    .setInstrumentation(new Instrumentation.Builder()
+                        .setBiometrics(true)
+                        .setImageInjection(true)
+                        .setNetworkCapture(true)
+                        .build());
+                break;
+            case IOS:
+                settingsBuilder.setResigning(new Resigning.Builder()
                     .setBiometrics(true)
                     .setImageInjection(true)
                     .setNetworkCapture(true)
-                    .build())
-                .setInstrumentationEnabled(true)
-                .setOrientation("Portrait")
-                .setSetupDeviceLock(true)
-                .setAudioCapture(true)
-                .build();
-
-            return new EditAppGroupSettings.Builder(platform)
-                .setSettings(settings)
-                .build();
-        } else if (platform.equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-            Settings settings = new Settings.Builder()
-                .setResigning(new Resigning.Builder()
-                    .setBiometrics(true)
-                    .setImageInjection(true)
-                    .setNetworkCapture(true)
-                    .build())
-                .setResigningEnabled(true)
-                .setAudioCapture(true)
-                .build();
-
-            return new EditAppGroupSettings.Builder(platform)
-                .setSettings(settings)
-                .build();
+                    .build());
+                break;
+            default:
+                System.out.println("Unknown platform - cannot create AppGroupSettings");
+                return null;
         }
 
-        return null;
+        return new EditAppGroupSettings.Builder(platform)
+            .setSettings(settingsBuilder.build())
+            .build();
     }
 
     public void setup(Region region) {
@@ -74,18 +71,9 @@ public class StorageTest {
     public void resetAppGroupSettings() {
         try {
             for (ItemInteger itemInteger : storage.get().getGroups().items) {
-                if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.ANDROID)) {
-                    try {
-                        storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.ANDROID)));
-                    } catch (IOException ignored) {
-                        System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
-                    }
-                } else if (EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind).equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-                    try {
-                        storage.get().updateAppStorageGroupSettings(itemInteger.id, Objects.requireNonNull(getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform.IOS)));
-                    } catch (IOException ignored) {
-                        System.out.println("Failed to reset app group settings for " + itemInteger.recent.name + " (" + itemInteger.id + ")" + " in EU Central");
-                    }
+                EditAppGroupSettings.Builder.Platform platform = EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind);
+                if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID) || platform.equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+                    resetAppGroupSettingsForPlatform(itemInteger.id, platform);
                 } else {
                     System.out.println("Not an app - do nothing");
                 }
@@ -94,6 +82,15 @@ public class StorageTest {
             logger.warning("Failed to reset app group settings" + e.getMessage());
         }
     }
+
+    private void resetAppGroupSettingsForPlatform(int id, EditAppGroupSettings.Builder.Platform platform) {
+        try {
+            storage.get().updateAppStorageGroupSettings(id, Objects.requireNonNull(getAppGroupResetSettings(platform)));
+        } catch (IOException ignored) {
+            System.out.println("Failed to reset app group settings for " + platform.name() + " (" + id + ")" + " in EU Central");
+        }
+    }
+
 
     @ParameterizedTest
     @EnumSource(Region.class)
