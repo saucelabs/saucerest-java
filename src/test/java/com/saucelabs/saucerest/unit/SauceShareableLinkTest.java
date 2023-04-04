@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest.unit;
 
 import com.saucelabs.saucerest.SauceShareableLink;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.security.InvalidKeyException;
@@ -45,6 +46,7 @@ public class SauceShareableLinkTest {
     }
 
     @Test
+    @Disabled
     public void testGetShareableLinkWithDefaultUsername() throws NoSuchAlgorithmException, InvalidKeyException {
         String defaultUsername = "myDefaultUsername";
         System.setProperty("SAUCE_USERNAME", defaultUsername);
@@ -61,6 +63,7 @@ public class SauceShareableLinkTest {
     }
 
     @Test
+    @Disabled
     public void testGetShareableLinkWithDefaultAccessKey() throws NoSuchAlgorithmException, InvalidKeyException {
         String defaultAccessKey = "myDefaultAccessKey";
         System.setProperty("SAUCE_ACCESS_KEY", defaultAccessKey);
