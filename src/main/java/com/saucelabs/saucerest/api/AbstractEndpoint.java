@@ -26,6 +26,7 @@ import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
 public abstract class AbstractEndpoint extends AbstractModel {
     private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
+    private static final String JSON_MEDIA_TYPE = "application/json";
     private static final int MAX_RETRIES = 2;
     private static final int BACKOFF_INITIAL_DELAY = 30;
     private static final int BACKOFF_MULTIPLIER = 500;
@@ -139,34 +140,33 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     public Response request(String url, HttpMethod httpMethod, String body) throws IOException {
-        Request.Builder chain = new Request.Builder();
+        Request request = createRequest(url, httpMethod, body);
+        return makeRequest(request);
+    }
+
+    protected Request createRequest(String url, HttpMethod httpMethod, String body) {
+        Request.Builder chain = new Request.Builder().url(url);
 
         if (credentials != null) {
             chain.header("Authorization", credentials);
         }
 
         if (body != null) {
-            if (body.equals("")) {
-                chain.method(httpMethod.label, RequestBody.create(body, MediaType.parse("application/json")));
-            } else {
-                String json = new JSONObject(body).toString();
-                chain.method(httpMethod.label, RequestBody.create(json, MediaType.parse("application/json")));
-            }
+            MediaType mediaType = MediaType.parse(JSON_MEDIA_TYPE);
+            RequestBody requestBody = (body.isEmpty()) ?
+                RequestBody.create(body, mediaType) : RequestBody.create(new JSONObject(body).toString(), mediaType);
+            chain.method(httpMethod.label, requestBody);
         } else {
-            if (httpMethod.equals(HttpMethod.GET)) {
-                chain.method(httpMethod.label, null);
-            } else if (httpMethod.equals(HttpMethod.POST)) {
-                chain.method(httpMethod.label, RequestBody.create(null, "application/json"));
-            } else {
-                chain.method(httpMethod.label, null);
+            switch (httpMethod) {
+                case POST:
+                    chain.method(httpMethod.label, RequestBody.create(new byte[]{}, MediaType.parse(JSON_MEDIA_TYPE)));
+                    break;
+                default:
+                    chain.method(httpMethod.label, null);
+                    break;
             }
         }
-
-        Request request = chain
-            .url(url)
-            .build();
-
-        return makeRequest(request);
+        return chain.build();
     }
 
     protected Response makeRequest(Request request) throws IOException {
