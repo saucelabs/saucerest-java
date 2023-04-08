@@ -26,6 +26,9 @@ public class ResponseHandler {
                 } else if (endpoint instanceof Storage) {
                     String appFileID = getID(response);
                     throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AppNotFound(appFileID)));
+                } else if (endpoint instanceof Accounts) {
+                    String accountID = getID(response);
+                    throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AccountNotFound(accountID)));
                 } else {
                     throw new SauceException.NotFound();
                 }

@@ -125,14 +125,23 @@ public class ErrorExplainers {
 
     public static String AppNotFound(String fileID) {
         return String.join(System.lineSeparator(),
-                "App or app group with ID " + fileID + " could not be found. Possible reasons:",
-                " * App was automatically deleted after 60 days",
-                " * App was deleted manually",
-                " * App was never uploaded",
-                " * App was uploaded to a different data center",
-                " * App was uploaded to a different account",
-                " * App was uploaded to a different team",
-                " * App was uploaded to a different user"
+            "App or app group with ID " + fileID + " could not be found. Possible reasons:",
+            " * App was automatically deleted after 60 days",
+            " * App was deleted manually",
+            " * App was never uploaded",
+            " * App was uploaded to a different data center",
+            " * App was uploaded to a different account",
+            " * App was uploaded to a different team",
+            " * App was uploaded to a different user"
+        );
+    }
+
+    public static String AccountNotFound(String accountID) {
+        return String.join(System.lineSeparator(),
+            "Account with ID " + accountID + " could not be found. Possible reasons:",
+            " * Account was never created",
+            " * Account was created in a different account",
+            " * Account ID is incorrect"
         );
     }
 }
