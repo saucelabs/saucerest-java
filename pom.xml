@@ -301,6 +301,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                     <trimStackTrace>false</trimStackTrace>
                     <reportFormat>plain</reportFormat>
                     <consoleOutputReporter>
