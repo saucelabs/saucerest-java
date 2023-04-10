@@ -57,7 +57,11 @@ public class AccountsTest {
             List<Result> users = accounts.lookupUsers().results;
             for (Result user : users) {
                 if (user.username.startsWith("saucerest-java-integration-test-user-")) {
-                    accounts.deactivateUser(user.id);
+                    try {
+                        accounts.deactivateUser(user.id);
+                    } catch (SauceException.NotFound e) {
+                        // ignore
+                    }
                 }
             }
 
