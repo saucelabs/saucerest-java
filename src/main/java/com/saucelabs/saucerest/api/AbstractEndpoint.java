@@ -145,7 +145,9 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     protected Request createRequest(String url, HttpMethod httpMethod, String body) {
-        Request.Builder chain = new Request.Builder().url(url);
+        Request.Builder chain = new Request.Builder()
+            .url(url)
+            .header("User-Agent", userAgent);
 
         if (credentials != null) {
             chain.header("Authorization", credentials);
