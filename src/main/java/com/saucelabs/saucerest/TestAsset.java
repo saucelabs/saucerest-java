@@ -13,7 +13,10 @@ public enum TestAsset {
     PERFORMANCE("performance.json"),
     CONSOLE_LOG("console.json"),
     SCREENSHOTS("screenshots.zip"),
-    APPIUM_LOG("appium-server.log");
+    APPIUM_LOG("appium-server.log"),
+    INSIGHTS_LOG("insights.json"),
+    CRASH_LOG("crash.json"),
+    DEVICE_LOG("device.log");
 
     public final String label;
 
