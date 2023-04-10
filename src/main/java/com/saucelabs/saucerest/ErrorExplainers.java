@@ -33,21 +33,61 @@ public class ErrorExplainers {
         return String.join(System.lineSeparator(),
                 "Resource Not Found.   Possible reasons:",
                 " * This job does not exist",
-                " * Job assets have expired"
+            " * Job assets have expired"
         );
     }
 
     static String videoMissing() {
         return String.join(System.lineSeparator(),
-                " * You disabled video recording by setting the `recordVideo` capability to false",
-                " * This test was not able to complete video encoding due to an error or early termination"
+            " * You disabled video recording by setting the `recordVideo` capability to false",
+            " * This test was not able to complete video encoding due to an error or early termination"
+        );
+    }
+
+    static String videoNotFound() {
+        return String.join(System.lineSeparator(),
+            "Video not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Video has not been processed yet"
+        );
+    }
+
+    static String insightsLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Insights log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Insights log has not been processed yet"
+        );
+    }
+
+    static String crashLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Crash log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Crash log has not been processed yet"
+        );
+    }
+
+    static String deviceLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Device log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Device log has not been processed yet"
+        );
+    }
+
+    static String networkHARNotFound() {
+        return String.join(System.lineSeparator(),
+            "Network HAR not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Network HAR has not been processed yet"
         );
     }
 
     static String HARMissing() {
         return String.join(System.lineSeparator(),
-                " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
-                " * This test was not able to complete HAR file recording due to an error or early termination"
+            " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
+            " * This test was not able to complete HAR file recording due to an error or early termination"
         );
     }
 
