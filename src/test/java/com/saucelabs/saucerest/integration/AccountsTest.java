@@ -7,6 +7,8 @@ import com.saucelabs.saucerest.api.Accounts;
 import com.saucelabs.saucerest.model.accounts.*;
 import com.saucelabs.saucerest.model.realdevices.Concurrency;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -19,15 +21,69 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountsTest {
+    private static User createTestUser(Accounts accounts) throws IOException {
+        CreateUser createUser = new CreateUser.Builder()
+            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
+            .setFirstName(RandomStringUtils.randomAlphabetic(8))
+            .setLastName(RandomStringUtils.randomAlphabetic(8))
+            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
+            .setOrganization(accounts.getOrganization().results.get(0).id)
+            .setRole(Roles.MEMBER)
+            .setUserName("saucerest-java-integration-test-user-" + RandomStringUtils.randomAlphabetic(8))
+            .build();
+
+        return accounts.createUser(createUser);
+    }
+
+    private static CreateTeam createTeam(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+        String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
+
+        Settings settings = new Settings.Builder()
+            .setVirtualMachines(0)
+            .build();
+
+        return accounts.createTeam(teamName, settings, RandomStringUtils.randomAlphabetic(8));
+    }
+
+    @AfterAll
+    @EnumSource(DataCenter.class)
+    public static void cleanup(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        Accounts accounts = sauceREST.getAccounts();
+
+        // TODO: add user deletion when Sauce Labs has a delete user API. meanwhile, we'll just deactivate them
+        List<Result> users = accounts.lookupUsers().results;
+        for (Result user : users) {
+            if (user.username.startsWith("saucerest-java-integration-test-user-")) {
+                accounts.deactivateUser(user.id);
+            }
+        }
+
+        List<Result> teams = accounts.lookupTeams().results;
+        for (Result team : teams) {
+            if (team.name.startsWith("000")) {
+                accounts.deleteTeam(team.id);
+            }
+        }
+    }
+
+    @BeforeAll
+    @EnumSource(DataCenter.class)
+    public static void setup(DataCenter dataCenter) throws IOException {
+        createTeam(dataCenter);
+    }
+
     @ParameterizedTest
     @EnumSource(DataCenter.class)
     public void lookupTeamsWithoutNameTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
-
         LookupTeams lookupTeams = accounts.lookupTeams();
 
-        assertNotNull(lookupTeams);
+        assertTrue(lookupTeams.count > 0);
+        assertTrue(lookupTeams.results.size() > 0);
     }
 
     @ParameterizedTest
@@ -38,7 +94,6 @@ public class AccountsTest {
 
         LookupTeams lookupTeams = accounts.lookupTeams("NotExisting");
 
-        assertNotNull(lookupTeams);
         assertEquals(0, lookupTeams.count);
         assertEquals(0, lookupTeams.results.size());
     }
@@ -48,13 +103,13 @@ public class AccountsTest {
     public void getSpecificTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
-
         LookupTeams lookupTeams = accounts.lookupTeams();
 
         for (Result result : lookupTeams.results) {
             Team team = accounts.getSpecificTeam(result.id);
 
-            assertNotNull(team);
+            assertTrue(team.id.length() > 0);
+            assertTrue(team.name.length() > 0);
         }
     }
 
@@ -165,14 +220,19 @@ public class AccountsTest {
     public void resetAccessKeyTeam(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
-
-        // TODO: after create user endpoint is implemented expand test to create a user and add it to the team and then reset the access key
         CreateTeam createTeam = accounts.createTeam("000" + RandomStringUtils.randomAlphabetic(12), new Settings.Builder().setVirtualMachines(0).build(), RandomStringUtils.randomAlphabetic(8));
+        User user1 = createTestUser(accounts);
+        User user2 = createTestUser(accounts);
+        accounts.setUsersTeam(user1.id, createTeam.id);
+        accounts.setUsersTeam(user2.id, createTeam.id);
+        String accessKeyUser1 = user1.accessKey;
+        String accessKeyUser2 = user2.accessKey;
 
         List<ResetAccessKeyForTeam> resetAccessKeyForTeam = accounts.resetAccessKeyForTeam(createTeam.id);
 
-        assertNotNull(resetAccessKeyForTeam);
-        assertEquals(0, resetAccessKeyForTeam.size());
+        assertEquals(2, resetAccessKeyForTeam.size());
+        assertNotEquals(accessKeyUser1, resetAccessKeyForTeam.stream().filter(r -> r.id.equals(user1.id)).findFirst().get().accessKey);
+        assertNotEquals(accessKeyUser2, resetAccessKeyForTeam.stream().filter(r -> r.id.equals(user2.id)).findFirst().get().accessKey);
     }
 
     @ParameterizedTest
@@ -214,42 +274,13 @@ public class AccountsTest {
         assertTrue(user.id.length() > 0);
     }
 
-    private static User createTestUser(Accounts accounts) throws IOException {
-        CreateUser createUser = new CreateUser.Builder()
-            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
-            .setFirstName(RandomStringUtils.randomAlphabetic(8))
-            .setLastName(RandomStringUtils.randomAlphabetic(8))
-            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
-            .setOrganization(accounts.getOrganization().results.get(0).id)
-            .setRole(Roles.MEMBER)
-            .setUserName("saucerest-java-integration-test-user-" + RandomStringUtils.randomAlphabetic(8))
-            .build();
-
-        User user = accounts.createUser(createUser);
-        return user;
-    }
-
     @ParameterizedTest
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void updateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
-
-        LookupUsers lookupUsers = accounts.lookupUsers();
-        User user;
-        Random rand = new Random();
-
-        List<Result> validResults = lookupUsers.results.stream()
-            .filter(r -> r.username.startsWith("saucerest-java-integration-test-user"))
-            .collect(Collectors.toList());
-
-        Result result = validResults.stream()
-            .skip(rand.nextInt(validResults.size()))
-            .findFirst()
-            .get();
-
-        user = accounts.getUser(result.id);
-
+        User testUser = createTestUser(accounts);
+        User user = accounts.getUser(testUser.id);
         String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
@@ -261,9 +292,10 @@ public class AccountsTest {
 
         User updatedUser = accounts.updateUser(updateUser);
 
-        assertEquals("Updated " + timeStamp, updatedUser.firstName);
-        assertEquals("Updated " + timeStamp, updatedUser.lastName);
-        assertEquals("+123456789", updatedUser.phone);
+        assertAll("User",
+            () -> assertEquals("Updated " + timeStamp, updatedUser.firstName),
+            () -> assertEquals("Updated " + timeStamp, updatedUser.lastName),
+            () -> assertEquals("+123456789", updatedUser.phone));
     }
 
     @ParameterizedTest
@@ -271,22 +303,8 @@ public class AccountsTest {
     public void partiallyUpdateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         Accounts accounts = sauceREST.getAccounts();
-
-        LookupUsers lookupUsers = accounts.lookupUsers();
-        User user;
-        Random rand = new Random();
-
-        List<Result> validResults = lookupUsers.results.stream()
-            .filter(r -> r.username.startsWith("saucerest-java-integration-test-user"))
-            .collect(Collectors.toList());
-
-        Result result = validResults.stream()
-            .skip(rand.nextInt(validResults.size()))
-            .findFirst()
-            .get();
-
-        user = accounts.getUser(result.id);
-
+        User testUser = createTestUser(accounts);
+        User user = accounts.getUser(testUser.id);
         String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
