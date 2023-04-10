@@ -48,23 +48,24 @@ public class AccountsTest {
     }
 
     @AfterAll
-    @EnumSource(DataCenter.class)
-    public static void cleanup(DataCenter dataCenter) throws IOException {
-        SauceREST sauceREST = new SauceREST(dataCenter);
-        Accounts accounts = sauceREST.getAccounts();
+    public static void cleanup() throws IOException {
+        for (DataCenter dataCenter : DataCenter.values()) {
+            SauceREST sauceREST = new SauceREST(dataCenter);
+            Accounts accounts = sauceREST.getAccounts();
 
-        // TODO: add user deletion when Sauce Labs has a delete user API. meanwhile, we'll just deactivate them
-        List<Result> users = accounts.lookupUsers().results;
-        for (Result user : users) {
-            if (user.username.startsWith("saucerest-java-integration-test-user-")) {
-                accounts.deactivateUser(user.id);
+            // TODO: add user deletion when Sauce Labs has a delete user API. meanwhile, we'll just deactivate them
+            List<Result> users = accounts.lookupUsers().results;
+            for (Result user : users) {
+                if (user.username.startsWith("saucerest-java-integration-test-user-")) {
+                    accounts.deactivateUser(user.id);
+                }
             }
-        }
 
-        List<Result> teams = accounts.lookupTeams().results;
-        for (Result team : teams) {
-            if (team.name.startsWith("000")) {
-                accounts.deleteTeam(team.id);
+            List<Result> teams = accounts.lookupTeams().results;
+            for (Result team : teams) {
+                if (team.name.startsWith("000")) {
+                    accounts.deleteTeam(team.id);
+                }
             }
         }
     }
