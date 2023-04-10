@@ -180,14 +180,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
             throw e;
         }
 
+        if (shouldRetryOnHttpError(response)) {
+            response = retryRequest(request);
+        }
+
         if (!response.isSuccessful()) {
             logger.log(Level.WARNING, "Request {0} {1} failed with response code {2} and message {3}",
                 new Object[]{request.method(), request.url(), response.code(), response.message()});
             responseHandler(this, response);
-        }
-
-        if (shouldRetryOnHttpError(response)) {
-            response = retryRequest(request);
         }
 
         return response;
