@@ -70,9 +70,10 @@ public class AccountsTest {
     }
 
     @BeforeAll
-    @EnumSource(DataCenter.class)
-    public static void setup(DataCenter dataCenter) throws IOException {
-        createTeam(dataCenter);
+    public static void setup() throws IOException {
+        for (DataCenter dataCenter : DataCenter.values()) {
+            createTeam(dataCenter);
+        }
     }
 
     @ParameterizedTest
