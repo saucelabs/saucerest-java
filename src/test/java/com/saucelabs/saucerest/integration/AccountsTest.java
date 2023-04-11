@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AccountsTest {
     private static User createTestUser(Accounts accounts) throws IOException {
         CreateUser createUser = new CreateUser.Builder()
-            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@example.com")
+            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@saucelabs.com")
             .setFirstName(RandomStringUtils.randomAlphabetic(8))
             .setLastName(RandomStringUtils.randomAlphabetic(8))
             .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
             .setOrganization(accounts.getOrganization().results.get(0).id)
             .setRole(Roles.MEMBER)
-            .setUserName("saucerest-java-integration-test-user-" + RandomStringUtils.randomAlphabetic(8))
+            .setUserName("sl-test-del-" + RandomStringUtils.randomAlphabetic(8))
             .build();
 
         return accounts.createUser(createUser);
@@ -363,7 +363,7 @@ public class AccountsTest {
         Accounts accounts = sauceREST.getAccounts();
 
         LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
-            .setUsername("saucerest-java-integration-test-user")
+            .setUsername("sl-test-del")
             .setRoles(Roles.MEMBER)
             .build();
 
