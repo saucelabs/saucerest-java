@@ -6,7 +6,7 @@ on:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */72 * * *'
 
 permissions:
   contents: write
