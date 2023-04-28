@@ -18,15 +18,15 @@ public class ResponseHandler {
         // TODO: add more specific error messages for each endpoint
         switch (response.code()) {
             case HTTP_NOT_FOUND:
-                if (endpoint instanceof SauceConnect) {
+                if (endpoint instanceof SauceConnectEndpoint) {
                     if (response.request().method().equals(HttpMethod.DELETE.label)) {
                         String tunnelID = getID(response);
                         throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.TunnelNotFound(tunnelID)));
                     }
-                } else if (endpoint instanceof Storage) {
+                } else if (endpoint instanceof StorageEndpoint) {
                     String appFileID = getID(response);
                     throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AppNotFound(appFileID)));
-                } else if (endpoint instanceof Accounts) {
+                } else if (endpoint instanceof AccountsEndpoint) {
                     String accountID = getID(response);
                     throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AccountNotFound(accountID)));
                 } else {
@@ -35,7 +35,7 @@ public class ResponseHandler {
             case HTTP_UNAUTHORIZED:
                 throw new SauceException.NotAuthorized(checkCredentials(endpoint));
             case HTTP_BAD_REQUEST:
-                if (endpoint instanceof Job) {
+                if (endpoint instanceof JobsEndpoint) {
                     if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
                         throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
                     } else {

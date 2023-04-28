@@ -4,8 +4,8 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
-import com.saucelabs.saucerest.api.Job;
-import com.saucelabs.saucerest.api.SauceConnect;
+import com.saucelabs.saucerest.api.JobsEndpoint;
+import com.saucelabs.saucerest.api.SauceConnectEndpoint;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -21,16 +21,14 @@ class ResponseHandlerTest {
     public void tunnelNotFoundTest() {
         Response response = getMockResponse(getMockRequest("https://saucelabs.com/rest/v1/fakeuser/tunnels/1234", HttpMethod.DELETE), 404);
 
-        assertThrows(SauceException.NotFound.class, () -> responseHandler(new SauceConnect(DataCenter.EU_CENTRAL), response));
+        assertThrows(SauceException.NotFound.class, () -> responseHandler(new SauceConnectEndpoint(DataCenter.EU_CENTRAL), response));
     }
 
     @Test
     public void notAuthorizedTest() {
         Response response = getMockResponse(getMockRequest("https://fakewebsite.com", HttpMethod.GET), 401);
 
-        assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint(null, null), response));
-        assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint("fakeuser", null), response));
-        assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint(null, "fakeaccesskeyy"), response));
+        assertThrows(SauceException.NotAuthorized.class, () -> responseHandler(getMockAbstractEndpoint("user", "key"), response));
     }
 
     @Test
@@ -56,12 +54,12 @@ class ResponseHandlerTest {
         );
     }
 
-    private Job getMockJob(String username, String accessKey) {
+    private JobsEndpoint getMockJob(String username, String accessKey) {
         return Mockito.mock(
-            Job.class,
-            Mockito.withSettings()
-                .useConstructor(username, accessKey, "apiserver", "1234")
-                .defaultAnswer(Mockito.CALLS_REAL_METHODS)
+                JobsEndpoint.class,
+                Mockito.withSettings()
+                        .useConstructor(username, accessKey, "apiserver")
+                        .defaultAnswer(Mockito.CALLS_REAL_METHODS)
         );
     }
 

@@ -29,12 +29,13 @@ Parameters:
 | access-key  | String (required)               | your sauce labs accesskey                                   |
 | data_center | String or DataCenter (required) | one of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
 
+Users generally only have access to their own jobsEndpoint and resources. Parent accountsEndpoint may have access to their children's jobsEndpoint. Check out
+the Sauce Labs documentation for more information.
 
+## Change a jobsEndpoint's metadata
 
-Users generally only have access to their own jobs and resources.  Parent accounts may have access to their children's jobs.  Check out the Sauce Labs documentation for more information.
+### Mark a jobsEndpoint passed or failed:
 
-## Change a job's metadata
-### Mark a job passed or failed:
 ```java
 sauce.jobPassed(job_id);
 sauce.jobFailed(job_id);
@@ -47,9 +48,11 @@ String tunnels = sauce.getTunnels();
 ```
 
 ## Download Assets
-Assets are downloaded by providing a job ID and the location to save the asset to.
 
-Filenames are set automatically to `jobId_yyyyMMdd_HHmmSS_filename.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset type.
+Assets are downloaded by providing a jobsEndpoint ID and the location to save the asset to.
+
+Filenames are set automatically to `jobId_yyyyMMdd_HHmmSS_filename.ext`, where yyyyMMdd_HHmmSS is the retrieval timestamp and ext is determined by the asset
+type.
 
 Each of these methods comes in two flavours; the `downloadX` methods which ignore exceptions, and the `downloadXOrThrow` methods which throw:
  * SauceException.NotAuthorized if credentials are missing or wrong
@@ -70,7 +73,8 @@ sauce.downloadLogOrThrow("job_id", "/var/tmp");
 Extension: `.log`
 
 ### HAR File
-HAR files are only available for jobs using [Extended Debugging](https://docs.saucelabs.com/insights/debug/).
+
+HAR files are only available for jobsEndpoint using [Extended Debugging](https://docs.saucelabs.com/insights/debug/).
 
 ```java
 // Download the HAR file; Ignore exceptions
@@ -83,7 +87,9 @@ sauce.downloadHAROrThrow("job_id", "/var/tmp");
 Extension: `.har`
 
 ### Video
-Video is only available for jobs which have not [disabled video recording](https://docs.saucelabs.com/dev/test-configuration-options/#TestConfigurationOptions-Disablevideorecording.
+
+Video is only available for jobsEndpoint which have
+not [disabled video recording](https://docs.saucelabs.com/dev/test-configuration-options/#TestConfigurationOptions-Disablevideorecording.
 
 ```java
 // Download the Log; Ignore exceptions
@@ -96,20 +102,21 @@ sauce.downloadVideoOrThrow("job_id", "/var/tmp");
 Extension: `.mp4`
 
 ## Get Information
-### About a particular job
+
+### About a particular jobsEndpoint
 ```java
 sauce.getJobInfo("job_id");
 ```
 
-### About the last 20 jobs
+### About the last 20 jobsEndpoint
 ```java
 sauce.getJobInfo();
 ```
 
-### About a requested number of jobs
+### About a requested number of jobsEndpoint
 
 ```java
-sauce.getJobInfo(n);  #n is the number of jobs to retrieve,as an integer
+sauce.getJobInfo(n);  #n is the number of jobsEndpoint to retrieve,as an integer
 ```
 
 ### About your tunnels

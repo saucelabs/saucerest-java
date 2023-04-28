@@ -2,25 +2,32 @@ package com.saucelabs.saucerest.integration;
 
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.SauceREST;
-import com.saucelabs.saucerest.api.RealDevices;
+import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.model.realdevices.*;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class RealDevicesTest {
-    private final ThreadLocal<RealDevices> realDevices = new ThreadLocal<>();
+public class RealDevicesEndpointTest {
+    private final ThreadLocal<RealDevicesEndpoint> realDevices = new ThreadLocal<>();
+    @TempDir
+    private Path tempDir;
 
     @BeforeAll
     public static void runRealDeviceTest() throws MalformedURLException {
@@ -38,10 +45,12 @@ public class RealDevicesTest {
         URL usWestSauceLabsUrl = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.us-west-1.saucelabs.com/wd/hub");
 
         AndroidDriver driverEU = new AndroidDriver(euCentralSauceLabsUrl, capabilities);
-        //driverEU.get("https://saucedemo.com");
+        driverEU.get("https://saucedemo.com");
+        driverEU.getScreenshotAs(OutputType.FILE);
         driverEU.quit();
         AndroidDriver driverUS = new AndroidDriver(usWestSauceLabsUrl, capabilities);
-        //driverUS.get("https://saucedemo.com");
+        driverUS.get("https://saucedemo.com");
+        driverUS.getScreenshotAs(OutputType.FILE);
         driverUS.quit();
     }
 
@@ -146,8 +155,35 @@ public class RealDevicesTest {
         assertNotNull(concurrency);
     }
 
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void getTestAssetTest(Region region) throws IOException {
+        setup(region);
+
+        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
+        DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
+
+        realDevices.get().downloadVideo(deviceJob.id, tempDir.toString());
+        realDevices.get().downloadDeviceLog(deviceJob.id, tempDir.toString());
+        realDevices.get().downloadCommandsLog(deviceJob.id, tempDir.toString());
+        realDevices.get().downloadAppiumLog(deviceJob.id, tempDir.toString());
+        realDevices.get().downloadScreenshots(deviceJob.id, tempDir.toString());
+        //realDevices.get().downloadHARFile(deviceJob.id, tempDir.toString());
+        //realDevices.get().downloadDeviceVitals(deviceJob.id, tempDir.toString());
+
+        assertAll(
+                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4"))),
+                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "device.log"))),
+                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "commands.json"))),
+                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "appium-server.log"))),
+                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "0.png")))
+                //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "network.har"))),
+                //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "insights.json")))
+        );
+    }
+
     /**
-     * Use this instead of {@link com.saucelabs.saucerest.integration.DataCenter} because not all regions support
+     * Use this instead of {@link com.saucelabs.saucerest.DataCenter} because not all regions support
      * app files yet.
      */
     enum Region {

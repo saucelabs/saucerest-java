@@ -12,6 +12,7 @@ public class ErrorExplainers {
     public static String missingCreds() {
         return String.join(System.lineSeparator(),
                 "If using System Properties/Environment Variables (ENVars), this can happen because:",
+                " * Your IDE/Java environment did not load the ENVars",
                 " * You are using a toolchain which does not automatically propagate ENVars between tools",
                 " * You are using a CI platform which does not automatically propagate ENVars between separate controller and processing hosts",
                 " * You are running tests on an environment on which these properties are not set; A newly build CI server, a Docker instance, etc"
@@ -33,7 +34,7 @@ public class ErrorExplainers {
         return String.join(System.lineSeparator(),
                 "Resource Not Found.   Possible reasons:",
                 " * This job does not exist",
-            " * Job assets have expired"
+                " * Job assets have expired"
         );
     }
 
@@ -78,16 +79,22 @@ public class ErrorExplainers {
 
     static String networkHARNotFound() {
         return String.join(System.lineSeparator(),
-            "Network HAR not found. Possible reasons:",
-            " * Job ID is not from a real device test",
-            " * Network HAR has not been processed yet"
+                "Network HAR not found. Possible reasons:",
+                " * Job ID is not from a real device test",
+                " * Network HAR has not been processed yet"
+        );
+    }
+
+    static String appiumServerLogNotFound() {
+        return String.join(System.lineSeparator(),
+                "Appium server log not found."
         );
     }
 
     static String HARMissing() {
         return String.join(System.lineSeparator(),
-            " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
-            " * This test was not able to complete HAR file recording due to an error or early termination"
+                " * This test was run without Extended Debugging. See https://wiki.saucelabs.com/pages/viewpage.action?pageId=70072943",
+                " * This test was not able to complete HAR file recording due to an error or early termination"
         );
     }
 

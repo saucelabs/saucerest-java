@@ -124,7 +124,7 @@ jobs:
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
 
-      -   name: Publish Surefire report
+      - name: Publish Surefire report
         uses: actions/upload-artifact@v3
         with:
           name: surefire-reports
