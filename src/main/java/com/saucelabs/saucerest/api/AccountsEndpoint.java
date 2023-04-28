@@ -15,20 +15,20 @@ import java.util.Map;
  * <p>
  * The Accounts API exposes the following methods related to individual and team account configuration and monitoring.
  */
-public class Accounts extends AbstractEndpoint {
-    public Accounts(DataCenter dataCenter) {
+public class AccountsEndpoint extends AbstractEndpoint {
+    public AccountsEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
 
-    public Accounts(String apiServer) {
+    public AccountsEndpoint(String apiServer) {
         super(apiServer);
     }
 
-    public Accounts(String username, String accessKey, DataCenter dataCenter) {
+    public AccountsEndpoint(String username, String accessKey, DataCenter dataCenter) {
         super(username, accessKey, dataCenter);
     }
 
-    public Accounts(String username, String accessKey, String apiServer) {
+    public AccountsEndpoint(String username, String accessKey, String apiServer) {
         super(username, accessKey, apiServer);
     }
 
@@ -46,7 +46,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams() throws IOException {
         String url = getBaseEndpoint() + "teams/";
 
-        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), LookupTeams.class);
     }
 
     /**
@@ -57,7 +57,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupTeams lookupTeams(String name) throws IOException {
         String url = getBaseEndpoint() + "teams?name=" + name;
 
-        return deserializeJSONObject(getResponseObject(url), LookupTeams.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), LookupTeams.class);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Accounts extends AbstractEndpoint {
     public Team getSpecificTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return deserializeJSONObject(getResponseObject(url), Team.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), Team.class);
     }
 
     /**
@@ -88,7 +88,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/";
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return deserializeJSONObject(request(url, HttpMethod.POST, map).body().string(), CreateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, map), CreateTeam.class);
     }
 
     public CreateTeam createTeam(String name, Integer VMConcurrency, String description) throws IOException {
@@ -98,7 +98,7 @@ public class Accounts extends AbstractEndpoint {
     public Organizations getOrganization() throws IOException {
         String url = getBaseEndpoint() + "organizations";
 
-        return deserializeJSONObject(getResponseObject(url), Organizations.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), Organizations.class);
     }
 
     /**
@@ -130,7 +130,7 @@ public class Accounts extends AbstractEndpoint {
         String url = getBaseEndpoint() + "teams/" + teamID;
         Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
-        return deserializeJSONObject(request(url, HttpMethod.PUT, map).body().string(), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, map), UpdateTeam.class);
     }
 
     /**
@@ -144,7 +144,7 @@ public class Accounts extends AbstractEndpoint {
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam.toJson()).body().string(), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam.toJson()), UpdateTeam.class);
     }
 
     /**
@@ -157,7 +157,7 @@ public class Accounts extends AbstractEndpoint {
     public TeamMembers getTeamMembers(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/members";
 
-        return deserializeJSONObject(getResponseObject(url), TeamMembers.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), TeamMembers.class);
     }
 
     /**
@@ -170,7 +170,7 @@ public class Accounts extends AbstractEndpoint {
     public List<ResetAccessKeyForTeam> resetAccessKeyForTeam(String teamID) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID + "/reset-access-key";
 
-        return deserializeJSONArray(request(url, HttpMethod.POST, "").body().string(), ResetAccessKeyForTeam.class);
+        return deserializeJSONArray(request(url, HttpMethod.POST, ""), ResetAccessKeyForTeam.class);
     }
 
     /**
@@ -182,7 +182,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers() throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return deserializeJSONObject(getResponseObject(url), LookupUsers.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), LookupUsers.class);
     }
 
     /**
@@ -195,7 +195,7 @@ public class Accounts extends AbstractEndpoint {
     public LookupUsers lookupUsers(LookupUsersParameter lookupUsersParameter) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return deserializeJSONObject(getResponseObject(url, lookupUsersParameter.toMap()).body().string(), LookupUsers.class);
+        return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, lookupUsersParameter.toMap()), LookupUsers.class);
     }
 
     /**
@@ -208,7 +208,7 @@ public class Accounts extends AbstractEndpoint {
     public User getUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID;
 
-        return deserializeJSONObject(getResponseObject(url), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), User.class);
     }
 
     /**
@@ -221,7 +221,7 @@ public class Accounts extends AbstractEndpoint {
     public User createUser(CreateUser createUser) throws IOException {
         String url = getBaseEndpoint() + "users/";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST, createUser.toMap()).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, createUser.toMap()), User.class);
     }
 
     /**
@@ -234,7 +234,7 @@ public class Accounts extends AbstractEndpoint {
     public User updateUser(UpdateUser updateUser) throws IOException {
         String url = getBaseEndpoint() + "users/" + updateUser.userID;
 
-        return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()), User.class);
     }
 
     /**
@@ -247,13 +247,13 @@ public class Accounts extends AbstractEndpoint {
     public User partiallyUpdateUser(UpdateUser updateUser) throws IOException {
         String url = getBaseEndpoint() + "users/" + updateUser.userID;
 
-        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()), User.class);
     }
 
     /**
      * Returns details about the current in-use virtual machines and real devices along with the maximum allowed values. <br> <br>
      * NOTE:
-     * At this time, the current usage for real devices is not accurately returned in the response. As a workaround, use the following endpoint: {@link RealDevices#getConcurrency()}
+     * At this time, the current usage for real devices is not accurately returned in the response. As a workaround, use the following endpoint: {@link RealDevicesEndpoint#getConcurrency()}
      *
      * @param username The username of the user whose concurrency you are looking up. You can look up a user's name using a variety of filtering parameters with the {@link LookupUsers} endpoint.
      * @return {@link UserConcurrency}
@@ -262,7 +262,7 @@ public class Accounts extends AbstractEndpoint {
     public UserConcurrency getUserConcurrency(String username) throws IOException {
         String url = super.getBaseEndpoint() + "rest/v1.2/users/" + username + "/concurrency";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), UserConcurrency.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), UserConcurrency.class);
     }
 
     /**
@@ -275,7 +275,7 @@ public class Accounts extends AbstractEndpoint {
     public UsersTeam getUsersTeam(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/teams/";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), UsersTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), UsersTeam.class);
     }
 
     /**
@@ -292,7 +292,7 @@ public class Accounts extends AbstractEndpoint {
 
         Map map = ImmutableMap.of("user", userID, "team", teamID);
 
-        return deserializeJSONObject(request(url, HttpMethod.POST, map).body().string(), SetTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST, map), SetTeam.class);
     }
 
     /**
@@ -305,7 +305,7 @@ public class Accounts extends AbstractEndpoint {
     public User setAdmin(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/set-admin";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST), User.class);
     }
 
     /**
@@ -318,7 +318,7 @@ public class Accounts extends AbstractEndpoint {
     public User setTeamAdmin(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/set-team-admin";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST), User.class);
     }
 
     /**
@@ -331,7 +331,7 @@ public class Accounts extends AbstractEndpoint {
     public User setMember(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/set-member";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST), User.class);
     }
 
     /**
@@ -344,7 +344,7 @@ public class Accounts extends AbstractEndpoint {
     public User getAccessKey(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/access-key";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), User.class);
     }
 
     /**
@@ -358,7 +358,7 @@ public class Accounts extends AbstractEndpoint {
     public List<User> resetAccessKey(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/reset-access-key";
 
-        return deserializeJSONArray(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONArray(request(url, HttpMethod.POST), User.class);
     }
 
     /**
@@ -371,7 +371,7 @@ public class Accounts extends AbstractEndpoint {
     public User deactivateUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/deactivate";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST), User.class);
     }
 
     /**
@@ -384,6 +384,6 @@ public class Accounts extends AbstractEndpoint {
     public User activateUser(String userID) throws IOException {
         String url = getBaseEndpoint() + "users/" + userID + "/activate";
 
-        return deserializeJSONObject(request(url, HttpMethod.POST).body().string(), User.class);
+        return deserializeJSONObject(request(url, HttpMethod.POST), User.class);
     }
 }

@@ -13,22 +13,6 @@ public class LookupUsersParameter {
     private final Integer limit;
     private final Integer offset;
 
-    public enum Status {
-        ACTIVE("active"),
-        PENDING("pending"),
-        INACTIVE("inactive");
-
-        private final String value;
-
-        Status(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
     public LookupUsersParameter(String username, String teams, String teamName, Integer roles, String phrase, String status, Integer limit, Integer offset) {
         this.username = username;
         this.teams = teams;
@@ -87,6 +71,22 @@ public class LookupUsersParameter {
         }
 
         return parameters;
+    }
+
+    public enum Status {
+        ACTIVE("active"),
+        PENDING("pending"),
+        INACTIVE("inactive");
+
+        private final String value;
+
+        Status(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public static final class Builder {

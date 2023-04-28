@@ -5,7 +5,8 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.storage.*;
 import okhttp3.*;
-import org.apache.commons.io.FileUtils;
+import okio.BufferedSink;
+import okio.Okio;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -14,20 +15,20 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
-public class Storage extends AbstractEndpoint {
-    public Storage(DataCenter dataCenter) {
+public class StorageEndpoint extends AbstractEndpoint {
+    public StorageEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
 
-    public Storage(String apiServer) {
+    public StorageEndpoint(String apiServer) {
         super(apiServer);
     }
 
-    public Storage(String username, String accessKey, DataCenter dataCenter) {
+    public StorageEndpoint(String username, String accessKey, DataCenter dataCenter) {
         super(username, accessKey, dataCenter);
     }
 
-    public Storage(String username, String accessKey, String apiServer) {
+    public StorageEndpoint(String username, String accessKey, String apiServer) {
         super(username, accessKey, apiServer);
     }
 
@@ -41,7 +42,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles() throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        return deserializeJSONObject(getResponseObject(url), GetAppFiles.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), GetAppFiles.class);
     }
 
     /**
@@ -56,7 +57,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppFiles getFiles(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/files";
 
-        return deserializeJSONObject(getResponseObject(url, params).body().string(), GetAppFiles.class);
+        return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, params), GetAppFiles.class);
     }
 
     /**
@@ -69,7 +70,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroups getGroups() throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        return deserializeJSONObject(getResponseObject(url), GetAppStorageGroups.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), GetAppStorageGroups.class);
     }
 
     /**
@@ -84,7 +85,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroups getGroups(Map<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/groups";
 
-        return deserializeJSONObject(getResponseObject(url, params).body().string(), GetAppStorageGroups.class);
+        return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, params), GetAppStorageGroups.class);
     }
 
     /**
@@ -98,7 +99,7 @@ public class Storage extends AbstractEndpoint {
     public GetAppStorageGroupSettings getGroupSettings(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return deserializeJSONObject(getResponseObject(url), GetAppStorageGroupSettings.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), GetAppStorageGroupSettings.class);
     }
 
     /**
@@ -113,13 +114,13 @@ public class Storage extends AbstractEndpoint {
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return deserializeJSONObject(request(url, HttpMethod.PUT, jsonBody).body().string(), EditAppGroupSettings.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, jsonBody), EditAppGroupSettings.class);
     }
 
     public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, EditAppGroupSettings editAppGroupSettings) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
-        return deserializeJSONObject(request(url, HttpMethod.PUT, editAppGroupSettings.toJson()).body().string(), EditAppGroupSettings.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
 
     }
 
@@ -175,8 +176,8 @@ public class Storage extends AbstractEndpoint {
     public void downloadFile(String fileId, Path path) throws IOException {
         String url = getBaseEndpoint() + "/download/" + fileId;
 
-        try (Response response = getResponse(url)) {
-            FileUtils.writeByteArrayToFile(new File(path.toFile().toURI()), Objects.requireNonNull(response.body()).bytes());
+        try (BufferedSink sink = Okio.buffer(Okio.sink(path.toFile()))) {
+            sink.writeAll(Objects.requireNonNull(request(url, HttpMethod.GET).body()).source());
         }
     }
 
@@ -194,7 +195,7 @@ public class Storage extends AbstractEndpoint {
 
         JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
 
-        return deserializeJSONObject(request(url, HttpMethod.PUT, json.toString()).body().string(), EditFileDescription.class);
+        return deserializeJSONObject(request(url, HttpMethod.PUT, json.toString()), EditFileDescription.class);
     }
 
     /**
@@ -208,7 +209,7 @@ public class Storage extends AbstractEndpoint {
     public DeleteAppFile deleteFile(String fileId) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
-        return deserializeJSONObject(request(url, HttpMethod.DELETE).body().string(), DeleteAppFile.class);
+        return deserializeJSONObject(request(url, HttpMethod.DELETE), DeleteAppFile.class);
     }
 
     /**
@@ -222,7 +223,7 @@ public class Storage extends AbstractEndpoint {
     public DeleteAppGroupFiles deleteFileGroup(int groupId) throws IOException {
         String url = getBaseEndpoint() + "/groups/" + groupId;
 
-        return deserializeJSONObject(request(url, HttpMethod.DELETE).body().string(), DeleteAppGroupFiles.class);
+        return deserializeJSONObject(request(url, HttpMethod.DELETE), DeleteAppGroupFiles.class);
     }
 
     /**
@@ -266,21 +267,5 @@ public class Storage extends AbstractEndpoint {
 
             return response.body().string();
         }
-    }
-
-    /**
-     * Can't use {@link AbstractEndpoint#getResponseObject(String)} because it would write the whole response into memory.
-     * This would be a problem if the app file to be downloaded is larger than 1MB.
-     *
-     * @param url The URL to download the app file
-     * @return {@link Response}
-     */
-    private Response getResponse(String url) throws IOException {
-        Request request = new Request.Builder()
-            .header("Authorization", credentials)
-            .url(url)
-            .build();
-
-        return makeRequest(request);
     }
 }
