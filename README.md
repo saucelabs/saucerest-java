@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/saucelabs/saucerest-java/">
-    <img alt="saucerest-java Logo" src="https://github.com/saucelabs/saucerest-java/.github/SauceLabsLogo.png">
+    <img alt="saucerest-java Logo" src="https://raw.githubusercontent.com/saucelabs/saucerest-java/master/.github/SauceLabsLogo.png">
   </a>
 </p>
 
