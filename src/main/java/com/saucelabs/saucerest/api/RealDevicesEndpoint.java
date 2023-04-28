@@ -103,7 +103,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
     public DeviceJobs getDeviceJobs(ImmutableMap<String, Object> params) throws IOException {
         String url = getBaseEndpoint() + "/jobs";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET, params), DeviceJobs.class);
+        return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, params), DeviceJobs.class);
     }
 
     /**
