@@ -241,14 +241,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <includes>
-                        <include>com.saucelabs.saucerest.DataCenter.class</include>
-                        <include>com.saucelabs.saucerest.SauceREST.class</include>
-                        <include>com.saucelabs.saucerest.api.StorageEndpoint.class</include>
-                        <include>com.saucelabs.saucerest.api.JobsEndpoint.class</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
