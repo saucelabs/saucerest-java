@@ -21,16 +21,8 @@ public class EditAppGroupSettings extends AbstractModel {
     }
 
     public static final class Builder {
-        private Settings settings;
         private final Platform platform;
-
-        public enum Platform {
-            IOS, ANDROID, OTHER;
-
-            public static Platform fromString(String platform) {
-                return Stream.of(values()).filter(p -> p.name().equalsIgnoreCase(platform)).findFirst().orElse(OTHER);
-            }
-        }
+        private Settings settings;
 
         public Builder(Platform platform) {
             this.platform = platform;
@@ -59,6 +51,14 @@ public class EditAppGroupSettings extends AbstractModel {
             }
 
             return new EditAppGroupSettings(this);
+        }
+
+        public enum Platform {
+            IOS, ANDROID, OTHER;
+
+            public static Platform fromString(String platform) {
+                return Stream.of(values()).filter(p -> p.name().equalsIgnoreCase(platform)).findFirst().orElse(OTHER);
+            }
         }
     }
 }

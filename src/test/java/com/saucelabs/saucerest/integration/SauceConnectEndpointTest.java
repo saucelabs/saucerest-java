@@ -2,7 +2,7 @@ package com.saucelabs.saucerest.integration;
 
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
-import com.saucelabs.saucerest.api.SauceConnect;
+import com.saucelabs.saucerest.api.SauceConnectEndpoint;
 import com.saucelabs.saucerest.model.sauceconnect.JobsForATunnel;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
@@ -19,19 +19,19 @@ import java.util.List;
  * Sauce Connect integration tests by nature require a running Sauce Connect tunnel. On GitHub this is done via an
  * action that starts the required tunnels. Locally running these tests require the developer to start a tunnel beforehand.
  */
-public class SauceConnectTest {
+public class SauceConnectEndpointTest {
 
     @AfterAll
     @SuppressWarnings("all")
     public static void tearDown() throws IOException {
         for (DataCenter dataCenter : DataCenter.values()) {
             SauceREST sauceREST = new SauceREST(dataCenter);
-            SauceConnect sauceConnect = sauceREST.getSauceConnect();
+            SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
 
-            List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+            List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
             for (String tunnelID : tunnelIDs) {
-                StopTunnel stopTunnel = sauceConnect.stopTunnel(tunnelID);
+                StopTunnel stopTunnel = sauceConnectEndpoint.stopTunnel(tunnelID);
 
                 Assertions.assertTrue(stopTunnel.result);
                 Assertions.assertFalse(stopTunnel.id.isEmpty());
@@ -44,8 +44,8 @@ public class SauceConnectTest {
     @EnumSource(DataCenter.class)
     public void getLatestVersionTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-        Versions versions = sauceConnect.getLatestVersions();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        Versions versions = sauceConnectEndpoint.getLatestVersions();
 
         Assertions.assertFalse(versions.latestVersion.isEmpty());
         Assertions.assertFalse(versions.infoUrl.isEmpty());
@@ -64,8 +64,8 @@ public class SauceConnectTest {
     @EnumSource(DataCenter.class)
     public void getLatestVersionWithoutCredentialsTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST("", "", dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-        Versions versions = sauceConnect.getLatestVersions();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        Versions versions = sauceConnectEndpoint.getLatestVersions();
 
         Assertions.assertFalse(versions.latestVersion.isEmpty());
         Assertions.assertFalse(versions.infoUrl.isEmpty());
@@ -84,9 +84,9 @@ public class SauceConnectTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
 
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+        List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
         Assertions.assertTrue(tunnelIDs.size() > 0);
     }
@@ -95,12 +95,12 @@ public class SauceConnectTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
 
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+        List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
         for (String tunnelID : tunnelIDs) {
-            TunnelInformation tunnelInformation = sauceConnect.getTunnelInformation(tunnelID);
+            TunnelInformation tunnelInformation = sauceConnectEndpoint.getTunnelInformation(tunnelID);
 
             Assertions.assertTrue(tunnelIDs.size() > 0);
             Assertions.assertNotNull(tunnelInformation);
@@ -111,11 +111,11 @@ public class SauceConnectTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnect sauceConnect = sauceREST.getSauceConnect();
-        List<String> tunnelIDs = sauceConnect.getTunnelsForAUser();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
         for (String tunnelID : tunnelIDs) {
-            JobsForATunnel jobsForATunnel = sauceConnect.getCurrentJobsForATunnel(tunnelID);
+            JobsForATunnel jobsForATunnel = sauceConnectEndpoint.getCurrentJobsForATunnel(tunnelID);
 
             Assertions.assertFalse(jobsForATunnel.id.isEmpty());
             Assertions.assertNotNull(jobsForATunnel.jobsRunning);

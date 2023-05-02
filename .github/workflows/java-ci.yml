@@ -6,7 +6,7 @@ on:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */72 * * *'
 
 permissions:
   contents: write
@@ -125,7 +125,7 @@ jobs:
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
 
       - name: Publish Surefire report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: surefire-reports
           path: target/surefire-reports

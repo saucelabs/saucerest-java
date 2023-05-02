@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class StorageParameterTest {
+public class StorageEndpointParameterTest {
 
     @Test
     public void pageNotSet() {
         StorageParameter storageParameter = new StorageParameter.Builder()
-            .setQ("bla")
-            .build();
+                .setQ("bla")
+                .build();
 
         Assertions.assertNull(storageParameter.toMap().get("page"));
     }
