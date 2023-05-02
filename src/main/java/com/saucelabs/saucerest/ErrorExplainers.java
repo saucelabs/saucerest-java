@@ -12,6 +12,7 @@ public class ErrorExplainers {
     public static String missingCreds() {
         return String.join(System.lineSeparator(),
                 "If using System Properties/Environment Variables (ENVars), this can happen because:",
+                " * Your IDE/Java environment did not load the ENVars",
                 " * You are using a toolchain which does not automatically propagate ENVars between tools",
                 " * You are using a CI platform which does not automatically propagate ENVars between separate controller and processing hosts",
                 " * You are running tests on an environment on which these properties are not set; A newly build CI server, a Docker instance, etc"
@@ -39,8 +40,54 @@ public class ErrorExplainers {
 
     static String videoMissing() {
         return String.join(System.lineSeparator(),
-                " * You disabled video recording by setting the `recordVideo` capability to false",
-                " * This test was not able to complete video encoding due to an error or early termination"
+            " * You disabled video recording by setting the `recordVideo` capability to false",
+            " * This test was not able to complete video encoding due to an error or early termination"
+        );
+    }
+
+    static String videoNotFound() {
+        return String.join(System.lineSeparator(),
+            "Video not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Video has not been processed yet"
+        );
+    }
+
+    static String insightsLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Insights log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Insights log has not been processed yet"
+        );
+    }
+
+    static String crashLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Crash log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Crash log has not been processed yet"
+        );
+    }
+
+    static String deviceLogNotFound() {
+        return String.join(System.lineSeparator(),
+            "Device log not found. Possible reasons:",
+            " * Job ID is not from a real device test",
+            " * Device log has not been processed yet"
+        );
+    }
+
+    static String networkHARNotFound() {
+        return String.join(System.lineSeparator(),
+                "Network HAR not found. Possible reasons:",
+                " * Job ID is not from a real device test",
+                " * Network HAR has not been processed yet"
+        );
+    }
+
+    static String appiumServerLogNotFound() {
+        return String.join(System.lineSeparator(),
+                "Appium server log not found."
         );
     }
 

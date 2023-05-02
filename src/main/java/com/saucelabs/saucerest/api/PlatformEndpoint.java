@@ -1,27 +1,28 @@
 package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
 
 import java.io.IOException;
 
-public class Platform extends AbstractEndpoint {
+public class PlatformEndpoint extends AbstractEndpoint {
 
-    public Platform(DataCenter dataCenter) {
+    public PlatformEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
 
-    public Platform(String apiServer) {
+    public PlatformEndpoint(String apiServer) {
         super(apiServer);
     }
 
-    public Platform(String username, String accessKey, DataCenter dataCenter) {
+    public PlatformEndpoint(String username, String accessKey, DataCenter dataCenter) {
         super(username, accessKey, dataCenter);
     }
 
-    public Platform(String username, String accessKey, String apiServer) {
+    public PlatformEndpoint(String username, String accessKey, String apiServer) {
         super(username, accessKey, apiServer);
     }
 
@@ -35,7 +36,7 @@ public class Platform extends AbstractEndpoint {
     public TestStatus getTestStatus() throws IOException {
         String url = getBaseEndpoint() + "/status";
 
-        return deserializeJSONObject(getResponseObject(url), TestStatus.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), TestStatus.class);
     }
 
     /**
@@ -49,7 +50,7 @@ public class Platform extends AbstractEndpoint {
     public SupportedPlatforms getSupportedPlatforms(String automationApi) throws IOException {
         String url = getBaseEndpoint() + "/platforms/" + automationApi;
 
-        return new SupportedPlatforms(deserializeJSONArray(getResponseObject(url), com.saucelabs.saucerest.model.platform.Platform.class));
+        return new SupportedPlatforms(deserializeJSONArray(request(url, HttpMethod.GET), com.saucelabs.saucerest.model.platform.Platform.class));
     }
 
     /**
@@ -62,7 +63,7 @@ public class Platform extends AbstractEndpoint {
     public EndOfLifeAppiumVersions getEndOfLifeAppiumVersions() throws IOException {
         String url = getBaseEndpoint() + "/platforms/appium/eol";
 
-        return new EndOfLifeAppiumVersions(getResponseObject(url));
+        return new EndOfLifeAppiumVersions(request(url, HttpMethod.GET).body().string());
     }
 
     /**

@@ -90,4 +90,13 @@ public class SauceException extends RuntimeException {
         public DeviceLockOnlyOnAndroid() {
         }
     }
+
+    public static class MissingCredentials extends SauceException {
+        public MissingCredentials(String message) {
+            super(message);
+        }
+
+        public MissingCredentials() {
+        }
+    }
 }

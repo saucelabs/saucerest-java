@@ -71,7 +71,7 @@ public class SauceRESTBuilder {
             throw new IllegalStateException("Required values (username/accessKey) missing");
         }
 
-        return new SauceREST(username, accessKey, dataCenter, maxDuration, maxRetries, delay, maxDelay, chronoUnit,
-            delayFactor, throwableList);
+        return new SauceREST(username, accessKey, dataCenter
+        );
     }
 }
