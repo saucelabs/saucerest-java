@@ -135,4 +135,16 @@ public class SauceREST implements Serializable {
     public AccountsEndpoint getAccountsEndpoint(DataCenter dataCenter) {
         return new AccountsEndpoint(this.username, this.accessKey, dataCenter);
     }
+
+    public BuildsEndpoint getBuildsEndpoint() {
+        return new BuildsEndpoint(this.username, this.accessKey, this.apiServer);
+    }
+
+    public BuildsEndpoint getBuildsEndpoint(String apiServer) {
+        return new BuildsEndpoint(this.username, this.accessKey, apiServer);
+    }
+
+    public BuildsEndpoint getBuildsEndpoint(DataCenter dataCenter) {
+        return new BuildsEndpoint(this.username, this.accessKey, dataCenter);
+    }
 }
