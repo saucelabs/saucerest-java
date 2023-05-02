@@ -463,7 +463,7 @@ public class JobsEndpointTest {
     public void getJobAssetFileTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         runTest(dataCenter, testInfo);
 
-        jobs.get().getJobAssetFile(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SAUCE_LOG.label), TestAsset.SAUCE_LOG);
+        jobs.get().downloadJobAsset(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SAUCE_LOG.label), TestAsset.SAUCE_LOG);
 
         assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
     }
@@ -491,10 +491,11 @@ public class JobsEndpointTest {
         jobs.get().downloadAllAssets(sessionID.get(), Paths.get(tempDir + "/"));
 
         assertAll(
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.LOGCAT_LOG.label)))
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.APPIUM_LOG.label))),
+            () -> assertFalse(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.LOGCAT_LOG.label)))
         );
     }
 
@@ -506,10 +507,11 @@ public class JobsEndpointTest {
         jobs.get().downloadAllAssets(sessionID.get(), Paths.get(tempDir + "/"));
 
         assertAll(
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SYSLOG_LOG.label)))
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.APPIUM_LOG.label))),
+            () -> assertFalse(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SYSLOG_LOG.label)))
         );
     }
 
@@ -518,7 +520,7 @@ public class JobsEndpointTest {
     public void getAllScreenshotsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         runTest(dataCenter, testInfo);
 
-        jobs.get().getAllScreenshots(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SCREENSHOTS.label));
+        jobs.get().downloadAllScreenshots(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SCREENSHOTS.label));
 
         assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
     }
