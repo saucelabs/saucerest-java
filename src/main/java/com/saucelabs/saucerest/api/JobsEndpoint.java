@@ -8,6 +8,8 @@ import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
 import okhttp3.Response;
 import org.apache.commons.io.FileUtils;
 import org.awaitility.Awaitility;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +128,7 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets";
 
         waitForFinishedTest(jobID);
+        waitForBasicTestAssets(jobID);
 
         return deserializeJSONObject(request(url, HttpMethod.GET), JobAssets.class);
     }
@@ -268,9 +271,25 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets";
 
         Awaitility.await()
-                .ignoreExceptionsMatching(e -> e.getMessage().contains("Bad Request"))
-                .atMost(Duration.ofSeconds(60))
-                .pollInterval(Duration.ofSeconds(1))
-                .until(() -> request(url, HttpMethod.GET).body() != null);
+            .ignoreExceptionsMatching(e -> e.getMessage().contains("Bad Request"))
+            .atMost(Duration.ofSeconds(60))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> request(url, HttpMethod.GET).body() != null);
+    }
+
+    private void waitForBasicTestAssets(String jobID) {
+        String url = getBaseEndpoint() + jobID + "/assets";
+
+        Awaitility.await()
+            .ignoreExceptionsMatching(e -> e.getCause().equals(JSONException.class))
+            .atMost(Duration.ofSeconds(60))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(
+                () -> {
+                    JSONObject response = new JSONObject(request(url, HttpMethod.GET));
+                    return response.has("video") &&
+                        response.has(TestAsset.SAUCE_LOG.jsonKey) &&
+                        response.has("selenium-log");
+                });
     }
 }
