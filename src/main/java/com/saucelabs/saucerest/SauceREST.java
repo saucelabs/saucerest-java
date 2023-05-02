@@ -15,15 +15,6 @@ public class SauceREST implements Serializable {
     private final String apiServer;
     private final String edsServer;
     private final String appServer;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getAccessKey() {
-        return accessKey;
-    }
-
     protected String username;
     protected String accessKey;
 
@@ -38,6 +29,26 @@ public class SauceREST implements Serializable {
         this.appServer = buildUrl(dataCenter.appServer(), "SAUCE_REST_APP_ENDPOINT", "saucerest-java.base_app_url");
         this.apiServer = buildUrl(dataCenter.apiServer(), "SAUCE_API_ENDPOINT", "saucerest-java.base_api_url");
         this.edsServer = buildUrl(dataCenter.edsServer(), "SAUCE_REST_EDS_ENDPOINT", "saucerest-java.base_eds_url");
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public String getAppServer() {
+        return appServer;
+    }
+
+    public String getEdsServer() {
+        return edsServer;
     }
 
     /**
