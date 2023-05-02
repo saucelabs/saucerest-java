@@ -10,20 +10,20 @@ import com.saucelabs.saucerest.model.sauceconnect.Versions;
 import java.io.IOException;
 import java.util.List;
 
-public class SauceConnect extends AbstractEndpoint {
-    public SauceConnect(DataCenter dataCenter) {
+public class SauceConnectEndpoint extends AbstractEndpoint {
+    public SauceConnectEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
 
-    public SauceConnect(String apiServer) {
+    public SauceConnectEndpoint(String apiServer) {
         super(apiServer);
     }
 
-    public SauceConnect(String username, String accessKey, String apiServer) {
+    public SauceConnectEndpoint(String username, String accessKey, String apiServer) {
         super(username, accessKey, apiServer);
     }
 
-    public SauceConnect(String username, String accessKey, DataCenter dataCenter) {
+    public SauceConnectEndpoint(String username, String accessKey, DataCenter dataCenter) {
         super(username, accessKey, dataCenter);
     }
 
@@ -46,7 +46,7 @@ public class SauceConnect extends AbstractEndpoint {
     public List<String> getTunnelsForAUser(String username) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels";
 
-        return deserializeJSONArray(getResponseObject(url), String.class);
+        return deserializeJSONArray(request(url, HttpMethod.GET), String.class);
     }
 
     /**
@@ -60,7 +60,7 @@ public class SauceConnect extends AbstractEndpoint {
     public TunnelInformation getTunnelInformation(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return deserializeJSONObject(getResponseObject(url), TunnelInformation.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), TunnelInformation.class);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SauceConnect extends AbstractEndpoint {
     public JobsForATunnel getCurrentJobsForATunnel(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID + "/num_jobs";
 
-        return deserializeJSONObject(getResponseObject(url), JobsForATunnel.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), JobsForATunnel.class);
     }
 
     /**
@@ -110,7 +110,7 @@ public class SauceConnect extends AbstractEndpoint {
     public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
         String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return deserializeJSONObject(request(url, HttpMethod.DELETE).body().string(), StopTunnel.class);
+        return deserializeJSONObject(request(url, HttpMethod.DELETE), StopTunnel.class);
     }
 
     /**
@@ -133,7 +133,7 @@ public class SauceConnect extends AbstractEndpoint {
     public Versions getLatestVersions() throws IOException {
         String url = getBaseEndpoint() + "public/tunnels/info/versions";
 
-        return deserializeJSONObject(getResponseObject(url), Versions.class);
+        return deserializeJSONObject(request(url, HttpMethod.GET), Versions.class);
     }
 
     /**

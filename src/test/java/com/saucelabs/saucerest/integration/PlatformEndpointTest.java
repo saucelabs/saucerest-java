@@ -2,7 +2,7 @@ package com.saucelabs.saucerest.integration;
 
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
-import com.saucelabs.saucerest.api.Platform;
+import com.saucelabs.saucerest.api.PlatformEndpoint;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
@@ -12,16 +12,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
 
-public class PlatformTest {
-    private final ThreadLocal<Platform> platform = new ThreadLocal<>();
+public class PlatformEndpointTest {
+    private final ThreadLocal<PlatformEndpoint> platform = new ThreadLocal<>();
 
-    public void setup(com.saucelabs.saucerest.integration.DataCenter dataCenter) {
-        platform.set(new SauceREST(DataCenter.fromString(dataCenter.toString())).getPlatform());
+    public void setup(DataCenter dataCenter) {
+        platform.set(new SauceREST(dataCenter).getPlatform());
     }
 
     @ParameterizedTest
-    @EnumSource(com.saucelabs.saucerest.integration.DataCenter.class)
-    public void getTestStatus(com.saucelabs.saucerest.integration.DataCenter dataCenter) throws IOException {
+    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    public void getTestStatus(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
         TestStatus testStatus = platform.get().getTestStatus();
@@ -31,8 +31,8 @@ public class PlatformTest {
     }
 
     @ParameterizedTest
-    @EnumSource(com.saucelabs.saucerest.integration.DataCenter.class)
-    public void getAllSupportedPlatforms(com.saucelabs.saucerest.integration.DataCenter dataCenter) throws IOException {
+    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    public void getAllSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("all");
@@ -42,8 +42,8 @@ public class PlatformTest {
     }
 
     @ParameterizedTest
-    @EnumSource(com.saucelabs.saucerest.integration.DataCenter.class)
-    public void getAppiumSupportedPlatforms(com.saucelabs.saucerest.integration.DataCenter dataCenter) throws IOException {
+    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    public void getAppiumSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("appium");
@@ -53,8 +53,8 @@ public class PlatformTest {
     }
 
     @ParameterizedTest
-    @EnumSource(com.saucelabs.saucerest.integration.DataCenter.class)
-    public void getWebdriverSupportedPlatforms(com.saucelabs.saucerest.integration.DataCenter dataCenter) throws IOException {
+    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    public void getWebdriverSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("webdriver");
@@ -64,8 +64,8 @@ public class PlatformTest {
     }
 
     @ParameterizedTest
-    @EnumSource(com.saucelabs.saucerest.integration.DataCenter.class)
-    public void getEndOfLifeAppiumVersions(com.saucelabs.saucerest.integration.DataCenter dataCenter) throws IOException {
+    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    public void getEndOfLifeAppiumVersions(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
         EndOfLifeAppiumVersions endOfLifeAppiumVersions = platform.get().getEndOfLifeAppiumVersions();

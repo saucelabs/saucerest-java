@@ -1,15 +1,50 @@
 package com.saucelabs.saucerest.unit;
 
+import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
+import okhttp3.HttpUrl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
 public class AbstractEndpointTest {
+    /**
+     * Test of {@link com.saucelabs.saucerest.api.AbstractEndpoint#buildUrl(String, Map)} method, of class AbstractEndpoint using reflection.
+     */
+    @Test
+    public void testBuildUrl() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        AbstractEndpoint instance = mock(AbstractEndpoint.class);
+        Method method = AbstractEndpoint.class.getDeclaredMethod("buildUrl", String.class, Map.class);
+        method.setAccessible(true);
+
+        String url = "https://example.com";
+        Map<String, Object> params = new HashMap<>();
+        params.put("param1", "value1");
+        params.put("param2", new String[]{"value2", "value3"});
+
+        String expected = HttpUrl.parse("https://example.com")
+                .newBuilder()
+                .addQueryParameter("param1", "value1")
+                .addQueryParameter("param2", "value2")
+                .addQueryParameter("param2", "value3")
+                .build()
+                .toString();
+
+        String actual = (String) method.invoke(instance, url, params);
+
+        assertEquals(expected, actual);
+    }
 
     @Test
     void testDeserializeJSONArray() throws IOException {
@@ -21,11 +56,11 @@ public class AbstractEndpointTest {
 
         // Verify that the deserialized list contains the expected objects
         assertAll("persons",
-            () -> assertEquals(persons.size(), 2),
-            () -> assertEquals(persons.get(0).getName(), "John"),
-            () -> assertEquals(persons.get(0).getAge(), 30),
-            () -> assertEquals(persons.get(1).getName(), "Jane"),
-            () -> assertEquals(persons.get(1).getAge(), 25)
+                () -> assertEquals(persons.size(), 2),
+                () -> assertEquals(persons.get(0).getName(), "John"),
+                () -> assertEquals(persons.get(0).getAge(), 30),
+                () -> assertEquals(persons.get(1).getName(), "Jane"),
+                () -> assertEquals(persons.get(1).getAge(), 25)
         );
     }
 
@@ -39,9 +74,14 @@ public class AbstractEndpointTest {
 
         // Verify that the deserialized list contains the expected objects
         assertAll("persons",
-            () -> assertEquals(person.getName(), "John"),
-            () -> assertEquals(person.getAge(), 30)
+                () -> assertEquals(person.getName(), "John"),
+                () -> assertEquals(person.getAge(), 30)
         );
+    }
+
+    @Test
+    public void testConstructorWithNullCredentials() {
+        assertThrows(SauceException.MissingCredentials.class, () -> new PersonEndpoint(null, null, null));
     }
 
     public static class Person {
@@ -66,6 +106,10 @@ public class AbstractEndpointTest {
 
         public PersonEndpoint(String apiServer) {
             super(apiServer);
+        }
+
+        public PersonEndpoint(String username, String accessKey, String apiServer) {
+            super(username, accessKey, apiServer);
         }
 
         public <T> List<T> publicDeserializeJSONArray(String json, Class<T> clazz) throws IOException {

@@ -16,14 +16,14 @@
     </licenses>
     <organization>
         <name>Sauce Labs</name>
-        <url>http://www.saucelabs.com/</url>
+        <url>https://www.saucelabs.com/</url>
     </organization>
     <developers>
         <developer>
             <name>Yi Min Yang</name>
             <email>yi-min.yang@saucelabs.com</email>
             <organization>Sauce Labs</organization>
-            <organizationUrl>http://www.saucelabs.com/</organizationUrl>
+            <organizationUrl>https://www.saucelabs.com/</organizationUrl>
         </developer>
     </developers>
     <scm>
@@ -80,12 +80,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.2</version>
+            <version>5.9.3</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.9.2</version>
+            <version>5.9.3</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.10.0</version>
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-junit-jupiter</artifactId>
-        <version>5.2.0</version>
+          <version>5.3.1</version>
         <scope>test</scope>
       </dependency>
 
@@ -226,7 +226,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>0.8.10</version>
                 <executions>
                     <execution>
                         <goals>
@@ -245,8 +245,8 @@
                     <includes>
                         <include>com.saucelabs.saucerest.DataCenter.class</include>
                         <include>com.saucelabs.saucerest.SauceREST.class</include>
-                        <include>com.saucelabs.saucerest.api.Storage.class</include>
-                        <include>com.saucelabs.saucerest.api.Job.class</include>
+                        <include>com.saucelabs.saucerest.api.StorageEndpoint.class</include>
+                        <include>com.saucelabs.saucerest.api.JobsEndpoint.class</include>
                     </includes>
                 </configuration>
             </plugin>

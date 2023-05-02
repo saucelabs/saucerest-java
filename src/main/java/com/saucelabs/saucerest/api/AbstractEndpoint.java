@@ -1,23 +1,27 @@
 package com.saucelabs.saucerest.api;
 
-import com.saucelabs.saucerest.BuildUtils;
-import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.HttpMethod;
-import com.saucelabs.saucerest.MoshiSingleton;
+import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonDataException;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import okhttp3.*;
+import okio.BufferedSink;
+import okio.Okio;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +75,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
     private String initializeCredentials() {
         if (username == null || accessKey == null) {
-            return null;
+            logger.warning("Credentials are null. Please set the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables.");
+            throw new SauceException.MissingCredentials(ErrorExplainers.missingCreds());
         }
         return Credentials.basic(username, accessKey);
     }
@@ -80,21 +85,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return baseURL;
     }
 
-    public String getResponseObject(String url) throws IOException {
-        Response response = getResponse(url);
-
-        return response.body().string();
-    }
-
     /**
-     * Make a GET request with query parameters.
+     * Build a URL with query parameters.
      *
      * @param url    Sauce Labs API endpoint
      * @param params query parameters for GET request
-     * @return
-     * @throws IOException
+     * @return URL with query parameters
      */
-    public Response getResponseObject(String url, Map<String, Object> params) throws IOException {
+    private String buildUrl(String url, Map<String, Object> params) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
         for (Map.Entry<String, Object> param : params.entrySet()) {
@@ -108,27 +106,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
             }
         }
 
-        return request(urlBuilder.build().toString(), HttpMethod.GET);
-    }
-
-    public okio.BufferedSource getStream(String url) throws IOException {
-        Response response = getResponse(url);
-        return response.body().source();
-    }
-
-    private Response getResponse(String url) throws IOException {
-        Request.Builder chain = new Request.Builder();
-
-        if (credentials != null) {
-            chain = chain.header("Authorization", credentials);
-        }
-
-        Request request = chain
-            .url(url)
-            .get()
-            .build();
-
-        return makeRequest(request);
+        return urlBuilder.build().toString();
     }
 
     public Response request(String url, HttpMethod httpMethod) throws IOException {
@@ -144,10 +122,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return makeRequest(request);
     }
 
-    protected Request createRequest(String url, HttpMethod httpMethod, String body) {
+    public Response requestWithQueryParameters(String url, HttpMethod httpMethod, Map<String, Object> params) throws IOException {
+        return request(buildUrl(url, params), httpMethod);
+    }
+
+    private Request createRequest(String url, HttpMethod httpMethod, String body) {
         Request.Builder chain = new Request.Builder()
-            .url(url)
-            .header("User-Agent", userAgent);
+                .url(url)
+                .header("User-Agent", userAgent);
 
         if (credentials != null) {
             chain.header("Authorization", credentials);
@@ -161,6 +143,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
         } else {
             switch (httpMethod) {
                 case POST:
+                case PUT:
+                case PATCH:
                     chain.method(httpMethod.label, RequestBody.create(new byte[]{}, MediaType.parse(JSON_MEDIA_TYPE)));
                     break;
                 default:
@@ -168,6 +152,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
                     break;
             }
         }
+        logger.log(Level.FINE, "Request {0} {1} with body {2}", new Object[]{httpMethod.label, url, body});
         return chain.build();
     }
 
@@ -180,14 +165,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
             throw e;
         }
 
+        if (shouldRetryOnHttpError(response)) {
+            response = retryRequest(request);
+        }
+
         if (!response.isSuccessful()) {
             logger.log(Level.WARNING, "Request {0} {1} failed with response code {2} and message {3}",
                 new Object[]{request.method(), request.url(), response.code(), response.message()});
             responseHandler(this, response);
-        }
-
-        if (shouldRetryOnHttpError(response)) {
-            response = retryRequest(request);
         }
 
         return response;
@@ -252,7 +237,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
             return jsonAdapter.fromJson(jsonResponse);
         } catch (IOException e) {
             throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
+        } catch (JsonDataException e) {
+            logger.warning("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+            throw e;
         }
+    }
+
+    protected <T> T deserializeJSONObject(Response response, Class<T> clazz) throws IOException {
+        return deserializeJSONObject(response.body().string(), clazz);
     }
 
     /**
@@ -274,5 +266,38 @@ public abstract class AbstractEndpoint extends AbstractModel {
         } catch (IOException e) {
             throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
         }
+    }
+
+    protected <T> List<T> deserializeJSONArray(Response response, Class<T> clazz) throws IOException {
+        return deserializeJSONArray(response.body().string(), clazz);
+    }
+
+    protected void downloadFile(String url, String path, String fileName) {
+        try (BufferedSink sink = Okio.buffer(Okio.sink(Paths.get(path, fileName).toFile()))) {
+            sink.writeAll(Objects.requireNonNull(request(url, HttpMethod.GET).body()).source());
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, String.format("Error downloading file to %s with filename %s", path, fileName), e);
+        }
+    }
+
+    protected void downloadFile(String url, String path) {
+        downloadFile(url, path, Paths.get(url).getFileName().toString());
+    }
+
+    protected Path getDirectoryPath(String directoryPathString) throws IOException {
+        if (directoryPathString == null || directoryPathString.isEmpty()) {
+            // Use current directory if directoryPath is not specified
+            directoryPathString = System.getProperty("user.dir");
+        }
+
+        Path directoryPath = Paths.get(directoryPathString);
+        // Create directory if it doesn't exist
+        Files.createDirectories(directoryPath);
+
+        return directoryPath;
+    }
+
+    protected Path getFilePath(Path directoryPath, String fileName) {
+        return directoryPath.resolve(fileName);
     }
 }
