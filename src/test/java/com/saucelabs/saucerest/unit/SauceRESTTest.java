@@ -162,4 +162,18 @@ public class SauceRESTTest {
         BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint("https://eu-central-1.saucelabs.com/rest/v1/builds");
         assertNotNull(buildsEndpoint);
     }
+
+    @Test
+    public void testGetBuildsEndpointWithoutSauceREST() {
+        BuildsEndpoint buildsEndpoint = new BuildsEndpoint(DataCenter.US_WEST);
+        assertNotNull(buildsEndpoint);
+    }
+
+    @Test
+    public void testGetBuildsEndpointWithoutSauceRESTAndAPIServer() {
+        BuildsEndpoint buildsEndpoint = new BuildsEndpoint("https://eu-central-1.saucelabs.com/rest/v1/builds");
+        assertNotNull(buildsEndpoint);
+    }
+
+    //TODO add more unit tests for the other constructors
 }

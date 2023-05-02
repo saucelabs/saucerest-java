@@ -13,7 +13,7 @@
   <a href="https://github.com/saucelabs/saucerest-java/actions/workflows/java-ci.yml">
     <img alt="CI/CD" src="https://img.shields.io/github/actions/workflow/status/saucelabs/saucerest-java/java-ci.yml?branch=master&label=CI/CD&style=for-the-badge&logo=githubactions&logoColor=white">
   </a>
-  <a href="https://codecov.io/gh/saucelabs/saucerest-java?branch=master">
+  <a href="https://codecov.io/gh/saucelabs/saucerest-java">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/saucelabs/saucerest-java?style=for-the-badge&logo=codecov&logoColor=white">
   </a>
   <a href="https://central.sonatype.com/artifact/com.saucelabs/saucerest">
