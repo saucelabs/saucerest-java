@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/saucelabs/saucerest-java/">
+  <a href="https://saucelabs.com/sign-up">
     <img alt="saucerest-java Logo" src="https://raw.githubusercontent.com/saucelabs/saucerest-java/master/.github/SauceLabsLogo.png">
   </a>
 </p>
@@ -41,22 +41,22 @@ request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-jav
 ## Create an instance of the client
 
 ```java
-SauceREST sauce=new SauceREST("username","access-key","data_center");
+SauceREST sauceREST=new SauceREST("username","access-key","data_center");
 ```
 
 OR
 
 ```java
-SauceREST sauce=new SauceREST("username","access-key",DataCenter.US_WEST);
+SauceREST sauceREST=new SauceREST("username","access-key",DataCenter.US_WEST);
 ```
 
 Parameters:
 
 | Name        | Type                            | Details                                                     |
 |-------------|---------------------------------|-------------------------------------------------------------|
-| username    | String (required)               | your sauce labs username                                    |
-| access-key  | String (required)               | your sauce labs accesskey                                   |
-| data_center | String or DataCenter (required) | one of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
+| username    | String (required)               | Your sauce labs username                                    |
+| access-key  | String (required)               | Your sauce labs accesskey                                   |
+| data_center | String or DataCenter (required) | One of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
 
 ## Code examples
 
