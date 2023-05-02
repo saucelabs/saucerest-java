@@ -53,7 +53,7 @@ jobs:
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v3
         with:
-          flags: unittests
+          flags: unittests,tests
 
   Upload_apps:
     name: Upload My Demo Apps
@@ -126,7 +126,7 @@ jobs:
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v3
         with:
-          flags: integrationtests
+          flags: integrationtests,tests
 
 #  slackNotification:
 #    name: Slack Notification
