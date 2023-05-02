@@ -28,15 +28,33 @@ public class SauceExceptionTest {
     }
 
     @Test
+    public void testUnknownErrorConstructorWithoutMessage() {
+        SauceException.UnknownError exception = new SauceException.UnknownError();
+        assertEquals(null, exception.getMessage());
+    }
+
+    @Test
     public void testNotAuthorizedConstructor() {
         SauceException.NotAuthorized exception = new SauceException.NotAuthorized(MESSAGE);
         assertEquals(MESSAGE, exception.getMessage());
     }
 
     @Test
+    public void testNotAuthorizedConstructorWithoutMessage() {
+        SauceException.NotAuthorized exception = new SauceException.NotAuthorized();
+        assertEquals(null, exception.getMessage());
+    }
+
+    @Test
     public void testNotFoundConstructor() {
         SauceException.NotFound exception = new SauceException.NotFound(MESSAGE);
         assertEquals(MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void testNotFoundConstructorWithoutMessage() {
+        SauceException.NotFound exception = new SauceException.NotFound();
+        assertEquals(null, exception.getMessage());
     }
 
     @Test
@@ -53,9 +71,21 @@ public class SauceExceptionTest {
     }
 
     @Test
+    public void testNotYetDoneConstructorWithoutMessage() {
+        SauceException.NotYetDone exception = new SauceException.NotYetDone();
+        assertEquals(null, exception.getMessage());
+    }
+
+    @Test
     public void testResigningNotAllowedConstructor() {
         SauceException.ResigningNotAllowed exception = new SauceException.ResigningNotAllowed(MESSAGE);
         assertEquals(MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void testResigningNotAllowedConstructorWithoutMessage() {
+        SauceException.ResigningNotAllowed exception = new SauceException.ResigningNotAllowed();
+        assertEquals(null, exception.getMessage());
     }
 
     @Test
@@ -65,8 +95,20 @@ public class SauceExceptionTest {
     }
 
     @Test
+    public void testInstrumentationNotAllowedConstructorWithoutMessage() {
+        SauceException.InstrumentationNotAllowed exception = new SauceException.InstrumentationNotAllowed();
+        assertEquals(null, exception.getMessage());
+    }
+
+    @Test
     public void testDeviceLockOnlyOnAndroidConstructor() {
         SauceException.DeviceLockOnlyOnAndroid exception = new SauceException.DeviceLockOnlyOnAndroid(MESSAGE);
         assertEquals(MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    public void testDeviceLockOnlyOnAndroidConstructorWithoutMessage() {
+        SauceException.DeviceLockOnlyOnAndroid exception = new SauceException.DeviceLockOnlyOnAndroid();
+        assertEquals(null, exception.getMessage());
     }
 }
