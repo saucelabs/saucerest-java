@@ -1,46 +1,49 @@
 package com.saucelabs.saucerest.unit;
 
+import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceShareableLink;
 import org.junit.jupiter.api.Test;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SauceShareableLinkTest {
-
-    public static final String EXPECTED_DIGEST = "0a7a857b4eba79ef23eefbfa332a10c7";
-    private static final String USERNAME = "myUsername";
-    private static final String ACCESS_KEY = "myAccessKey";
-    private static final String JOB_ID = "12345";
-    private static final String SERVER = "https://saucelabs.com/rest/v1/";
-
     @Test
-    public void testGetShareableLink() throws NoSuchAlgorithmException, InvalidKeyException {
-        String expectedLink = "https://saucelabs.com/rest/v1/tests/" + JOB_ID + "?auth=" + EXPECTED_DIGEST;
-        String actualLink = SauceShareableLink.getShareableLink(USERNAME, ACCESS_KEY, JOB_ID, SERVER);
-        assertEquals(expectedLink, actualLink);
+    void testGetShareableLinkWithValidInputs() {
+        String shareableLink = SauceShareableLink.getShareableLink("1234", DataCenter.EU_CENTRAL);
+
+        assertAll(
+            () -> assertNotNull(shareableLink),
+            () -> assertFalse(shareableLink.isEmpty()),
+            () -> assertTrue(shareableLink.contains("1234")),
+            () -> assertTrue(shareableLink.contains(DataCenter.EU_CENTRAL.appServer))
+        );
     }
 
     @Test
-    void testGetShareableLinkWithNullSauceJobId() {
-        assertThrows(IllegalArgumentException.class, () -> SauceShareableLink.getShareableLink("myUsername", "myAccessKey", null, "https://mydatacenter.saucelabs.com/"));
+    void testGetShareableLinkWithDefaultCredentials() {
+        String shareableLink = SauceShareableLink.getShareableLink("username", "accessKey", "1234", DataCenter.EU_CENTRAL);
+        String expectedShareableLink = "https://app.eu-central-1.saucelabs.com/tests/1234?auth=6cfae591bc67fc04059684ce9b737f81";
+
+        assertAll(
+            () -> assertNotNull(shareableLink),
+            () -> assertFalse(shareableLink.isEmpty()),
+            () -> assertTrue(shareableLink.contains("1234")),
+            () -> assertTrue(shareableLink.contains(DataCenter.EU_CENTRAL.appServer)),
+            () -> assertEquals(expectedShareableLink, shareableLink)
+        );
     }
 
     @Test
     void testGetShareableLinkWithEmptySauceJobId() {
-        assertThrows(IllegalArgumentException.class, () -> SauceShareableLink.getShareableLink("myUsername", "myAccessKey", "", "https://mydatacenter.saucelabs.com/"));
+        assertThrows(IllegalArgumentException.class, () -> {
+            SauceShareableLink.getShareableLink(null, null, "", DataCenter.EU_CENTRAL);
+        });
     }
 
     @Test
-    void testGetShareableLinkWithNullDataCenterEndpoint() {
-        assertThrows(IllegalArgumentException.class, () -> SauceShareableLink.getShareableLink("myUsername", "myAccessKey", "12345", null));
-    }
-
-    @Test
-    void testGetShareableLinkWithEmptyDataCenterEndpoint() {
-        assertThrows(IllegalArgumentException.class, () -> SauceShareableLink.getShareableLink("myUsername", "myAccessKey", "12345", ""));
+    void testGetShareableLinkWithNullDataCenter() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            SauceShareableLink.getShareableLink("username", "accessKey", "1234", null);
+        });
     }
 }
