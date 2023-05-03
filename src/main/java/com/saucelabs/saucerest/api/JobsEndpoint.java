@@ -8,11 +8,12 @@ import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
 import okhttp3.Response;
 import org.apache.commons.io.FileUtils;
 import org.awaitility.Awaitility;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.*;
 
@@ -126,6 +127,7 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets";
 
         waitForFinishedTest(jobID);
+        waitForBasicTestAssets(jobID);
 
         return deserializeJSONObject(request(url, HttpMethod.GET), JobAssets.class);
     }
@@ -139,7 +141,7 @@ public class JobsEndpoint extends AbstractEndpoint {
      * @param testAsset {@link TestAsset} object
      * @throws IOException if the request fails
      */
-    public void getJobAssetFile(String jobID, Path path, TestAsset testAsset) throws IOException {
+    public void downloadJobAsset(String jobID, Path path, TestAsset testAsset) throws IOException {
         String url = getBaseEndpoint() + jobID + "/assets/" + testAsset.label;
 
         try (Response response = request(url, HttpMethod.GET)) {
@@ -154,7 +156,7 @@ public class JobsEndpoint extends AbstractEndpoint {
      * @param path  Path including filename where the asset file should be stored
      * @throws IOException if the request fails
      */
-    public void getAllScreenshots(String jobID, Path path) throws IOException {
+    public void downloadAllScreenshots(String jobID, Path path) throws IOException {
         String url = getBaseEndpoint() + jobID + "/assets/screenshots.zip";
 
         try (Response response = request(url, HttpMethod.GET)) {
@@ -172,20 +174,28 @@ public class JobsEndpoint extends AbstractEndpoint {
     public void downloadAllAssets(String jobID, Path path) throws IOException {
         JobAssets jobAssets = listJobAssets(jobID);
         Map<String, String> assets = jobAssets.getAvailableAssets();
-
-        // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
-        // this is a workaround to get the correct filename when downloading the log
-        if (getJobDetails(jobID).automationBackend.equalsIgnoreCase(AutomationBackend.APPIUM.label)) {
-            path = path.resolveSibling(TestAsset.APPIUM_LOG.label);
-        } else {
-            path = path.resolveSibling(TestAsset.SELENIUM_LOG.label);
-        }
+        boolean isAppium = getJobDetails(jobID).automationBackend.equalsIgnoreCase(AutomationBackend.APPIUM.label);
 
         for (Map.Entry<String, String> entry : assets.entrySet()) {
-            getJobAssetFile(jobID, Paths.get(path.toString(), entry.getValue()), TestAsset.get(entry.getValue()).get());
+            String assetLabel = entry.getValue();
+            String filename = assetLabel;
+
+            switch (assetLabel) {
+                // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
+                // this is a workaround to get the correct filename when downloading the log
+                case "selenium-server.log":
+                    filename = isAppium ? TestAsset.APPIUM_LOG.label : TestAsset.SELENIUM_LOG.label;
+                    break;
+                default:
+                    break;
+            }
+
+            Path assetPath = path.resolve(filename);
+            downloadJobAsset(jobID, assetPath, TestAsset.get(assetLabel).get());
         }
 
-        getAllScreenshots(jobID, Paths.get(path.toString(), "screenshots.zip"));
+        Path screenshotsPath = path.resolve("screenshots.zip");
+        downloadAllScreenshots(jobID, screenshotsPath);
     }
 
     /**
@@ -206,7 +216,7 @@ public class JobsEndpoint extends AbstractEndpoint {
             path = path.resolveSibling(TestAsset.SELENIUM_LOG.label);
         }
 
-        getJobAssetFile(jobID, path, TestAsset.SELENIUM_LOG);
+        downloadJobAsset(jobID, path, TestAsset.SELENIUM_LOG);
     }
 
     /**
@@ -268,9 +278,25 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets";
 
         Awaitility.await()
-                .ignoreExceptionsMatching(e -> e.getMessage().contains("Bad Request"))
-                .atMost(Duration.ofSeconds(60))
-                .pollInterval(Duration.ofSeconds(1))
-                .until(() -> request(url, HttpMethod.GET).body() != null);
+            .ignoreExceptionsMatching(e -> e.getMessage().contains("Bad Request"))
+            .atMost(Duration.ofSeconds(60))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> request(url, HttpMethod.GET).body() != null);
+    }
+
+    private void waitForBasicTestAssets(String jobID) {
+        String url = getBaseEndpoint() + jobID + "/assets";
+
+        Awaitility.await()
+            .ignoreExceptionsMatching(e -> e.getClass().equals(JSONException.class))
+            .atMost(Duration.ofMinutes(5))
+            .pollInterval(Duration.ofSeconds(10))
+            .until(
+                () -> {
+                    JSONObject response = new JSONObject(request(url, HttpMethod.GET).body().string());
+                    return response.has("video") &&
+                        response.has(TestAsset.SAUCE_LOG.jsonKey) &&
+                        response.has("selenium-log");
+                });
     }
 }

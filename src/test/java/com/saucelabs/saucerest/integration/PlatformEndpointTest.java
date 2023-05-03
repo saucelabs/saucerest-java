@@ -16,7 +16,7 @@ public class PlatformEndpointTest {
     private final ThreadLocal<PlatformEndpoint> platform = new ThreadLocal<>();
 
     public void setup(DataCenter dataCenter) {
-        platform.set(new SauceREST(dataCenter).getPlatform());
+        platform.set(new SauceREST(dataCenter).getPlatformEndpoint());
     }
 
     @ParameterizedTest

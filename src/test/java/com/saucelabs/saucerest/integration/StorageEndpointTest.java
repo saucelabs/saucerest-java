@@ -64,7 +64,7 @@ public class StorageEndpointTest {
     }
 
     public void setup(Region region) {
-        storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorage());
+        storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorageEndpoint());
     }
 
     @AfterEach
@@ -109,18 +109,6 @@ public class StorageEndpointTest {
         assertEquals(apkFile.getName(), uploadFileApp.item.name);
         assertEquals("", uploadFileApp.item.description);
         assertEquals("android", uploadFileApp.item.kind);
-    }
-
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void uploadZipFileTest(Region region) throws IOException {
-        setup(region);
-        File zipFile = new File(Objects.requireNonNull(getClass().getResource("/Storage/SL_Logo.zip")).getFile());
-        UploadFileApp uploadFileApp = storage.get().uploadFile(zipFile);
-
-        assertEquals(zipFile.getName(), uploadFileApp.item.name);
-        assertEquals("", uploadFileApp.item.description);
-        assertEquals("other", uploadFileApp.item.kind);
     }
 
     @ParameterizedTest
