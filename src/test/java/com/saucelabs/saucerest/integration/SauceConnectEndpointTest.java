@@ -26,7 +26,7 @@ public class SauceConnectEndpointTest {
     public static void tearDown() throws IOException {
         for (DataCenter dataCenter : DataCenter.values()) {
             SauceREST sauceREST = new SauceREST(dataCenter);
-            SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+            SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
 
             List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
@@ -44,7 +44,7 @@ public class SauceConnectEndpointTest {
     @EnumSource(DataCenter.class)
     public void getLatestVersionTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
         Versions versions = sauceConnectEndpoint.getLatestVersions();
 
         Assertions.assertFalse(versions.latestVersion.isEmpty());
@@ -64,7 +64,7 @@ public class SauceConnectEndpointTest {
     @EnumSource(DataCenter.class)
     public void getLatestVersionWithoutCredentialsTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST("", "", dataCenter);
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
         Versions versions = sauceConnectEndpoint.getLatestVersions();
 
         Assertions.assertFalse(versions.latestVersion.isEmpty());
@@ -84,7 +84,7 @@ public class SauceConnectEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelsForAUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
 
         List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
@@ -95,7 +95,7 @@ public class SauceConnectEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
 
         List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
@@ -111,7 +111,7 @@ public class SauceConnectEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"EU_CENTRAL", "US_WEST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobsForATunnelTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnect();
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
         List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
         for (String tunnelID : tunnelIDs) {

@@ -227,6 +227,11 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com/saucelabs/saucerest/model/**/*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -241,14 +246,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <includes>
-                        <include>com.saucelabs.saucerest.DataCenter.class</include>
-                        <include>com.saucelabs.saucerest.SauceREST.class</include>
-                        <include>com.saucelabs.saucerest.api.StorageEndpoint.class</include>
-                        <include>com.saucelabs.saucerest.api.JobsEndpoint.class</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
