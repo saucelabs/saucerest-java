@@ -64,75 +64,87 @@ public class SauceREST implements Serializable {
         return envVar != null ? envVar : System.getProperty(systemPropertyName, defaultUrl);
     }
 
-    public JobsEndpoint getJobs() {
+    public JobsEndpoint getJobsEndpoint() {
         return new JobsEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public JobsEndpoint getJobs(DataCenter dataCenter) {
+    public JobsEndpoint getJobsEndpoint(DataCenter dataCenter) {
         return new JobsEndpoint(this.username, this.accessKey, dataCenter);
     }
 
-    public JobsEndpoint getJobs(String apiServer) {
+    public JobsEndpoint getJobsEndpoint(String apiServer) {
         return new JobsEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public StorageEndpoint getStorage() {
+    public StorageEndpoint getStorageEndpoint() {
         return new StorageEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public StorageEndpoint getStorage(DataCenter dataCenter) {
+    public StorageEndpoint getStorageEndpoint(DataCenter dataCenter) {
         return new StorageEndpoint(this.username, this.accessKey, dataCenter);
     }
 
-    public StorageEndpoint getStorage(String apiServer) {
+    public StorageEndpoint getStorageEndpoint(String apiServer) {
         return new StorageEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public PlatformEndpoint getPlatform() {
+    public PlatformEndpoint getPlatformEndpoint() {
         return new PlatformEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public PlatformEndpoint getPlatform(DataCenter dataCenter) {
+    public PlatformEndpoint getPlatformEndpoint(DataCenter dataCenter) {
         return new PlatformEndpoint(this.username, this.accessKey, dataCenter);
     }
 
-    public PlatformEndpoint getPlatform(String apiServer) {
+    public PlatformEndpoint getPlatformEndpoint(String apiServer) {
         return new PlatformEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public RealDevicesEndpoint getRealDevices(DataCenter dataCenter) {
+    public RealDevicesEndpoint getRealDevicesEndpoint(DataCenter dataCenter) {
         return new RealDevicesEndpoint(this.username, this.accessKey, dataCenter);
     }
 
-    public RealDevicesEndpoint getRealDevices() {
+    public RealDevicesEndpoint getRealDevicesEndpoint() {
         return new RealDevicesEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public RealDevicesEndpoint getRealDevices(String apiServer) {
+    public RealDevicesEndpoint getRealDevicesEndpoint(String apiServer) {
         return new RealDevicesEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public SauceConnectEndpoint getSauceConnect() {
+    public SauceConnectEndpoint getSauceConnectEndpoint() {
         return new SauceConnectEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public SauceConnectEndpoint getSauceConnect(String apiServer) {
+    public SauceConnectEndpoint getSauceConnectEndpoint(String apiServer) {
         return new SauceConnectEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public SauceConnectEndpoint getSauceConnect(DataCenter dataCenter) {
+    public SauceConnectEndpoint getSauceConnectEndpoint(DataCenter dataCenter) {
         return new SauceConnectEndpoint(this.username, this.accessKey, dataCenter);
     }
 
-    public AccountsEndpoint getAccounts() {
+    public AccountsEndpoint getAccountsEndpoint() {
         return new AccountsEndpoint(this.username, this.accessKey, this.apiServer);
     }
 
-    public AccountsEndpoint getAccounts(String apiServer) {
+    public AccountsEndpoint getAccountsEndpoint(String apiServer) {
         return new AccountsEndpoint(this.username, this.accessKey, apiServer);
     }
 
-    public AccountsEndpoint getAccounts(DataCenter dataCenter) {
+    public AccountsEndpoint getAccountsEndpoint(DataCenter dataCenter) {
         return new AccountsEndpoint(this.username, this.accessKey, dataCenter);
+    }
+
+    public BuildsEndpoint getBuildsEndpoint() {
+        return new BuildsEndpoint(this.username, this.accessKey, this.apiServer);
+    }
+
+    public BuildsEndpoint getBuildsEndpoint(String apiServer) {
+        return new BuildsEndpoint(this.username, this.accessKey, apiServer);
+    }
+
+    public BuildsEndpoint getBuildsEndpoint(DataCenter dataCenter) {
+        return new BuildsEndpoint(this.username, this.accessKey, dataCenter);
     }
 }
