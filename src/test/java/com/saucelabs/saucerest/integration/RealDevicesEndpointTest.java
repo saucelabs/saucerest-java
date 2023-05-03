@@ -55,7 +55,7 @@ public class RealDevicesEndpointTest {
     }
 
     public void setup(Region region) {
-        realDevices.set(new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(region.toString())).getRealDevices());
+        realDevices.set(new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(region.toString())).getRealDevicesEndpoint());
     }
 
     @ParameterizedTest

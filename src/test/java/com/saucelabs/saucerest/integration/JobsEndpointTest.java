@@ -70,12 +70,12 @@ public class JobsEndpointTest {
         if (DataCenter.EU_CENTRAL == dataCenter) {
             url = new URL("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
             driver.set(new RemoteWebDriver(url, options));
-            jobs.set(new SauceREST(EU_CENTRAL).getJobs());
+            jobs.set(new SauceREST(EU_CENTRAL).getJobsEndpoint());
             sessionID.set(driver.get().getSessionId().toString());
         } else if (DataCenter.US_WEST == dataCenter) {
             url = new URL("https://ondemand.us-west-1.saucelabs.com/wd/hub");
             driver.set(new RemoteWebDriver(url, options));
-            jobs.set(new SauceREST(US_WEST).getJobs());
+            jobs.set(new SauceREST(US_WEST).getJobsEndpoint());
             sessionID.set(driver.get().getSessionId().toString());
         }
     }
@@ -103,12 +103,12 @@ public class JobsEndpointTest {
         if (DataCenter.EU_CENTRAL == dataCenter) {
             url = new URL("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
             androidDriver.set(new AndroidDriver(url, capabilities));
-            jobs.set(new SauceREST(EU_CENTRAL).getJobs());
+            jobs.set(new SauceREST(EU_CENTRAL).getJobsEndpoint());
             sessionID.set(androidDriver.get().getSessionId().toString());
         } else if (DataCenter.US_WEST == dataCenter) {
             url = new URL("https://ondemand.us-west-1.saucelabs.com/wd/hub");
             androidDriver.set(new AndroidDriver(url, capabilities));
-            jobs.set(new SauceREST(US_WEST).getJobs());
+            jobs.set(new SauceREST(US_WEST).getJobsEndpoint());
             sessionID.set(androidDriver.get().getSessionId().toString());
         }
     }
@@ -136,12 +136,12 @@ public class JobsEndpointTest {
         if (DataCenter.EU_CENTRAL == dataCenter) {
             url = new URL("https://ondemand.eu-central-1.saucelabs.com/wd/hub");
             iosDriver.set(new IOSDriver(url, capabilities));
-            jobs.set(new SauceREST(EU_CENTRAL).getJobs());
+            jobs.set(new SauceREST(EU_CENTRAL).getJobsEndpoint());
             sessionID.set(iosDriver.get().getSessionId().toString());
         } else if (DataCenter.US_WEST == dataCenter) {
             url = new URL("https://ondemand.us-west-1.saucelabs.com/wd/hub");
             iosDriver.set(new IOSDriver(url, capabilities));
-            jobs.set(new SauceREST(US_WEST).getJobs());
+            jobs.set(new SauceREST(US_WEST).getJobsEndpoint());
             sessionID.set(iosDriver.get().getSessionId().toString());
         }
     }
@@ -316,7 +316,7 @@ public class JobsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         SauceREST sauceREST = new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(dataCenter.toString()));
-        JobsEndpoint job = sauceREST.getJobs();
+        JobsEndpoint job = sauceREST.getJobsEndpoint();
         ArrayList<Job> jobList = job.getJobs();
 
         assertTrue(jobList.size() > 0);
@@ -326,7 +326,7 @@ public class JobsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobsWithParametersTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         SauceREST sauceREST = new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(dataCenter.toString()));
-        JobsEndpoint jobsEndpoint = sauceREST.getJobs();
+        JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint();
 
         GetJobsParameters parameters = new GetJobsParameters.Builder()
                 .setLimit(10)
@@ -341,7 +341,7 @@ public class JobsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
     public void getJobDetailsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        JobsEndpoint jobsEndpoint = sauceREST.getJobs();
+        JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint();
         ArrayList<Job> jobList = jobsEndpoint.getJobs();
 
         Job jobDetails = jobsEndpoint.getJobDetails(jobList.get(0).id);
@@ -463,7 +463,7 @@ public class JobsEndpointTest {
     public void getJobAssetFileTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         runTest(dataCenter, testInfo);
 
-        jobs.get().getJobAssetFile(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SAUCE_LOG.label), TestAsset.SAUCE_LOG);
+        jobs.get().downloadJobAsset(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SAUCE_LOG.label), TestAsset.SAUCE_LOG);
 
         assertTrue(Files.exists(Paths.get(tempDir.toString(), "log.json")));
     }
@@ -491,10 +491,11 @@ public class JobsEndpointTest {
         jobs.get().downloadAllAssets(sessionID.get(), Paths.get(tempDir + "/"));
 
         assertAll(
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.LOGCAT_LOG.label)))
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.APPIUM_LOG.label))),
+            () -> assertFalse(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.LOGCAT_LOG.label)))
         );
     }
 
@@ -506,10 +507,11 @@ public class JobsEndpointTest {
         jobs.get().downloadAllAssets(sessionID.get(), Paths.get(tempDir + "/"));
 
         assertAll(
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SYSLOG_LOG.label)))
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SAUCE_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.VIDEO.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.APPIUM_LOG.label))),
+            () -> assertFalse(Files.exists(Paths.get(tempDir.toString(), TestAsset.SELENIUM_LOG.label))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), TestAsset.SYSLOG_LOG.label)))
         );
     }
 
@@ -518,7 +520,7 @@ public class JobsEndpointTest {
     public void getAllScreenshotsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         runTest(dataCenter, testInfo);
 
-        jobs.get().getAllScreenshots(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SCREENSHOTS.label));
+        jobs.get().downloadAllScreenshots(sessionID.get(), Paths.get(tempDir + "/" + TestAsset.SCREENSHOTS.label));
 
         assertTrue(Files.exists(Paths.get(tempDir.toString(), "screenshots.zip")));
     }

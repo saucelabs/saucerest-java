@@ -37,7 +37,7 @@ public class AccountsEndpointTest {
 
     private static CreateTeam createTeam(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
 
         Settings settings = new Settings.Builder()
@@ -51,7 +51,7 @@ public class AccountsEndpointTest {
     public static void cleanup() throws IOException {
         for (DataCenter dataCenter : DataCenter.values()) {
             SauceREST sauceREST = new SauceREST(dataCenter);
-            AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+            AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
             // TODO: add user deletion when Sauce Labs has a delete user API. meanwhile, we'll just deactivate them
             List<Result> users = accountsEndpoint.lookupUsers().results;
@@ -85,7 +85,7 @@ public class AccountsEndpointTest {
     @EnumSource(DataCenter.class)
     public void lookupTeamsWithoutNameTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         LookupTeams lookupTeams = accountsEndpoint.lookupTeams();
 
         assertTrue(lookupTeams.count > 0);
@@ -96,7 +96,7 @@ public class AccountsEndpointTest {
     @EnumSource(DataCenter.class)
     public void lookupTeamsWithNameTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupTeams lookupTeams = accountsEndpoint.lookupTeams("NotExisting");
 
@@ -108,7 +108,7 @@ public class AccountsEndpointTest {
     @EnumSource(DataCenter.class)
     public void getSpecificTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         LookupTeams lookupTeams = accountsEndpoint.lookupTeams();
 
         for (Result result : lookupTeams.results) {
@@ -123,7 +123,7 @@ public class AccountsEndpointTest {
     @EnumSource(DataCenter.class)
     public void getSpecificTeamNotFoundTest(DataCenter dataCenter) {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         assertThrows(SauceException.NotFound.class, () -> accountsEndpoint.getSpecificTeam("1234"));
     }
@@ -132,7 +132,7 @@ public class AccountsEndpointTest {
     @EnumSource(DataCenter.class)
     public void getOrganizationTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         Organizations organizations = accountsEndpoint.getOrganization();
 
@@ -144,7 +144,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void createTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
 
         Settings settings = new Settings.Builder()
@@ -163,7 +163,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void updateTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
 
         Settings settings = new Settings.Builder()
@@ -187,7 +187,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void partiallyUpdateTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         String teamName = "000" + RandomStringUtils.randomAlphabetic(12);
 
         Settings settings = new Settings.Builder()
@@ -213,7 +213,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getTeamMembersTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupTeams lookupTeams = accountsEndpoint.lookupTeams();
         TeamMembers teamMembers = accountsEndpoint.getTeamMembers(lookupTeams.results.get(0).id);
@@ -225,7 +225,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void resetAccessKeyTeam(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         CreateTeam createTeam = accountsEndpoint.createTeam("000" + RandomStringUtils.randomAlphabetic(12), new Settings.Builder().setVirtualMachines(0).build(), RandomStringUtils.randomAlphabetic(8));
         User user1 = createTestUser(accountsEndpoint);
         User user2 = createTestUser(accountsEndpoint);
@@ -245,7 +245,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void lookupUsersWithParametersTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
             .setRoles(Roles.ORGADMIN)
@@ -260,7 +260,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupUsers lookupUsers = accountsEndpoint.lookupUsers();
         User user = accountsEndpoint.getUser(lookupUsers.results.get(0).id);
@@ -272,7 +272,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void createUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         User user = createTestUser(accountsEndpoint);
 
@@ -284,7 +284,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void updateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
         String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
@@ -308,7 +308,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void partiallyUpdateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
         String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
@@ -327,10 +327,10 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getUserConcurrencyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         UserConcurrency userConcurrency = accountsEndpoint.getUserConcurrency(sauceREST.getUsername());
-        Concurrency realDeviceConcurrency = sauceREST.getRealDevices().getConcurrency();
+        Concurrency realDeviceConcurrency = sauceREST.getRealDevicesEndpoint().getConcurrency();
 
         assertNotNull(userConcurrency);
         assertNotNull(realDeviceConcurrency);
@@ -340,7 +340,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getUsersTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
             .setUsername(sauceREST.getUsername())
@@ -360,7 +360,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void setRoleTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         LookupUsersParameter lookupUsersParameter = new LookupUsersParameter.Builder()
                 .setUsername("sl-test-del")
@@ -405,7 +405,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void deactivateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         User user = createTestUser(accountsEndpoint);
 
@@ -422,7 +422,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void activateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         User user = createTestUser(accountsEndpoint);
 
@@ -441,7 +441,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void resetAccessKeyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         User user = createTestUser(accountsEndpoint);
 
@@ -459,7 +459,7 @@ public class AccountsEndpointTest {
     @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
     public void getAccessKeyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccounts();
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
 
         User user = createTestUser(accountsEndpoint);
 
