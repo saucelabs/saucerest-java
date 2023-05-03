@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/saucelabs/saucerest-java/">
+  <a href="https://saucelabs.com/sign-up">
     <img alt="saucerest-java Logo" src="https://raw.githubusercontent.com/saucelabs/saucerest-java/master/.github/SauceLabsLogo.png">
   </a>
 </p>
@@ -13,7 +13,7 @@
   <a href="https://github.com/saucelabs/saucerest-java/actions/workflows/java-ci.yml">
     <img alt="CI/CD" src="https://img.shields.io/github/actions/workflow/status/saucelabs/saucerest-java/java-ci.yml?branch=master&label=CI/CD&style=for-the-badge&logo=githubactions&logoColor=white">
   </a>
-  <a href="https://codecov.io/gh/saucelabs/saucerest-java?branch=master">
+  <a href="https://codecov.io/gh/saucelabs/saucerest-java">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/saucelabs/saucerest-java?style=for-the-badge&logo=codecov&logoColor=white">
   </a>
   <a href="https://central.sonatype.com/artifact/com.saucelabs/saucerest">
@@ -41,22 +41,22 @@ request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-jav
 ## Create an instance of the client
 
 ```java
-SauceREST sauce=new SauceREST("username","access-key","data_center");
+SauceREST sauceREST=new SauceREST("username","access-key","data_center");
 ```
 
 OR
 
 ```java
-SauceREST sauce=new SauceREST("username","access-key",DataCenter.US_WEST);
+SauceREST sauceREST=new SauceREST("username","access-key",DataCenter.US_WEST);
 ```
 
 Parameters:
 
 | Name        | Type                            | Details                                                     |
 |-------------|---------------------------------|-------------------------------------------------------------|
-| username    | String (required)               | your sauce labs username                                    |
-| access-key  | String (required)               | your sauce labs accesskey                                   |
-| data_center | String or DataCenter (required) | one of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
+| username    | String (required)               | Your sauce labs username                                    |
+| access-key  | String (required)               | Your sauce labs accesskey                                   |
+| data_center | String or DataCenter (required) | One of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
 
 ## Code examples
 

@@ -34,17 +34,26 @@ public class SauceShareableLink {
     }
 
     /**
-     * Based on the code from here: https://docs.saucelabs.com/test-results/sharing-test-results/index.html#example---java
+     * This method will use username and access key from the environment variables SAUCE_USERNAME and SAUCE_ACCESS_KEY.
      *
-     * @param username           Sauce Labs username
-     * @param accessKey          Sauce Labs access key
-     * @param sauceJobId         Sauce Labs job id
-     * @param dataCenterEndpoint Sauce Labs data center endpoint
+     * @param sauceJobId Sauce Labs job id
+     * @param dataCenter Sauce Labs data center endpoint
      * @return A url of the test result with an authentication token, so it can be accessed without Sauce Labs credentials.
-     * @throws NoSuchAlgorithmException if the HmacMD5 algorithm is not available
-     * @throws InvalidKeyException      if the key is invalid
      */
-    public static String getShareableLink(String username, String accessKey, String sauceJobId, String dataCenterEndpoint) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static String getShareableLink(String sauceJobId, DataCenter dataCenter) {
+        return getShareableLink(null, null, sauceJobId, dataCenter);
+    }
+
+    /**
+     * Based on the code from <a href="https://docs.saucelabs.com/test-results/sharing-test-results/index.html#example---java">here</a>
+     *
+     * @param username   Sauce Labs username
+     * @param accessKey  Sauce Labs access key
+     * @param sauceJobId Sauce Labs job id
+     * @param dataCenter Sauce Labs data center endpoint
+     * @return A url of the test result with an authentication token, so it can be accessed without Sauce Labs credentials.
+     */
+    public static String getShareableLink(String username, String accessKey, String sauceJobId, DataCenter dataCenter) {
         String defaultUsername = System.getenv("SAUCE_USERNAME");
         String defaultAccessKey = System.getenv("SAUCE_ACCESS_KEY");
 
@@ -68,16 +77,11 @@ public class SauceShareableLink {
             throw new IllegalArgumentException("Sauce Labs job ID cannot be null or empty");
         }
 
-        if (dataCenterEndpoint == null || dataCenterEndpoint.isEmpty()) {
-            throw new IllegalArgumentException("Sauce Labs data center endpoint cannot be null or empty");
+        if (dataCenter == null) {
+            throw new IllegalArgumentException("Sauce Labs data center endpoint cannot be null");
         }
 
         String digest = getJobAuthDigest(username, accessKey, sauceJobId);
-        StringBuilder builder = new StringBuilder(dataCenterEndpoint);
-        builder.append("tests/")
-            .append(sauceJobId)
-            .append("?auth=")
-            .append(digest);
-        return builder.toString();
+        return dataCenter.appServer + "tests/" + sauceJobId + "?auth=" + digest;
     }
 }
