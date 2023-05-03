@@ -56,6 +56,18 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void testGetJobsEndpointWithoutSauceREST() {
+        JobsEndpoint jobsEndpoint = new JobsEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(jobsEndpoint);
+    }
+
+    @Test
+    public void testGetJobsEndpointWithoutSauceRESTAndWithAPIServer() {
+        JobsEndpoint jobsEndpoint = new JobsEndpoint("https://eu-central-1.saucelabs.com/rest/v1");
+        assertNotNull(jobsEndpoint);
+    }
+
+    @Test
     public void testGetStorageEndpoint() {
         StorageEndpoint storageEndpoint = sauceREST.getStorageEndpoint();
         assertNotNull(storageEndpoint);
@@ -70,6 +82,18 @@ public class SauceRESTTest {
     @Test
     public void testGetStorageEndpointWithApiServer() {
         StorageEndpoint storageEndpoint = sauceREST.getStorageEndpoint("https://eu-central-1.saucelabs.com/rest/v1/storage");
+        assertNotNull(storageEndpoint);
+    }
+
+    @Test
+    public void testGetStorageEndpointWithoutSauceREST() {
+        StorageEndpoint storageEndpoint = new StorageEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(storageEndpoint);
+    }
+
+    @Test
+    public void testGetStorageEndpointWithoutSauceRESTAndWithAPIServer() {
+        StorageEndpoint storageEndpoint = new StorageEndpoint("https://eu-central-1.saucelabs.com/rest/v1/storage");
         assertNotNull(storageEndpoint);
     }
 
@@ -92,6 +116,18 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void testGetPlatformEndpointWithoutSauceREST() {
+        PlatformEndpoint platformEndpoint = new PlatformEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(platformEndpoint);
+    }
+
+    @Test
+    public void testGetPlatformEndpointWithoutSauceRESTAndWithAPIServer() {
+        PlatformEndpoint platformEndpoint = new PlatformEndpoint("https://eu-central-1.saucelabs.com/rest/v1/platforms");
+        assertNotNull(platformEndpoint);
+    }
+
+    @Test
     public void testGetRealDevicesEndpoint() {
         RealDevicesEndpoint realDevicesEndpoint = sauceREST.getRealDevicesEndpoint();
         assertNotNull(realDevicesEndpoint);
@@ -106,6 +142,18 @@ public class SauceRESTTest {
     @Test
     public void testGetRealDevicesEndpointWithApiServer() {
         RealDevicesEndpoint realDevicesEndpoint = sauceREST.getRealDevicesEndpoint("https://eu-central-1.saucelabs.com/rest/v1/rdc");
+        assertNotNull(realDevicesEndpoint);
+    }
+
+    @Test
+    public void testGetRealDevicesEndpointWithoutSauceREST() {
+        RealDevicesEndpoint realDevicesEndpoint = new RealDevicesEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(realDevicesEndpoint);
+    }
+
+    @Test
+    public void testGetRealDevicesEndpointWithoutSauceRESTAndWithAPIServer() {
+        RealDevicesEndpoint realDevicesEndpoint = new RealDevicesEndpoint("https://eu-central-1.saucelabs.com/rest/v1/rdc");
         assertNotNull(realDevicesEndpoint);
     }
 
@@ -128,6 +176,18 @@ public class SauceRESTTest {
     }
 
     @Test
+    public void testGetSauceConnectEndpointWithoutSauceREST() {
+        SauceConnectEndpoint sauceConnectEndpoint = new SauceConnectEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(sauceConnectEndpoint);
+    }
+
+    @Test
+    public void testGetSauceConnectEndpointWithoutSauceRESTAndWithAPIServer() {
+        SauceConnectEndpoint sauceConnectEndpoint = new SauceConnectEndpoint("https://eu-central-1.saucelabs.com/rest/v1/sc");
+        assertNotNull(sauceConnectEndpoint);
+    }
+
+    @Test
     public void testGetAccountsEndpoint() {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         assertNotNull(accountsEndpoint);
@@ -142,6 +202,18 @@ public class SauceRESTTest {
     @Test
     public void testGetAccountsEndpointWithApiServer() {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint("https://eu-central-1.saucelabs.com/rest/v1/users");
+        assertNotNull(accountsEndpoint);
+    }
+
+    @Test
+    public void testGetAccountsEndpointWithoutSauceREST() {
+        AccountsEndpoint accountsEndpoint = new AccountsEndpoint(DataCenter.EU_CENTRAL);
+        assertNotNull(accountsEndpoint);
+    }
+
+    @Test
+    public void testGetAccountsEndpointWithoutSauceRESTAndWithAPIServer() {
+        AccountsEndpoint accountsEndpoint = new AccountsEndpoint("https://eu-central-1.saucelabs.com/rest/v1/users");
         assertNotNull(accountsEndpoint);
     }
 
@@ -170,10 +242,8 @@ public class SauceRESTTest {
     }
 
     @Test
-    public void testGetBuildsEndpointWithoutSauceRESTAndAPIServer() {
+    public void testGetBuildsEndpointWithoutSauceRESTAndWithAPIServer() {
         BuildsEndpoint buildsEndpoint = new BuildsEndpoint("https://eu-central-1.saucelabs.com/rest/v1/builds");
         assertNotNull(buildsEndpoint);
     }
-
-    //TODO add more unit tests for the other constructors
 }
