@@ -36,19 +36,16 @@ request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-jav
 
 <hr>
 
-# Usage
+# How to use
 
-## Create an instance of the client
-
-```java
-SauceREST sauceREST=new SauceREST("username","access-key","data_center");
-```
-
-OR
+<details open>
+  <summary>Creating a client object</summary>
 
 ```java
-SauceREST sauceREST=new SauceREST("username","access-key",DataCenter.US_WEST);
+SauceREST sauceREST=new SauceREST("username","access-key",DataCenter.EU_CENTRAL);
 ```
+
+</details>
 
 Parameters:
 
