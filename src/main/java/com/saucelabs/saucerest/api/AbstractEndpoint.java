@@ -188,7 +188,6 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return isHttpError || isTooManyRequests;
     }
 
-
     /**
      * Executes the given HTTP request and retries it if it fails due to a runtime exception, IOException,
      * or IllegalStateException.
@@ -198,7 +197,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @throws IOException If an I/O error occurs while executing the request.
      */
     private Response retryRequest(Request request) throws IOException {
-        Response response = null;
+        Response response;
         try {
             response = Failsafe.with(new RetryPolicy<>()
                     .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
@@ -219,7 +218,6 @@ public abstract class AbstractEndpoint extends AbstractModel {
         return response;
     }
 
-
     /**
      * This method is used to deserialize a JSON object response from an API endpoint.
      *
@@ -230,6 +228,9 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @throws IOException If the JSON object cannot be deserialized
      */
     protected <T> T deserializeJSONObject(String jsonResponse, Class<T> clazz) throws IOException {
+        Objects.requireNonNull(jsonResponse, "JSON response cannot be null");
+        Objects.requireNonNull(clazz, "Class object cannot be null");
+
         Moshi moshi = MoshiSingleton.getInstance();
         // failOnUnknown() will make sure that API changes in SL are caught ASAP, so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
@@ -244,7 +245,11 @@ public abstract class AbstractEndpoint extends AbstractModel {
     }
 
     protected <T> T deserializeJSONObject(Response response, Class<T> clazz) throws IOException {
-        return deserializeJSONObject(response.body().string(), clazz);
+        if (response.body() != null) {
+            return deserializeJSONObject(response.body().string(), clazz);
+        } else {
+            throw new IOException("Response body is null");
+        }
     }
 
     /**
@@ -265,11 +270,18 @@ public abstract class AbstractEndpoint extends AbstractModel {
             return jsonAdapter.fromJson(jsonResponse);
         } catch (IOException e) {
             throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
+        } catch (JsonDataException e) {
+            logger.warning("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+            throw e;
         }
     }
 
     protected <T> List<T> deserializeJSONArray(Response response, Class<T> clazz) throws IOException {
-        return deserializeJSONArray(response.body().string(), clazz);
+        if (response.body() != null) {
+            return deserializeJSONArray(response.body().string(), clazz);
+        } else {
+            throw new IOException("Response body is null");
+        }
     }
 
     protected void downloadFile(String url, String path, String fileName) {
