@@ -63,7 +63,7 @@ public class PlatformEndpoint extends AbstractEndpoint {
     public EndOfLifeAppiumVersions getEndOfLifeAppiumVersions() throws IOException {
         String url = getBaseEndpoint() + "/platforms/appium/eol";
 
-        return new EndOfLifeAppiumVersions(request(url, HttpMethod.GET).body().string());
+        return new EndOfLifeAppiumVersions(request(url, HttpMethod.GET));
     }
 
     /**

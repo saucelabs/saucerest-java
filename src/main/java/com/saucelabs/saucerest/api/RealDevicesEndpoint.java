@@ -5,6 +5,7 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.TestAsset;
 import com.saucelabs.saucerest.model.realdevices.*;
+import okhttp3.Response;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.json.JSONArray;
@@ -171,7 +172,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
         Path directoryPath = getDirectoryPath(path);
         Path filePath = getFilePath(directoryPath, TestAsset.APPIUM_LOG.label);
 
-        downloadNonMalformedLog(filePath, new JSONArray(request(url, HttpMethod.GET).body().string()));
+        downloadNonMalformedLog(filePath, request(url, HttpMethod.GET));
     }
 
     public void downloadDeviceLog(String jobID, String path) throws IOException {
@@ -179,23 +180,14 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
         Path directoryPath = getDirectoryPath(path);
         Path filePath = getFilePath(directoryPath, TestAsset.DEVICE_LOG.label);
 
-        downloadNonMalformedLog(filePath, new JSONArray(request(url, HttpMethod.GET).body().string()));
+        downloadNonMalformedLog(filePath, request(url, HttpMethod.GET));
     }
 
     public void downloadCommandsLog(String jobID, String path) throws IOException {
         String url = retryUntilTestAssetAvailable(getSpecificDeviceJob(jobID), TestAsset.COMMANDS_LOG).requestsUrl;
         Path directoryPath = getDirectoryPath(path);
-        Path filePath = getFilePath(directoryPath, TestAsset.COMMANDS_LOG.label);
 
-        JSONArray commandsLog = new JSONArray(request(url, HttpMethod.GET).body().string());
-        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-            try {
-                writer.write(commandsLog.toString());
-                writer.newLine();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        downloadFile(url, directoryPath.toString(), TestAsset.COMMANDS_LOG.label);
     }
 
     public void downloadDeviceVitals(String jobID, String path) throws IOException {
@@ -264,25 +256,41 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
      * Some log files are malformed and have noise in them making it difficult to read.
      * This method will download these logs and parse them so it is readable and in an expected format.
      *
-     * @param path      The path to the directory to download the log file to.
-     * @param jsonArray The log file as a JSONArray.
+     * @param path     The path to the directory to download the log file to.
+     * @param response The response from the request to download the log file.
      * @throws IOException If there is an issue writing to the file.
      */
-    private void downloadNonMalformedLog(Path path, JSONArray jsonArray) throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            jsonArray.forEach(obj -> {
-                JSONObject jsonObj = (JSONObject) obj;
-                String time = jsonObj.getString("time");
-                String level = jsonObj.getString("level");
-                String message = jsonObj.getString("message");
+    private void downloadNonMalformedLog(Path path, Response response) throws IOException {
+        if (response.body() == null) {
+            logger.warning(String.format("Response is null for %s", path));
+            throw new IOException("Response is null");
+        }
 
-                try {
-                    writer.write(String.format("%s %s %s", time, level, message));
-                    writer.newLine();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+        StringBuilder output = new StringBuilder();
+        JSONArray jsonArray = new JSONArray(response.body().string());
+
+        for (Object obj : jsonArray) {
+            if (!(obj instanceof JSONObject)) {
+                continue; // skip non-JSON objects
+            }
+
+            JSONObject jsonObj = (JSONObject) obj;
+            String time = jsonObj.optString("time");
+            String level = jsonObj.optString("level");
+            String message = jsonObj.optString("message");
+
+            if (time.isEmpty() || level.isEmpty() || message.isEmpty()) {
+                continue; // skip objects that don't have the required fields
+            }
+
+            output.append(String.format("%s %s %s%n", time, level, message));
+        }
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            writer.write(output.toString());
+        } catch (IOException e) {
+            logger.warning(String.format("Failed to write to file %s", path));
+            throw e;
         }
     }
 }
