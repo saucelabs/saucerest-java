@@ -64,7 +64,7 @@ jobs:
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v3
         with:
-            flags: tests,release
+          flags: tests,release
 
       - name: Set projects Maven version to GitHub Action GUI set version
         run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}" -DgenerateBackupPoms=false -B --no-transfer-progress
@@ -93,10 +93,10 @@ jobs:
           body: |
             ```
             <dependencies>
-            	<dependency>
-            	    <groupId>com.saucelabs</groupId>
-            	    <artifactId>saucerest</artifactId>
-            	    <version>${{ github.event.inputs.releaseversion }}</version>
+              <dependency>
+            	<groupId>com.saucelabs</groupId>
+            	<artifactId>saucerest</artifactId>
+            	<version>${{ github.event.inputs.releaseversion }}</version>
             	</dependency>
             </dependencies>
             ```
