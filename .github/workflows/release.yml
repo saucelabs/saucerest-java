@@ -25,7 +25,7 @@ jobs:
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '20'
           distribution: 'temurin'
           cache: 'maven'
           server-id: ossrh
@@ -61,11 +61,10 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
 
-      - name: Upload to Codecov
+      - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./target/site/jacoco/jacoco.xml
-          flags: unittests
+            flags: tests,release
 
       - name: Set projects Maven version to GitHub Action GUI set version
         run: mvn versions:set "-DnewVersion=${{ github.event.inputs.releaseversion }}" -DgenerateBackupPoms=false -B --no-transfer-progress

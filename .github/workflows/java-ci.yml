@@ -6,7 +6,8 @@ on:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
   schedule:
-    - cron: '0 */72 * * *'
+      # Run every 6 hours at minute 0: 06:00, 12:00, 18:00, 00:00
+      - cron: '0 6,12,18,0 * * *'
 
 permissions:
   contents: write
@@ -16,36 +17,17 @@ env:
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
 
 jobs:
-  pre_job:
-    continue-on-error: true # Uncomment once integration is finished
-    runs-on: ubuntu-latest
-    # Map a step output to a job output
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
-        with: # All of these options are optional, so you can remove them if you are happy with the defaults
-          concurrent_skipping: 'always'
-          skip_after_successful_duplicate: 'true'
-          paths_ignore: '["**/README.md", "**/docs/**"]'
-          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
-      - name: Not from fork?
-        run: |
-          echo "$NOT_FROM_FORK"
 
-  main_job:
-    needs: pre_job
+  unit_tests_job:
     name: Unit Tests
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 20
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '20'
           distribution: 'temurin'
           cache: 'maven'
       - name: Build with Maven
@@ -55,26 +37,21 @@ jobs:
         with:
           flags: unittests,tests
 
-  Upload_apps:
+  upload_apps_job:
     name: Upload My Demo Apps
-    needs: main_job
+    # Only proceed if unit tests pass
+    needs: unit_tests_job
     uses: ./.github/workflows/upload_my_demo_app.yml
     secrets: inherit
 
-  #  Setup_Sauce_Connect:
-  #    name: Setup Sauce Connect tunnels
-  #    needs: main_job
-  #    uses: ./.github/workflows/setup-sauce-connect-tunnels.yml
-  #    secrets: inherit
-
-  Integration:
-    needs: [ main_job, Upload_apps ]
+  integration_tests_job:
     name: Integration Tests
+    needs: [ unit_tests_job, upload_apps_job ]
     runs-on: ubuntu-latest
-    # Only run integration tests if the code is coming from this repo and not forks
 
     steps:
       - name: Set env var for Integration Tests
+        # Only run integration tests if the code is coming from this repo and not forks
         if: ${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }}
         run: |
           echo "NOT_FROM_FORK=true" >> $GITHUB_ENV
@@ -86,11 +63,11 @@ jobs:
       - uses: actions/checkout@v3
         if: ${{ env.NOT_FROM_FORK }} == 'true'
 
-      - name: Set up JDK 17
+      - name: Set up JDK 20
         uses: actions/setup-java@v3
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         with:
-          java-version: '17'
+          java-version: '20'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -119,7 +96,6 @@ jobs:
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-apac-southeast.yaml
 
       - name: Build with Maven
-        id: runIntegrationTests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
 
@@ -127,16 +103,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           flags: integrationtests,tests
-
-#  slackNotification:
-#    name: Slack Notification
-#    if: |
-#      always() && (steps.runIntegrationTests.outcome == 'failure') &&
-#      (${{  github.repository == github.event.pull_request.head.repo.full_name }} || ${{ github.event.push.head.repo.full_name == github.repository }})
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Slack Notification
-#        uses: rtCamp/action-slack-notify@v2
-#        env:
-#          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
