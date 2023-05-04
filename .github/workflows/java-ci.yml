@@ -6,8 +6,8 @@ on:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
   schedule:
-      # Run every 6 hours at minute 0: 06:00, 12:00, 18:00, 00:00
-      - cron: '0 6,12,18,0 * * *'
+    # Run every 6 hours at minute 0: 06:00, 12:00, 18:00, 00:00
+    - cron: '0 6,12,18,0 * * *'
 
 permissions:
   contents: write
