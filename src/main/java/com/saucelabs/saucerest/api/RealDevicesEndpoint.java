@@ -1,15 +1,15 @@
 package com.saucelabs.saucerest.api;
 
 import com.google.common.collect.ImmutableMap;
-import com.saucelabs.saucerest.DataCenter;
-import com.saucelabs.saucerest.HttpMethod;
-import com.saucelabs.saucerest.TestAsset;
+import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.realdevices.*;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonReader;
+import com.squareup.moshi.Moshi;
 import okhttp3.Response;
+import okio.BufferedSource;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -145,7 +145,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
      * Returns details about the current in-use real devices along with the maximum allowed values.
      *
      * @return {@link Concurrency}
-     * @throws IOException
+     * @throws IOException API request failed
      */
     public Concurrency getConcurrency() throws IOException {
         String url = getBaseEndpoint() + "/concurrency";
@@ -261,33 +261,35 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
      * @throws IOException If there is an issue writing to the file.
      */
     private void downloadNonMalformedLog(Path path, Response response) throws IOException {
-        if (response.body() == null) {
+        if (response == null) {
             logger.warning(String.format("Response is null for %s", path));
             throw new IOException("Response is null");
         }
 
-        StringBuilder output = new StringBuilder();
-        JSONArray jsonArray = new JSONArray(response.body().string());
-
-        for (Object obj : jsonArray) {
-            if (!(obj instanceof JSONObject)) {
-                continue; // skip non-JSON objects
-            }
-
-            JSONObject jsonObj = (JSONObject) obj;
-            String time = jsonObj.optString("time");
-            String level = jsonObj.optString("level");
-            String message = jsonObj.optString("message");
-
-            if (time.isEmpty() || level.isEmpty() || message.isEmpty()) {
-                continue; // skip objects that don't have the required fields
-            }
-
-            output.append(String.format("%s %s %s%n", time, level, message));
+        if (response.body() == null) {
+            logger.warning(String.format("Response body is null for %s", path));
+            throw new IOException("Response body is null");
         }
 
+        Moshi moshi = MoshiSingleton.getInstance();
+        BufferedSource source = response.body().source();
+        JsonReader reader = JsonReader.of(source);
+
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write(output.toString());
+            JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
+            reader.beginArray();
+            while (reader.hasNext()) {
+                JsonReader.Token token = reader.peek();
+                if (token == JsonReader.Token.BEGIN_OBJECT) {
+                    LogEntry logEntry = adapter.fromJson(reader);
+                    if (logEntry != null && logEntry.getTime() != null && logEntry.getLevel() != null && logEntry.getMessage() != null) {
+                        writer.write(logEntry + System.lineSeparator());
+                    }
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.endArray();
         } catch (IOException e) {
             logger.warning(String.format("Failed to write to file %s", path));
             throw e;
