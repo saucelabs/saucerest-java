@@ -42,7 +42,7 @@ request!  [Contribution Details Here](https://github.com/saucelabs/saucerest-jav
   <summary>Creating a client object</summary>
 
 ```java
-SauceREST sauceREST=new SauceREST("username","access-key",DataCenter.EU_CENTRAL);
+SauceREST sauceREST = new SauceREST("username", "access-key", DataCenter.EU_CENTRAL);
 ```
 
 </details>
@@ -65,12 +65,12 @@ will provide you with a good overview of how to use this library.
 ```xml
 
 <dependencies>
-  <dependency>
-    <groupId>com.saucelabs</groupId>
-    <artifactId>saucerest</artifactId>
-    <version>LATEST VERSION</version>
-    <scope>test</scope>
-  </dependency>
+    <dependency>
+        <groupId>com.saucelabs</groupId>
+        <artifactId>saucerest</artifactId>
+        <version>LATEST VERSION</version>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 ```
 
