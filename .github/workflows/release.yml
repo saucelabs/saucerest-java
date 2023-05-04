@@ -97,7 +97,7 @@ jobs:
                 <groupId>com.saucelabs</groupId>
                 <artifactId>saucerest</artifactId>
                 <version>${{ github.event.inputs.releaseversion }}</version>
-                </dependency>
+              </dependency>
             </dependencies>
             ```
             ### Changelog
