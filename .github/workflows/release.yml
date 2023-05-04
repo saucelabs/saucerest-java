@@ -94,10 +94,10 @@ jobs:
             ```
             <dependencies>
               <dependency>
-            	<groupId>com.saucelabs</groupId>
-            	<artifactId>saucerest</artifactId>
-            	<version>${{ github.event.inputs.releaseversion }}</version>
-            	</dependency>
+                <groupId>com.saucelabs</groupId>
+                <artifactId>saucerest</artifactId>
+                <version>${{ github.event.inputs.releaseversion }}</version>
+                </dependency>
             </dependencies>
             ```
             ### Changelog
