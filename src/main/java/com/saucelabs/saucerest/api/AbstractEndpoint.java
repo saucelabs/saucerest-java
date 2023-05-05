@@ -205,7 +205,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
                     .withMaxRetries(MAX_RETRIES)
                     .onRetry(e -> {
                         if (e.getLastFailure() != null) {
-                            logger.log(Level.WARNING, "Retrying because of " + e.getLastFailure().getClass().getSimpleName());
+                            logger.log(Level.WARNING, String.format("Retrying because of: %s", e.getLastFailure().getClass().getSimpleName()));
                         } else {
                             logger.log(Level.WARNING, "Retrying");
                         }
@@ -213,7 +213,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
                 .get(() -> CLIENT.newCall(request).execute());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error retrying request", e);
-            throw new IOException(e);
+            throw new IOException(String.format("Error retrying request: %s", e.getMessage()), e);
         }
         return response;
     }
