@@ -11,6 +11,10 @@ import java.util.Formatter;
  * Class providing a method to create a shareable test results link of a test executed on Sauce Labs.
  */
 public class SauceShareableLink {
+    private SauceShareableLink() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
         try {
             String key = String.format("%s:%s", username, accessKey);
