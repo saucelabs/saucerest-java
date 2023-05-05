@@ -29,19 +29,17 @@ public class ResponseHandler {
                 } else if (endpoint instanceof AccountsEndpoint) {
                     String accountID = getID(response);
                     throw new SauceException.NotFound(String.join(System.lineSeparator(), ErrorExplainers.AccountNotFound(accountID)));
-                } else {
-                    throw new SauceException.NotFound();
                 }
+                throw new SauceException.NotFound();
             case HTTP_UNAUTHORIZED:
                 throw new SauceException.NotAuthorized(checkCredentials(endpoint));
             case HTTP_BAD_REQUEST:
                 if (endpoint instanceof JobsEndpoint) {
                     if (response.message().equalsIgnoreCase("Job hasn't finished running")) {
                         throw new SauceException.NotYetDone(ErrorExplainers.JobNotYetDone());
-                    } else {
-                        throw new RuntimeException("Unexpected code " + response);
                     }
                 }
+                throw new RuntimeException("Unexpected code " + response);
             default:
                 throw new RuntimeException("Unexpected code " + response);
         }
