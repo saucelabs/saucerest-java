@@ -45,28 +45,28 @@ public abstract class AbstractEndpoint extends AbstractModel {
     protected final String accessKey;
     protected final String credentials;
 
-    public AbstractEndpoint(DataCenter dataCenter) {
+    protected AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
         this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
     }
 
-    public AbstractEndpoint(String apiServer) {
+    protected AbstractEndpoint(String apiServer) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
         this.credentials = initializeCredentials();
         this.baseURL = apiServer;
     }
 
-    public AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
+    protected AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
         this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
     }
 
-    public AbstractEndpoint(String username, String accessKey, String apiServer) {
+    protected AbstractEndpoint(String username, String accessKey, String apiServer) {
         this.username = username;
         this.accessKey = accessKey;
         this.credentials = initializeCredentials();
