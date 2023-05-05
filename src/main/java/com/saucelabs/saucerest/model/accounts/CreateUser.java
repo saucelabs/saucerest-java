@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CreateUser {
-    public String firstName;
-    public String lastName;
-    public String email;
-    public String userName;
-    public String password;
-    public String organization;
-    public Integer role;
-    public String team;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final String userName;
+    private final String password;
+    private final String organization;
+    private final Integer role;
+    private final String team;
 
     private CreateUser(Builder builder) {
         firstName = builder.firstName;
