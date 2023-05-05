@@ -51,9 +51,6 @@ public class Settings extends AbstractModel {
         private Boolean setupDeviceLock;
         private Boolean instrumentationEnabled;
 
-        public Builder() {
-        }
-
         public Builder setProxy(Proxy val) {
             proxy = val;
             return this;

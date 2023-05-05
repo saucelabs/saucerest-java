@@ -70,9 +70,6 @@ public class UpdateJobParameter {
         private String build;
         private Map<String, String> customData;
 
-        public Builder() {
-        }
-
         public Builder setName(String val) {
             name = val;
             return this;

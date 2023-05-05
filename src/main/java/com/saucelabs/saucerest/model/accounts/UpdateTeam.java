@@ -65,9 +65,6 @@ public class UpdateTeam extends AbstractModel {
         private String description;
         private String name;
 
-        public Builder() {
-        }
-
         public Builder setSettings(Settings val) {
             settings = val;
             return this;

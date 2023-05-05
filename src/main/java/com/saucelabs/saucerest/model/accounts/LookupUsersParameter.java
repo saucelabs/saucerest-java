@@ -99,9 +99,6 @@ public class LookupUsersParameter {
         private Integer limit;
         private Integer offset;
 
-        public Builder() {
-        }
-
         public Builder setUsername(String val) {
             username = val;
             return this;

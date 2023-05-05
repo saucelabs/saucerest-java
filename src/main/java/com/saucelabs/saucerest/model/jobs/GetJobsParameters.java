@@ -82,9 +82,6 @@ public class GetJobsParameters {
         private int to;
         private Format format;
 
-        public Builder() {
-        }
-
         public Builder setUsername(String val) {
             username = val;
             return this;

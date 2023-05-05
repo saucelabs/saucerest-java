@@ -94,9 +94,6 @@ public class Settings {
     public static final class Builder {
         private Integer virtualMachines;
 
-        public Builder() {
-        }
-
         public Builder setVirtualMachines(Integer val) {
             virtualMachines = val;
             return this;

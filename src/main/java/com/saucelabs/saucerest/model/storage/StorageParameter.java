@@ -90,9 +90,6 @@ public class StorageParameter {
         private String perPage;
         private String[] groupIds;
 
-        public Builder() {
-        }
-
         public Builder setQ(String val) {
             q = val;
             return this;

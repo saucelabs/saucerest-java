@@ -40,9 +40,6 @@ public class UpdateUser {
         private String lastName;
         private String phone;
 
-        public Builder() {
-        }
-
         public Builder setUserID(String val) {
             userID = val;
             return this;

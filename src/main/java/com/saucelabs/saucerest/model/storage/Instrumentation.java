@@ -27,9 +27,6 @@ public class Instrumentation extends AbstractModel {
         private Boolean biometrics;
         private Boolean networkCapture;
 
-        public Builder() {
-        }
-
         public Builder setImageInjection(Boolean val) {
             imageInjection = val;
             return this;
