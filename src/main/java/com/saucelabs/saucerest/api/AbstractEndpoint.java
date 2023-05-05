@@ -89,20 +89,31 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * Build a URL with query parameters.
      *
      * @param url    Sauce Labs API endpoint
-     * @param params query parameters for GET request
+     * @param params Query parameters for GET request. If null, no query parameters will be added. Can be a string or an array of strings.
      * @return URL with query parameters
      */
-    private String buildUrl(String url, Map<String, Object> params) {
+    private String buildUrl(String url, Map<String, ?> params) {
+        if (url == null || url.isEmpty()) {
+            throw new IllegalArgumentException("URL cannot be null or empty");
+        }
+
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            // Check if parameter is a String array and add every element one by one to the url
-            if (param.getValue().getClass() == (String[].class)) {
-                for (String element : (String[]) param.getValue()) {
-                    urlBuilder.addQueryParameter(param.getKey(), element);
+        if (params != null) {
+            for (Map.Entry<String, ?> param : params.entrySet()) {
+                String key = param.getKey();
+                Object value = param.getValue();
+
+                // Check if the value is a string or an array of strings and add it one by one to the url
+                if (value instanceof String[]) {
+                    for (String element : (String[]) value) {
+                        urlBuilder.addQueryParameter(key, element);
+                    }
+                } else if (value instanceof String) {
+                    urlBuilder.addQueryParameter(key, (String) value);
+                } else {
+                    throw new IllegalArgumentException("Invalid parameter type: " + value.getClass());
                 }
-            } else {
-                urlBuilder.addQueryParameter(param.getKey(), param.getValue().toString());
             }
         }
 
