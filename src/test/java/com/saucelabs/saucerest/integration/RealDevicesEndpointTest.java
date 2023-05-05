@@ -33,7 +33,7 @@ public class RealDevicesEndpointTest {
     public static void runRealDeviceTest() throws MalformedURLException {
         MutableCapabilities capabilities = new MutableCapabilities();
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "12");
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "^1[2-3].*");
         capabilities.setCapability("appium:deviceName", ".*");
         capabilities.setCapability(CapabilityType.BROWSER_NAME, "Chrome");
 
