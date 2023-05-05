@@ -5,6 +5,10 @@ package com.saucelabs.saucerest;
  */
 public class ErrorExplainers {
 
+    private ErrorExplainers() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String errorMessageBuilder(String errorReason, String errorExplanation) {
         return (String.join(System.lineSeparator(), errorReason, errorExplanation));
     }
