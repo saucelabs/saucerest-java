@@ -41,7 +41,7 @@ public class JobsEndpoint extends AbstractEndpoint {
      * @return {@link ArrayList} of {@link Job} objects
      * @throws IOException if the request fails
      */
-    public ArrayList<Job> getJobs() throws IOException {
+    public List<Job> getJobs() throws IOException {
         String url = super.getBaseEndpoint() + "rest/v1/" + username + "/jobs";
 
         return new ArrayList<>(deserializeJSONArray(request(url, HttpMethod.GET), Job.class));
@@ -180,14 +180,10 @@ public class JobsEndpoint extends AbstractEndpoint {
             String assetLabel = entry.getValue();
             String filename = assetLabel;
 
-            switch (assetLabel) {
-                // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
-                // this is a workaround to get the correct filename when downloading the log
-                case "selenium-server.log":
-                    filename = isAppium ? TestAsset.APPIUM_LOG.label : TestAsset.SELENIUM_LOG.label;
-                    break;
-                default:
-                    break;
+            // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
+            // this is a workaround to get the correct filename when downloading the log
+            if (assetLabel.equals("selenium-server.log")) {
+                filename = isAppium ? TestAsset.APPIUM_LOG.label : TestAsset.SELENIUM_LOG.label;
             }
 
             Path assetPath = path.resolve(filename);

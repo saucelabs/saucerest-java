@@ -2,16 +2,17 @@ package com.saucelabs.saucerest.model.accounts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class CreateUser {
-    public String firstName;
-    public String lastName;
-    public String email;
-    public String userName;
-    public String password;
-    public String organization;
-    public Integer role;
-    public String team;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final String userName;
+    private final String password;
+    private final String organization;
+    private final Integer role;
+    private final String team;
 
     private CreateUser(Builder builder) {
         firstName = builder.firstName;
@@ -72,9 +73,6 @@ public class CreateUser {
         private Integer role;
         private String team;
 
-        public Builder() {
-        }
-
         public Builder setFirstName(String val) {
             firstName = val;
             return this;
@@ -125,21 +123,39 @@ public class CreateUser {
          * Based on <a href="https://docs.saucelabs.com/dev/api/accounts/#create-a-new-user">here</a>
          */
         private void checkParameter() {
-            if (firstName == null || firstName.isEmpty())
-                throw new IllegalArgumentException("First name is required");
+            Objects.requireNonNull(firstName, "First name is required");
+            if (firstName.isEmpty()) {
+                throw new IllegalArgumentException("First name cannot be empty");
+            }
 
-            if (lastName == null || lastName.isEmpty())
-                throw new IllegalArgumentException("Last name is required");
+            Objects.requireNonNull(lastName, "Last name is required");
+            if (lastName.isEmpty()) {
+                throw new IllegalArgumentException("Last name cannot be empty");
+            }
 
-            if (email == null || email.isEmpty())
-                throw new IllegalArgumentException("Email is required");
+            Objects.requireNonNull(email, "Email is required");
+            if (email.isEmpty()) {
+                throw new IllegalArgumentException("Email cannot be empty");
+            }
 
-            if (userName == null || userName.isEmpty())
-                throw new IllegalArgumentException("Username is required");
+            Objects.requireNonNull(userName, "Username is required");
+            if (userName.isEmpty()) {
+                throw new IllegalArgumentException("Username cannot be empty");
+            }
 
-            if (password == null || password.isEmpty()) {
-                throw new IllegalArgumentException("Password is required");
-            } else if (password.length() <= 8) {
+            Objects.requireNonNull(password, "Password is required");
+            validatePassword(password);
+
+            Objects.requireNonNull(organization, "Organization is required");
+            if (organization.isEmpty()) {
+                throw new IllegalArgumentException("Organization cannot be empty");
+            }
+
+            Objects.requireNonNull(role, "Role is required");
+        }
+
+        private void validatePassword(String password) {
+            if (password.length() < 8) {
                 throw new IllegalArgumentException("Password must be at least 8 characters");
             } else if (!password.matches(".*[0-9].*")) {
                 throw new IllegalArgumentException("Password must contain at least one number");
@@ -152,12 +168,6 @@ public class CreateUser {
             } else if (password.matches(".*\\s.*")) {
                 throw new IllegalArgumentException("Password must not contain any whitespace");
             }
-
-            if (organization == null || organization.isEmpty())
-                throw new IllegalArgumentException("Organization is required");
-
-            if (role == null)
-                throw new IllegalArgumentException("Role is required");
         }
     }
 }

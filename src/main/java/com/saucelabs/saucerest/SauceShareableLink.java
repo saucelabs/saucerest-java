@@ -11,6 +11,10 @@ import java.util.Formatter;
  * Class providing a method to create a shareable test results link of a test executed on Sauce Labs.
  */
 public class SauceShareableLink {
+    private SauceShareableLink() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
         try {
             String key = String.format("%s:%s", username, accessKey);
@@ -25,12 +29,12 @@ public class SauceShareableLink {
     }
 
     private static String bytesToHex(byte[] bytes) {
-        StringBuffer hexStringBuffer = new StringBuffer();
-        Formatter formatter = new Formatter(hexStringBuffer);
+        StringBuilder hexStringBuilder = new StringBuilder();
+        Formatter formatter = new Formatter(hexStringBuilder);
         for (byte b : bytes) {
             formatter.format("%02x", b);
         }
-        return hexStringBuffer.toString();
+        return hexStringBuilder.toString();
     }
 
     /**

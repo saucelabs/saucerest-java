@@ -56,11 +56,11 @@ public class AbstractEndpointTest {
 
         // Verify that the deserialized list contains the expected objects
         assertAll("persons",
-                () -> assertEquals(persons.size(), 2),
-                () -> assertEquals(persons.get(0).getName(), "John"),
-                () -> assertEquals(persons.get(0).getAge(), 30),
-                () -> assertEquals(persons.get(1).getName(), "Jane"),
-                () -> assertEquals(persons.get(1).getAge(), 25)
+                () -> assertEquals(2, persons.size()),
+                () -> assertEquals("John", persons.get(0).getName()),
+                () -> assertEquals(30, persons.get(0).getAge()),
+                () -> assertEquals("Jane", persons.get(1).getName()),
+                () -> assertEquals(25, persons.get(1).getAge())
         );
     }
 

@@ -31,9 +31,6 @@ public class Resigning extends AbstractModel {
         private Boolean sysAlertsDelay;
         private Boolean networkCapture;
 
-        public Builder() {
-        }
-
         public Builder setImageInjection(Boolean val) {
             imageInjection = val;
             return this;

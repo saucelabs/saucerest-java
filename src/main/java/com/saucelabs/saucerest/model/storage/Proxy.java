@@ -18,9 +18,6 @@ public class Proxy {
         private String host;
         private Integer port;
 
-        public Builder() {
-        }
-
         public Builder setHost(String val) {
             host = val;
             return this;

@@ -74,7 +74,7 @@ public class RealDevicesEndpointTest {
         setup(region);
 
         Devices devices = realDevices.get().getDevices();
-        String deviceId = devices.deviceList.get(0).id;
+        String deviceId = devices.getDeviceList().get(0).id;
         Device device = realDevices.get().getSpecificDevice(deviceId);
 
         assertNotNull(device);

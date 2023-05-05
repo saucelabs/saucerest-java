@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class PlatformEndpointTest {
     private final ThreadLocal<PlatformEndpoint> platform = new ThreadLocal<>();
 
@@ -26,8 +28,8 @@ public class PlatformEndpointTest {
 
         TestStatus testStatus = platform.get().getTestStatus();
 
-        Assertions.assertNotNull(testStatus);
-        Assertions.assertNotNull(testStatus.statusMessage);
+        assertNotNull(testStatus);
+        assertNotNull(testStatus.statusMessage);
     }
 
     @ParameterizedTest
@@ -37,8 +39,8 @@ public class PlatformEndpointTest {
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("all");
 
-        Assertions.assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> Assertions.assertTrue((platform.automationBackend.equals("appium")) || (platform.automationBackend.equals("webdriver"))));
+        assertNotNull(supportedPlatforms);
+        supportedPlatforms.getPlatforms().forEach(platform -> assertTrue((platform.automationBackend.equals("appium")) || (platform.automationBackend.equals("webdriver"))));
     }
 
     @ParameterizedTest
@@ -48,8 +50,8 @@ public class PlatformEndpointTest {
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("appium");
 
-        Assertions.assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> Assertions.assertEquals("appium", platform.automationBackend));
+        assertNotNull(supportedPlatforms);
+        supportedPlatforms.getPlatforms().forEach(platform -> Assertions.assertEquals("appium", platform.automationBackend));
     }
 
     @ParameterizedTest
@@ -59,8 +61,8 @@ public class PlatformEndpointTest {
 
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("webdriver");
 
-        Assertions.assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> Assertions.assertEquals("webdriver", platform.automationBackend));
+        assertNotNull(supportedPlatforms);
+        supportedPlatforms.getPlatforms().forEach(platform -> Assertions.assertEquals("webdriver", platform.automationBackend));
     }
 
     @ParameterizedTest
@@ -70,6 +72,6 @@ public class PlatformEndpointTest {
 
         EndOfLifeAppiumVersions endOfLifeAppiumVersions = platform.get().getEndOfLifeAppiumVersions();
 
-        Assertions.assertTrue(endOfLifeAppiumVersions.appiumVersionList.size() != 0);
+        assertNotEquals(0, endOfLifeAppiumVersions.getAppiumVersionList().size());
     }
 }

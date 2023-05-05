@@ -3,13 +3,28 @@ package com.saucelabs.saucerest.unit;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.storage.*;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class EditAppGroupSettingsTest {
 
     @Test
     void toJson() {
+        Settings settings = new Settings.Builder()
+                .setAudioCapture(true)
+                .setInstrumentation(new Instrumentation.Builder().setImageInjection(true).build())
+                .build();
+
+        EditAppGroupSettings editAppGroupSettings = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
+                .setSettings(settings)
+                .build();
+
+        JSONObject jsonObject = new JSONObject(editAppGroupSettings.toJson());
+
+        assertTrue(jsonObject.has("settings"));
+        assertTrue(jsonObject.getJSONObject("settings").has("audio_capture"));
+        assertTrue(jsonObject.getJSONObject("settings").getJSONObject("instrumentation").has("image_injection"));
     }
 
     @Test
@@ -24,23 +39,23 @@ class EditAppGroupSettingsTest {
             .setSettings(settings)
             .build();
 
-        Assertions.assertNotNull(editAppGroupSettings);
+        assertNotNull(editAppGroupSettings);
         System.out.println(editAppGroupSettings.toJson());
     }
 
     @Test
     public void testBuilderWithProxy() {
         Settings settings = new Settings.Builder()
-            .setProxy(new Proxy.Builder().setHost("local").setPort(1234).build())
-            .build();
+                .setProxy(new Proxy.Builder().setHost("local").setPort(1234).build())
+                .build();
 
         EditAppGroupSettings editAppGroupSettings = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-            .setSettings(settings)
-            .build();
+                .setSettings(settings)
+                .build();
 
-        Assertions.assertEquals("local", editAppGroupSettings.settings.proxy.host);
-        Assertions.assertEquals(1234, editAppGroupSettings.settings.proxy.port);
-        Assertions.assertTrue(editAppGroupSettings.settings.proxyEnabled);
+        assertEquals("local", editAppGroupSettings.settings.proxy.host);
+        assertEquals(1234, editAppGroupSettings.settings.proxy.port);
+        assertTrue(editAppGroupSettings.settings.proxyEnabled);
     }
 
     @Test
@@ -49,9 +64,9 @@ class EditAppGroupSettingsTest {
             .setResigning(new Resigning.Builder().setBiometrics(true).build())
             .build();
 
-        Assertions.assertThrows(SauceException.ResigningNotAllowed.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-            .setSettings(settings)
-            .build());
+        assertThrows(SauceException.ResigningNotAllowed.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
+                .setSettings(settings)
+                .build());
     }
 
     @Test
@@ -60,9 +75,9 @@ class EditAppGroupSettingsTest {
             .setSetupDeviceLock(true)
             .build();
 
-        Assertions.assertThrows(SauceException.DeviceLockOnlyOnAndroid.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
-            .setSettings(settings)
-            .build());
+        assertThrows(SauceException.DeviceLockOnlyOnAndroid.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+                .setSettings(settings)
+                .build());
     }
 
     @Test
@@ -75,7 +90,7 @@ class EditAppGroupSettingsTest {
             .setSettings(settings)
             .build();
 
-        Assertions.assertEquals("PORTRAIT", editAppGroupSettings.settings.orientation);
+        assertEquals("PORTRAIT", editAppGroupSettings.settings.orientation);
     }
 
     @Test
@@ -88,7 +103,7 @@ class EditAppGroupSettingsTest {
             .setSettings(settings)
             .build();
 
-        Assertions.assertEquals("LANDSCAPE", editAppGroupSettings.settings.orientation);
+        assertEquals("LANDSCAPE", editAppGroupSettings.settings.orientation);
     }
 
     @Test
@@ -97,25 +112,24 @@ class EditAppGroupSettingsTest {
             .setInstrumentation(new Instrumentation.Builder().setBiometrics(true).build())
             .build();
 
-        Assertions.assertThrows(SauceException.InstrumentationNotAllowed.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
-            .setSettings(settings)
-            .build());
+        assertThrows(SauceException.InstrumentationNotAllowed.class, () -> new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+                .setSettings(settings)
+                .build());
     }
 
     @Test
     public void testBuilderAddingRequiredFlag() {
         Settings settings = new Settings.Builder()
-            .setInstrumentation(new Instrumentation.Builder().setImageInjection(true).build())
-            .build();
+                .setInstrumentation(new Instrumentation.Builder().setImageInjection(true).build())
+                .build();
 
         EditAppGroupSettings editAppGroupSettings = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-            .setSettings(settings)
-            .build();
+                .setSettings(settings)
+                .build();
 
-        Assertions.assertTrue(editAppGroupSettings.settings.instrumentationEnabled);
-        Assertions.assertTrue(editAppGroupSettings.settings.instrumentation.imageInjection);
-        Assertions.assertNull(editAppGroupSettings.settings.instrumentation.biometrics);
-        System.out.println(editAppGroupSettings.toJson());
+        assertTrue(editAppGroupSettings.settings.instrumentationEnabled);
+        assertTrue(editAppGroupSettings.settings.instrumentation.imageInjection);
+        assertNull(editAppGroupSettings.settings.instrumentation.biometrics);
     }
 
     @Test
@@ -128,6 +142,6 @@ class EditAppGroupSettingsTest {
             .setSettings(settings)
             .build();
 
-        Assertions.assertDoesNotThrow(() -> new JSONObject(editAppGroupSettings.toJson()));
+        assertDoesNotThrow(() -> new JSONObject(editAppGroupSettings.toJson()));
     }
 }

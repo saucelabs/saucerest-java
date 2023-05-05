@@ -22,9 +22,6 @@ public class GetAppStorageGroupSettings {
         private String kind;
         private String identifier;
 
-        public Builder() {
-        }
-
         public Builder setSettings(Settings val) {
             settings = val;
             return this;

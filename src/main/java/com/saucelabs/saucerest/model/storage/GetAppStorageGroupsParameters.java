@@ -50,9 +50,6 @@ public class GetAppStorageGroupsParameters {
         private String[] groupIds;
         private int page;
 
-        public Builder() {
-        }
-
         public Builder setQ(String val) {
             q = val;
             return this;

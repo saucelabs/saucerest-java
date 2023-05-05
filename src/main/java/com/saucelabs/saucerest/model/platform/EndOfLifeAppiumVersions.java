@@ -9,7 +9,11 @@ import java.util.stream.Collectors;
 
 public class EndOfLifeAppiumVersions {
 
-    public List<AppiumVersion> appiumVersionList;
+    public List<AppiumVersion> getAppiumVersionList() {
+        return appiumVersionList;
+    }
+
+    private final List<AppiumVersion> appiumVersionList;
 
     public EndOfLifeAppiumVersions(Response response) throws IOException {
         super();

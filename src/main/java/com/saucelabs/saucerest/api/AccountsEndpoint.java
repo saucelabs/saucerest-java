@@ -86,7 +86,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      */
     public CreateTeam createTeam(String name, Settings settings, String description) throws IOException {
         String url = getBaseEndpoint() + "teams/";
-        Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
+        Map<String, Object> map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
         return deserializeJSONObject(request(url, HttpMethod.POST, map), CreateTeam.class);
     }
@@ -128,7 +128,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      */
     public UpdateTeam updateTeam(String teamID, String name, Settings settings, String description) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
-        Map map = ImmutableMap.of("name", name, "settings", settings, "description", description);
+        Map<String, Object> map = ImmutableMap.of("name", name, "settings", settings, "description", description);
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, map), UpdateTeam.class);
     }
@@ -232,7 +232,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public User updateUser(UpdateUser updateUser) throws IOException {
-        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+        String url = getBaseEndpoint() + "users/" + updateUser.getUserID();
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()), User.class);
     }
@@ -245,7 +245,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public User partiallyUpdateUser(UpdateUser updateUser) throws IOException {
-        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+        String url = getBaseEndpoint() + "users/" + updateUser.getUserID();
 
         return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()), User.class);
     }
@@ -290,7 +290,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
     public SetTeam setUsersTeam(String userID, String teamID) throws IOException {
         String url = getBaseEndpoint() + "membership";
 
-        Map map = ImmutableMap.of("user", userID, "team", teamID);
+        Map<String, Object> map = ImmutableMap.of("user", userID, "team", teamID);
 
         return deserializeJSONObject(request(url, HttpMethod.POST, map), SetTeam.class);
     }
