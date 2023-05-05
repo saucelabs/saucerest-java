@@ -72,6 +72,6 @@ public class PlatformEndpointTest {
 
         EndOfLifeAppiumVersions endOfLifeAppiumVersions = platform.get().getEndOfLifeAppiumVersions();
 
-        assertNotEquals(0, endOfLifeAppiumVersions.appiumVersionList.size());
+        assertNotEquals(0, endOfLifeAppiumVersions.getAppiumVersionList().size());
     }
 }
