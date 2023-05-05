@@ -29,12 +29,12 @@ public class SauceShareableLink {
     }
 
     private static String bytesToHex(byte[] bytes) {
-        StringBuffer hexStringBuffer = new StringBuffer();
-        Formatter formatter = new Formatter(hexStringBuffer);
+        StringBuilder hexStringBuilder = new StringBuilder();
+        Formatter formatter = new Formatter(hexStringBuilder);
         for (byte b : bytes) {
             formatter.format("%02x", b);
         }
-        return hexStringBuffer.toString();
+        return hexStringBuilder.toString();
     }
 
     /**
