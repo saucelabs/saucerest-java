@@ -72,9 +72,6 @@ public class CreateUser {
         private Integer role;
         private String team;
 
-        public Builder() {
-        }
-
         public Builder setFirstName(String val) {
             firstName = val;
             return this;
