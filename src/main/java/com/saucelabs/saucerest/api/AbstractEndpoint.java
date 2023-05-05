@@ -162,7 +162,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
             response = CLIENT.newCall(request).execute();
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error executing request", e);
-            throw e;
+            throw new IOException(String.format("Error executing request: %s", e.getMessage()), e);
         }
 
         if (shouldRetryOnHttpError(response)) {
