@@ -12,6 +12,9 @@ import static java.net.HttpURLConnection.*;
  * For example, provide endpoint specific context and error message.
  */
 public class ResponseHandler {
+    private ResponseHandler() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void responseHandler(AbstractEndpoint endpoint, Response response) {
         // TODO: refactor this to use Java 17 pattern matching in the future
