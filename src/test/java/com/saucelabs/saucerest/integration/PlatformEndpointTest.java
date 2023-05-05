@@ -40,7 +40,7 @@ public class PlatformEndpointTest {
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("all");
 
         assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> assertTrue((platform.automationBackend.equals("appium")) || (platform.automationBackend.equals("webdriver"))));
+        supportedPlatforms.getPlatforms().forEach(platform -> assertTrue((platform.automationBackend.equals("appium")) || (platform.automationBackend.equals("webdriver"))));
     }
 
     @ParameterizedTest
@@ -51,7 +51,7 @@ public class PlatformEndpointTest {
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("appium");
 
         assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> Assertions.assertEquals("appium", platform.automationBackend));
+        supportedPlatforms.getPlatforms().forEach(platform -> Assertions.assertEquals("appium", platform.automationBackend));
     }
 
     @ParameterizedTest
@@ -62,7 +62,7 @@ public class PlatformEndpointTest {
         SupportedPlatforms supportedPlatforms = platform.get().getSupportedPlatforms("webdriver");
 
         assertNotNull(supportedPlatforms);
-        supportedPlatforms.platforms.forEach(platform -> Assertions.assertEquals("webdriver", platform.automationBackend));
+        supportedPlatforms.getPlatforms().forEach(platform -> Assertions.assertEquals("webdriver", platform.automationBackend));
     }
 
     @ParameterizedTest
