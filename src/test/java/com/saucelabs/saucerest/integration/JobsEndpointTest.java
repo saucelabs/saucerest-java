@@ -317,7 +317,7 @@ public class JobsEndpointTest {
     public void getJobsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         SauceREST sauceREST = new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(dataCenter.toString()));
         JobsEndpoint job = sauceREST.getJobsEndpoint();
-        ArrayList<Job> jobList = job.getJobs();
+        List<Job> jobList = job.getJobs();
 
         assertTrue(jobList.size() > 0);
     }
@@ -342,7 +342,7 @@ public class JobsEndpointTest {
     public void getJobDetailsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint();
-        ArrayList<Job> jobList = jobsEndpoint.getJobs();
+        List<Job> jobList = jobsEndpoint.getJobs();
 
         Job jobDetails = jobsEndpoint.getJobDetails(jobList.get(0).id);
 

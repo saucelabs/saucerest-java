@@ -41,7 +41,7 @@ public class JobsEndpoint extends AbstractEndpoint {
      * @return {@link ArrayList} of {@link Job} objects
      * @throws IOException if the request fails
      */
-    public ArrayList<Job> getJobs() throws IOException {
+    public List<Job> getJobs() throws IOException {
         String url = super.getBaseEndpoint() + "rest/v1/" + username + "/jobs";
 
         return new ArrayList<>(deserializeJSONArray(request(url, HttpMethod.GET), Job.class));
