@@ -386,13 +386,13 @@ public class AccountsEndpointTest {
         assertEquals(createTeam.id, setTeam.team.id);
 
         user = accountsEndpoint.setTeamAdmin(user.id);
-        assertTrue(user.roles.get(0).role.equals(Roles.TEAMADMIN.getValue()));
+        assertEquals((int) user.roles.get(0).role, Roles.TEAMADMIN.getValue());
 
         user = accountsEndpoint.setAdmin(user.id);
-        assertTrue(user.roles.get(0).role.equals(Roles.ORGADMIN.getValue()));
+        assertEquals((int) user.roles.get(0).role, Roles.ORGADMIN.getValue());
 
         user = accountsEndpoint.setMember(user.id);
-        assertTrue(user.roles.get(0).role.equals(Roles.MEMBER.getValue()));
+        assertEquals((int) user.roles.get(0).role, Roles.MEMBER.getValue());
 
         accountsEndpoint.deleteTeam(createTeam.id);
 
