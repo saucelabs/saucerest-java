@@ -180,14 +180,10 @@ public class JobsEndpoint extends AbstractEndpoint {
             String assetLabel = entry.getValue();
             String filename = assetLabel;
 
-            switch (assetLabel) {
-                // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
-                // this is a workaround to get the correct filename when downloading the log
-                case "selenium-server.log":
-                    filename = isAppium ? TestAsset.APPIUM_LOG.label : TestAsset.SELENIUM_LOG.label;
-                    break;
-                default:
-                    break;
+            // the API always returns the Appium/Selenium log as selenium-server.log even when using Appium
+            // this is a workaround to get the correct filename when downloading the log
+            if (assetLabel.equals("selenium-server.log")) {
+                filename = isAppium ? TestAsset.APPIUM_LOG.label : TestAsset.SELENIUM_LOG.label;
             }
 
             Path assetPath = path.resolve(filename);
