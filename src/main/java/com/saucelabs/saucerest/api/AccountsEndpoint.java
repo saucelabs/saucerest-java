@@ -232,7 +232,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public User updateUser(UpdateUser updateUser) throws IOException {
-        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+        String url = getBaseEndpoint() + "users/" + updateUser.getUserID();
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, updateUser.toMap()), User.class);
     }
@@ -245,7 +245,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
      * @throws IOException API request failed
      */
     public User partiallyUpdateUser(UpdateUser updateUser) throws IOException {
-        String url = getBaseEndpoint() + "users/" + updateUser.userID;
+        String url = getBaseEndpoint() + "users/" + updateUser.getUserID();
 
         return deserializeJSONObject(request(url, HttpMethod.PATCH, updateUser.toMap()), User.class);
     }

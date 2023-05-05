@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateUser {
-    public String userID;
-    public String firstName;
-    public String lastName;
-    public String phone;
+    private final String userID;
+    private final String firstName;
+    private final String lastName;
+    private final String phone;
 
     private UpdateUser(Builder builder) {
         userID = builder.userID;
@@ -32,6 +32,10 @@ public class UpdateUser {
         }
 
         return parameters;
+    }
+
+    public String getUserID() {
+        return userID;
     }
 
     public static final class Builder {
