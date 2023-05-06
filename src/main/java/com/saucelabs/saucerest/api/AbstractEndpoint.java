@@ -111,6 +111,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
                     }
                 } else if (value instanceof String) {
                     urlBuilder.addQueryParameter(key, (String) value);
+                } else if (value instanceof Integer) {
+                    urlBuilder.addQueryParameter(key, Integer.toString((Integer) value));
+                } else if (value instanceof Boolean) {
+                    urlBuilder.addQueryParameter(key, Boolean.toString((Boolean) value));
                 } else {
                     throw new IllegalArgumentException("Invalid parameter type: " + value.getClass());
                 }

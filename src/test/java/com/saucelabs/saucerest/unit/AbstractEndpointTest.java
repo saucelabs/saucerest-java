@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,15 +29,19 @@ public class AbstractEndpointTest {
         method.setAccessible(true);
 
         String url = "https://example.com";
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new LinkedHashMap<>();
         params.put("param1", "value1");
         params.put("param2", new String[]{"value2", "value3"});
+        params.put("param3", 20);
+        params.put("param4", true);
 
         String expected = HttpUrl.parse("https://example.com")
                 .newBuilder()
                 .addQueryParameter("param1", "value1")
                 .addQueryParameter("param2", "value2")
                 .addQueryParameter("param2", "value3")
+                .addQueryParameter("param3", "20")
+                .addQueryParameter("param4", "true")
                 .build()
                 .toString();
 
