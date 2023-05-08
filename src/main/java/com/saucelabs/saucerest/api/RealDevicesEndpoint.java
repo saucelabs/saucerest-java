@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.realdevices.*;
 import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonDataException;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
 import okhttp3.Response;
@@ -292,6 +293,9 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             reader.endArray();
         } catch (IOException e) {
             logger.warning(String.format("Failed to write to file %s", path));
+            throw e;
+        } catch (JsonDataException e) {
+            logger.warning(String.format("Failed to parse JSON response: ", e.getMessage(), response.body()));
             throw e;
         }
     }
