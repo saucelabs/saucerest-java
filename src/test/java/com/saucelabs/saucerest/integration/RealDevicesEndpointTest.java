@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,9 +64,11 @@ public class RealDevicesEndpointTest {
     public void getDevices(Region region) throws IOException {
         setup(region);
 
-        Devices devices = realDevices.get().getDevices();
+        //Devices devices = realDevices.get().getDevices();
+        List<Device> devices = realDevices.get().getDevices();
 
-        assertNotNull(devices);
+        assertTrue(devices.size() > 0);
+        assertFalse(devices.get(0).id.isEmpty());
     }
 
     @ParameterizedTest
@@ -73,11 +76,12 @@ public class RealDevicesEndpointTest {
     public void getSpecificDevice(Region region) throws IOException {
         setup(region);
 
-        Devices devices = realDevices.get().getDevices();
-        String deviceId = devices.getDeviceList().get(0).id;
+        List<Device> devices = realDevices.get().getDevices();
+        String deviceId = devices.get(0).id;
         Device device = realDevices.get().getSpecificDevice(deviceId);
 
         assertNotNull(device);
+        assertEquals(device.id, deviceId);
     }
 
     @ParameterizedTest
