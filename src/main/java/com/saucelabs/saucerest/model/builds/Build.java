@@ -41,31 +41,9 @@ public class Build extends AbstractModel {
     @Json(name = "team_id")
     public String teamId;
 
-    /**
-     * No args constructor for use in serialization
-     */
     public Build() {
     }
 
-    /**
-     * @param creationTime
-     * @param _public
-     * @param groupId
-     * @param jobs
-     * @param deletionTime
-     * @param run
-     * @param source
-     * @param ownerId
-     * @param orgId
-     * @param modificationTime
-     * @param teamId
-     * @param name
-     * @param startTime
-     * @param endTime
-     * @param id
-     * @param passed
-     * @param status
-     */
     public Build(Integer creationTime, Object deletionTime, Integer endTime, String groupId, String id, Jobs jobs, Integer modificationTime, String name, String orgId, String ownerId, Object passed, Boolean _public, Integer run, String source, Integer startTime, String status, String teamId) {
         super();
         this.creationTime = creationTime;
