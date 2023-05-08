@@ -1,7 +1,9 @@
 package com.saucelabs.saucerest.unit;
 
+import com.saucelabs.saucerest.Helper;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
+import com.saucelabs.saucerest.model.builds.Build;
 import okhttp3.HttpUrl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +87,26 @@ public class AbstractEndpointTest {
     }
 
     @Test
+    void testDeserializeJSONObjectWithListOfClassTypes_WithTwoItems() throws IOException {
+        Helper helper = new Helper();
+        String jsonResponse = helper.getResourceFileAsString("/buildsResponses.json");
+
+        List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
+
+        assertEquals(2, builds.size());
+    }
+
+    @Test
+    void testDeserializeJSONObjectWithListOfClassTypes_WithOneItem() throws IOException {
+        Helper helper = new Helper();
+        String jsonResponse = helper.getResourceFileAsString("/buildsResponse.json");
+
+        List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
+
+        assertEquals(1, builds.size());
+    }
+
+    @Test
     public void testConstructorWithNullCredentials() {
         assertThrows(SauceException.MissingCredentials.class, () -> new PersonEndpoint(null, null, null));
     }
@@ -121,6 +144,10 @@ public class AbstractEndpointTest {
         }
 
         public <T> T publicDeserializeJSONObject(String json, Class<T> clazz) throws IOException {
+            return deserializeJSONObject(json, clazz);
+        }
+
+        public <T> List<T> publicDeserializeJSONObject(String json, List<Class<? extends T>> clazz) throws IOException {
             return deserializeJSONObject(json, clazz);
         }
     }

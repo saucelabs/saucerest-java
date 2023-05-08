@@ -2,10 +2,7 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonDataException;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
+import com.squareup.moshi.*;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import okhttp3.*;
@@ -13,6 +10,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -253,6 +251,35 @@ public abstract class AbstractEndpoint extends AbstractModel {
             return jsonAdapter.fromJson(jsonResponse);
         } catch (IOException e) {
             throw new IOException("Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
+        } catch (JsonDataException e) {
+            logger.warning("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+            throw e;
+        }
+    }
+
+    protected <T> List<T> deserializeJSONObject(Response response, List<Class<? extends T>> clazz) throws IOException {
+        if (response.body() != null) {
+            return deserializeJSONObject(response.body().string(), clazz);
+        } else {
+            throw new IOException("Response body is null");
+        }
+    }
+
+    protected <T> List<T> deserializeJSONObject(String jsonResponse, List<Class<? extends T>> clazz) throws IOException {
+        Objects.requireNonNull(jsonResponse, "JSON response cannot be null");
+        Objects.requireNonNull(clazz, "Class object cannot be null");
+
+        Moshi moshi = MoshiSingleton.getInstance();
+        JsonAdapter<List<T>> jsonAdapter = moshi.adapter(Types.newParameterizedType(List.class, clazz.get(0)));
+        try {
+            JsonReader reader = JsonReader.of(Okio.buffer(Okio.source(new ByteArrayInputStream(jsonResponse.getBytes()))));
+            reader.beginObject();
+            reader.nextName();
+            List<T> list = jsonAdapter.fromJson(reader);
+            reader.endObject();
+            return list;
+        } catch (IOException e) {
+            throw new IOException("Error deserializing JSON response to " + clazz.get(0).getSimpleName() + " class", e);
         } catch (JsonDataException e) {
             logger.warning("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
             throw e;
