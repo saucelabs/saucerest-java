@@ -9,7 +9,7 @@ public class Build extends AbstractModel {
     @Json(name = "creation_time")
     public Integer creationTime;
     @Json(name = "deletion_time")
-    public Object deletionTime;
+    public Integer deletionTime;
     @Json(name = "end_time")
     public Integer endTime;
     @Json(name = "group_id")
@@ -44,7 +44,7 @@ public class Build extends AbstractModel {
     public Build() {
     }
 
-    public Build(Integer creationTime, Object deletionTime, Integer endTime, String groupId, String id, Jobs jobs, Integer modificationTime, String name, String orgId, String ownerId, Object passed, Boolean _public, Integer run, String source, Integer startTime, String status, String teamId) {
+    public Build(Integer creationTime, Integer deletionTime, Integer endTime, String groupId, String id, Jobs jobs, Integer modificationTime, String name, String orgId, String ownerId, Object passed, Boolean _public, Integer run, String source, Integer startTime, String status, String teamId) {
         super();
         this.creationTime = creationTime;
         this.deletionTime = deletionTime;

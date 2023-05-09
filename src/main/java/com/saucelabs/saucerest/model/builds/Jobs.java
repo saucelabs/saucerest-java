@@ -28,16 +28,6 @@ public class Jobs {
     public Jobs() {
     }
 
-    /**
-     * @param running
-     * @param _public
-     * @param queued
-     * @param finished
-     * @param completed
-     * @param failed
-     * @param passed
-     * @param errored
-     */
     public Jobs(Integer completed, Integer errored, Integer failed, Integer finished, Integer passed, Integer _public, Integer queued, Integer running) {
         super();
         this.completed = completed;
@@ -49,5 +39,4 @@ public class Jobs {
         this.queued = queued;
         this.running = running;
     }
-
 }

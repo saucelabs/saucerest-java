@@ -90,7 +90,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @param params Query parameters for GET request. If null, no query parameters will be added. Can be a string or an array of strings.
      * @return URL with query parameters
      */
-    private String buildUrl(String url, Map<String, ?> params) {
+    private String buildUrl(String url, Map<String, Object> params) {
         if (url == null || url.isEmpty()) {
             throw new IllegalArgumentException("URL cannot be null or empty");
         }
@@ -98,23 +98,24 @@ public abstract class AbstractEndpoint extends AbstractModel {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
 
         if (params != null) {
-            for (Map.Entry<String, ?> param : params.entrySet()) {
+            for (Map.Entry<String, Object> param : params.entrySet()) {
                 String key = param.getKey();
                 Object value = param.getValue();
 
-                // Check if the value is a string or an array of strings and add it one by one to the url
+                if (value == null || (value instanceof String && ((String) value).isEmpty())) {
+                    continue; // skip null or empty values
+                }
+
                 if (value instanceof String[]) {
                     for (String element : (String[]) value) {
                         urlBuilder.addQueryParameter(key, element);
                     }
-                } else if (value instanceof String) {
-                    urlBuilder.addQueryParameter(key, (String) value);
-                } else if (value instanceof Integer) {
-                    urlBuilder.addQueryParameter(key, Integer.toString((Integer) value));
-                } else if (value instanceof Boolean) {
-                    urlBuilder.addQueryParameter(key, Boolean.toString((Boolean) value));
+                } else if (value instanceof Object[]) {
+                    for (Object element : (Object[]) value) {
+                        urlBuilder.addQueryParameter(key, element.toString());
+                    }
                 } else {
-                    throw new IllegalArgumentException("Invalid parameter type: " + value.getClass());
+                    urlBuilder.addQueryParameter(key, value.toString());
                 }
             }
         }
