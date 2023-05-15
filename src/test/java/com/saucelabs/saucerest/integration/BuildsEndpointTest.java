@@ -46,4 +46,21 @@ public class BuildsEndpointTest {
         assertTrue(builds.get(0).status.equalsIgnoreCase(Status.complete.value) ||
                 builds.get(0).status.equalsIgnoreCase(Status.success.value));
     }
+
+    @ParameterizedTest
+    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    public void getSpecificBuildTest(DataCenter dataCenter) throws IOException {
+        SauceREST sauceREST = new SauceREST(dataCenter);
+        BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint();
+
+        LookupBuildsParameters parameters = new LookupBuildsParameters.Builder()
+                .setLimit(1)
+                .build();
+
+        List<Build> builds = buildsEndpoint.lookupBuilds(JobSource.VDC, parameters);
+
+        Build build = buildsEndpoint.getSpecificBuild(JobSource.VDC, builds.get(0).id);
+
+        assertEquals(builds.get(0).id, build.id);
+    }
 }

@@ -43,10 +43,33 @@ public class BuildsEndpoint extends AbstractEndpoint {
         return deserializeJSONObject(request(url, HttpMethod.GET), Collections.singletonList(Build.class));
     }
 
+    /**
+     * Queries the requesting account and returns a summary of each build matching the query, including the ID value, which may be a required parameter of other API calls related to a specific build.
+     * <p>
+     * You can narrow the results of your query using any of the optional filtering parameters.
+     *
+     * @param jobSource The type of device for which you are getting builds. Valid values are: {@link JobSource}
+     * @param parameters A {@link LookupBuildsParameters} object containing the parameters to filter the results
+     * @return A list of {@link Build} objects
+     * @throws IOException when the request fails
+     */
     public List<Build> lookupBuilds(JobSource jobSource, LookupBuildsParameters parameters) throws IOException {
         String url = getBaseEndpoint(jobSource);
 
         return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, parameters.toMap()), Collections.singletonList(Build.class));
+    }
+
+    /**
+     * Retrieve the details related to a specific build by passing its unique ID in the request.
+     * @param jobSource The type of test device associated with the job and build. Valid values are: {@link JobSource#VDC} and {@link JobSource#RDC}
+     * @param buildID The unique identifier of the build to retrieve. You can look up build IDs in your organization using {@link #lookupBuilds(JobSource)} method.
+     * @return A {@link Build} object
+     * @throws IOException when the request fails
+     */
+    public Build getSpecificBuild(JobSource jobSource, String buildID) throws IOException {
+        String url = getBaseEndpoint(jobSource) + buildID + "/";
+
+        return deserializeJSONObject(request(url, HttpMethod.GET), Build.class);
     }
 
     /**
