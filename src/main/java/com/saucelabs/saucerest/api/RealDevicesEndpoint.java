@@ -42,16 +42,16 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
     }
 
     /**
-     * Returns all real device in Sauce Labs. Documentation is
+     * Returns all real devices in Sauce Labs. Documentation is
      * <a href="https://docs.saucelabs.com/dev/api/rdc/#get-devices">here</a>
      *
-     * @return {@link Devices}
+     * @return {@link List} of {@link Device}
      * @throws IOException API request failed
      */
-    public Devices getDevices() throws IOException {
+    public List<Device> getDevices() throws IOException {
         String url = getBaseEndpoint() + "/devices";
 
-        return new Devices(deserializeJSONArray(request(url, HttpMethod.GET), Device.class));
+        return deserializeJSONArray(request(url, HttpMethod.GET), Device.class);
     }
 
     /**
