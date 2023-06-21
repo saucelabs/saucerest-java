@@ -92,11 +92,13 @@ public class DeviceJob {
     public String crashLogUrl;
     @Json(name = "used_cached_device")
     public Boolean usedCachedDevice;
+    @Json(name = "backtrace_url")
+    public String backtraceUrl;
 
     public DeviceJob() {
     }
 
-    public DeviceJob(ApplicationSummary applicationSummary, Object assignedTunnelId, String deviceType, String ownerSauce, String automationBackend, BaseConfig baseConfig, String build, Boolean collectsAutomatorLog, String consolidatedStatus, Long creationTime, DeviceDescriptor deviceDescriptor, Long endTime, Object error, String id, String frameworkLogUrl, String deviceLogUrl, String requestsUrl, Object testCasesUrl, Object junitLogUrl, Boolean manual, Long modificationTime, String name, String os, String osVersion, String deviceName, Boolean passed, Boolean proxied, Boolean recordScreenshots, List<Object> screenshots, Boolean recordVideo, Long startTime, String status, List<Object> tags, String videoUrl, String remoteAppFileUrl, String appiumSessionId, Object deviceSessionId, String client, String networkLogUrl, String testfairyLogUrl, String testReportType, String crashLogUrl, Boolean usedCachedDevice) {
+    public DeviceJob(ApplicationSummary applicationSummary, Object assignedTunnelId, String deviceType, String ownerSauce, String automationBackend, BaseConfig baseConfig, String build, Boolean collectsAutomatorLog, String consolidatedStatus, Long creationTime, DeviceDescriptor deviceDescriptor, Long endTime, Object error, String id, String frameworkLogUrl, String deviceLogUrl, String requestsUrl, Object testCasesUrl, Object junitLogUrl, Boolean manual, Long modificationTime, String name, String os, String osVersion, String deviceName, Boolean passed, Boolean proxied, Boolean recordScreenshots, List<Object> screenshots, Boolean recordVideo, Long startTime, String status, List<Object> tags, String videoUrl, String remoteAppFileUrl, String appiumSessionId, Object deviceSessionId, String client, String networkLogUrl, String testfairyLogUrl, String testReportType, String crashLogUrl, Boolean usedCachedDevice, String backtraceUrl) {
         super();
         this.applicationSummary = applicationSummary;
         this.assignedTunnelId = assignedTunnelId;
@@ -141,5 +143,6 @@ public class DeviceJob {
         this.testReportType = testReportType;
         this.crashLogUrl = crashLogUrl;
         this.usedCachedDevice = usedCachedDevice;
+        this.backtraceUrl = backtraceUrl;
     }
 }

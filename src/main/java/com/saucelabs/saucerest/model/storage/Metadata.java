@@ -36,11 +36,13 @@ public class Metadata {
     public Integer targetSdk;
     @Json(name = "test_runner_class")
     public Object testRunnerClass;
+    @Json(name = "icon_hash")
+    public String iconHash;
 
     public Metadata() {
     }
 
-    public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass) {
+    public Metadata(String identifier, String name, String version, Boolean isTestRunner, String icon, String shortVersion, Boolean isSimulator, String minOs, String targetOs, Object testRunnerPluginPath, List<String> deviceFamily, Integer versionCode, Integer minSdk, Integer targetSdk, Object testRunnerClass, String iconHash) {
         super();
         this.identifier = identifier;
         this.name = name;
@@ -57,5 +59,6 @@ public class Metadata {
         this.minSdk = minSdk;
         this.targetSdk = targetSdk;
         this.testRunnerClass = testRunnerClass;
+        this.iconHash = iconHash;
     }
 }

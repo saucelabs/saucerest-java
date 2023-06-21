@@ -45,7 +45,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetJobsEndpointWithDataCenter() {
-        JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint(DataCenter.US_EAST);
+        JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(jobsEndpoint);
     }
 
@@ -75,7 +75,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetStorageEndpointWithDataCenter() {
-        StorageEndpoint storageEndpoint = sauceREST.getStorageEndpoint(DataCenter.US_EAST);
+        StorageEndpoint storageEndpoint = sauceREST.getStorageEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(storageEndpoint);
     }
 
@@ -105,7 +105,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetPlatformEndpointWithDataCenter() {
-        PlatformEndpoint platformEndpoint = sauceREST.getPlatformEndpoint(DataCenter.US_EAST);
+        PlatformEndpoint platformEndpoint = sauceREST.getPlatformEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(platformEndpoint);
     }
 
@@ -135,7 +135,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetRealDevicesEndpointWithDataCenter() {
-        RealDevicesEndpoint realDevicesEndpoint = sauceREST.getRealDevicesEndpoint(DataCenter.US_EAST);
+        RealDevicesEndpoint realDevicesEndpoint = sauceREST.getRealDevicesEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(realDevicesEndpoint);
     }
 
@@ -165,7 +165,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetSauceConnectEndpointWithDataCenter() {
-        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint(DataCenter.US_EAST);
+        SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(sauceConnectEndpoint);
     }
 
@@ -195,7 +195,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetAccountsEndpointWithDataCenter() {
-        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint(DataCenter.US_EAST);
+        AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(accountsEndpoint);
     }
 
@@ -225,7 +225,7 @@ public class SauceRESTTest {
 
     @Test
     public void testGetBuildsEndpointWithDataCenter() {
-        BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint(DataCenter.US_EAST);
+        BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint(DataCenter.EU_CENTRAL);
         assertNotNull(buildsEndpoint);
     }
 
