@@ -52,6 +52,8 @@ public class Settings {
     public Integer virtualMachines;
     @Json(name = "vm_lockdown")
     public Boolean vmLockdown;
+    @Json(name = "sso_legacy_enabled")
+    public Boolean ssoLegacyEnabled;
 
     /**
      * No args constructor for use in serialization
@@ -59,7 +61,7 @@ public class Settings {
     public Settings() {
     }
 
-    public Settings(Boolean allowIntegrationsPage, Boolean canUseTunnelsWithPublicRealDevices, String country, Boolean disableEmailVerification, Boolean groupsEnabled, Object jitDefaultTeam, String jitUsernamePrefix, Boolean jobsCrossTeamSharing, Boolean liveOnly, String logoutUrl, Integer macVirtualMachines, Boolean performanceEnabled, Boolean rdcEnabled, Integer realDevices, Boolean ssoEnabled, Boolean ssoOnly, Integer teamLimit, Boolean teamLimitReached, Object toPlan, Object trialPeriod, Boolean tunnelsLockdown, String userType, Integer virtualMachines, Boolean vmLockdown) {
+    public Settings(Boolean allowIntegrationsPage, Boolean canUseTunnelsWithPublicRealDevices, String country, Boolean disableEmailVerification, Boolean groupsEnabled, Object jitDefaultTeam, String jitUsernamePrefix, Boolean jobsCrossTeamSharing, Boolean liveOnly, String logoutUrl, Integer macVirtualMachines, Boolean performanceEnabled, Boolean rdcEnabled, Integer realDevices, Boolean ssoEnabled, Boolean ssoOnly, Integer teamLimit, Boolean teamLimitReached, Object toPlan, Object trialPeriod, Boolean tunnelsLockdown, String userType, Integer virtualMachines, Boolean vmLockdown, Boolean ssoLegacyEnabled) {
         super();
         this.allowIntegrationsPage = allowIntegrationsPage;
         this.canUseTunnelsWithPublicRealDevices = canUseTunnelsWithPublicRealDevices;
@@ -85,6 +87,7 @@ public class Settings {
         this.userType = userType;
         this.virtualMachines = virtualMachines;
         this.vmLockdown = vmLockdown;
+        this.ssoLegacyEnabled = ssoLegacyEnabled;
     }
 
     private Settings(Builder builder) {

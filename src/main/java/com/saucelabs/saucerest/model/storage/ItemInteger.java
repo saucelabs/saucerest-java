@@ -19,11 +19,13 @@ public class ItemInteger {
     public Access access;
     @Json(name = "settings")
     public Settings settings;
+    @Json(name = "project_path")
+    public String projectPath;
 
     public ItemInteger() {
     }
 
-    public ItemInteger(Integer id, String name, Recent recent, Integer count, Access access, Settings settings) {
+    public ItemInteger(Integer id, String name, Recent recent, Integer count, Access access, Settings settings, String projectPath) {
         super();
         this.id = id;
         this.name = name;
@@ -31,5 +33,6 @@ public class ItemInteger {
         this.count = count;
         this.access = access;
         this.settings = settings;
+        this.projectPath = projectPath;
     }
 }
