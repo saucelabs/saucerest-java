@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BuildsEndpointTest {
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void lookupBuildsTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint();
@@ -29,7 +29,7 @@ public class BuildsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void lookupBuildsTestWithParameter(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint();
@@ -48,7 +48,7 @@ public class BuildsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getSpecificBuildTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         BuildsEndpoint buildsEndpoint = sauceREST.getBuildsEndpoint();
