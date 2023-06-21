@@ -4,9 +4,7 @@ import java.util.stream.Stream;
 
 public enum DataCenter {
     US_WEST("https://saucelabs.com/", "https://api.us-west-1.saucelabs.com/", "https://app.saucelabs.com/"),
-    EU_CENTRAL("https://eu-central-1.saucelabs.com/", "https://api.eu-central-1.saucelabs.com/", "https://app.eu-central-1.saucelabs.com/"),
-    US_EAST("https://us-east-1.saucelabs.com/", "https://api.us-east-1.saucelabs.com/", "https://app.us-east-1.saucelabs.com/"),
-    APAC_SOUTHEAST("https://apac-southeast-1.saucelabs.com/", "https://api.apac-southeast-1.saucelabs.com/", "https://app.apac-southeast-1.saucelabs.com/");
+    EU_CENTRAL("https://eu-central-1.saucelabs.com/", "https://api.eu-central-1.saucelabs.com/", "https://app.eu-central-1.saucelabs.com/");
 
     public final String server;
     public final String apiServer;
