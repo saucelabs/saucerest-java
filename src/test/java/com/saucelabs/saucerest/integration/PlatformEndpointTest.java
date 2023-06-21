@@ -22,7 +22,7 @@ public class PlatformEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    @EnumSource(DataCenter.class)
     public void getTestStatus(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
@@ -33,7 +33,7 @@ public class PlatformEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    @EnumSource(DataCenter.class)
     public void getAllSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
@@ -44,7 +44,7 @@ public class PlatformEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    @EnumSource(DataCenter.class)
     public void getAppiumSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
@@ -55,7 +55,7 @@ public class PlatformEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    @EnumSource(DataCenter.class)
     public void getWebdriverSupportedPlatforms(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
@@ -66,7 +66,7 @@ public class PlatformEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_WEST", "EU_CENTRAL"}, mode = EnumSource.Mode.INCLUDE)
+    @EnumSource(DataCenter.class)
     public void getEndOfLifeAppiumVersions(DataCenter dataCenter) throws IOException {
         setup(dataCenter);
 
