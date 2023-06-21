@@ -141,7 +141,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void createTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -160,7 +160,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void updateTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -184,7 +184,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void partiallyUpdateTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -210,7 +210,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getTeamMembersTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -222,7 +222,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void resetAccessKeyTeam(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -242,7 +242,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void lookupUsersWithParametersTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -257,7 +257,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -269,7 +269,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void createUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -281,7 +281,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void updateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -305,7 +305,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void partiallyUpdateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -324,7 +324,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST", "APAC_SOUTHEAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getUserConcurrencyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -337,7 +337,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getUsersTeamTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -357,7 +357,7 @@ public class AccountsEndpointTest {
 
     @Disabled("Need to find a way to reliably get a user with a team.")
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void setRoleTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -402,7 +402,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void deactivateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -419,7 +419,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void activateUserTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -438,7 +438,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void resetAccessKeyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
@@ -456,7 +456,7 @@ public class AccountsEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DataCenter.class, names = {"US_EAST"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(DataCenter.class)
     public void getAccessKeyTest(DataCenter dataCenter) throws IOException {
         SauceREST sauceREST = new SauceREST(dataCenter);
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
