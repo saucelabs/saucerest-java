@@ -87,14 +87,14 @@ public class JobsEndpointTest {
 
         sauceOptions.setCapability("username", System.getenv("SAUCE_USERNAME"));
         sauceOptions.setCapability("accessKey", System.getenv("SAUCE_ACCESS_KEY"));
-        sauceOptions.setCapability("appiumVersion", "2.0.0-beta56");
+        sauceOptions.setCapability("appiumVersion", "2.0.0-beta66");
 
         if (testInfo != null) {
             sauceOptions.setCapability("name", testInfo.getTestMethod().get().getName());
         }
 
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("appium:platformVersion", "12.0");
+        capabilities.setCapability("appium:platformVersion", "13.0");
         capabilities.setCapability("browserName", "Chrome");
         capabilities.setCapability("appium:deviceName", "Android GoogleAPI Emulator");
         capabilities.setCapability("appium:automationName", "UiAutomator2");
@@ -120,7 +120,7 @@ public class JobsEndpointTest {
 
         sauceOptions.setCapability("username", System.getenv("SAUCE_USERNAME"));
         sauceOptions.setCapability("accessKey", System.getenv("SAUCE_ACCESS_KEY"));
-        sauceOptions.setCapability("appiumVersion", "2.0.0-beta56");
+        sauceOptions.setCapability("appiumVersion", "2.0.0-beta66");
 
         if (testInfo != null) {
             sauceOptions.setCapability("name", testInfo.getTestMethod().get().getName());
