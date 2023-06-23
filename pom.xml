@@ -148,14 +148,15 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <filterset id="filters">
-                                    <filter token="VERSION" value="${project.version}" />
+                                    <filter token="VERSION" value="${project.version}"/>
                                 </filterset>
-                                <copy preservelastmodified="true" file="./src/main/resources/com/saucelabs/saucerest/BuildUtils.template" tofile="./src/main/java/com/saucelabs/saucerest/BuildUtils.java" overwrite="true">
-                                    <filterset refid="filters" />
+                                <copy preservelastmodified="true" file="./src/main/resources/com/saucelabs/saucerest/BuildUtils.template"
+                                      tofile="./src/main/java/com/saucelabs/saucerest/BuildUtils.java" overwrite="true">
+                                    <filterset refid="filters"/>
                                 </copy>
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
