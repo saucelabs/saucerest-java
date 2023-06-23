@@ -295,7 +295,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             logger.warning(String.format("Failed to write to file %s", path));
             throw e;
         } catch (JsonDataException e) {
-            logger.warning(String.format("Failed to parse JSON response: ", e.getMessage(), response.body()));
+            logger.warning(String.format("Failed to parse JSON response: %s", e.getMessage()));
             throw e;
         }
     }
