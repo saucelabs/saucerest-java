@@ -16,11 +16,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RealDevicesEndpoint extends AbstractEndpoint {
     private static final Logger logger = Logger.getLogger(RealDevicesEndpoint.class.getName());
@@ -205,6 +209,62 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             String url = ((Map<String, String>) pairs).get("url");
             downloadFile(url, path, i + ".png");
         }
+    }
+
+    /**
+     * Returns the Appium server version used for the test.
+     *
+     * @param jobID The ID of the job/test
+     * @return The Appium server version
+     * @throws IOException API request failed
+     */
+    public String getAppiumServerVersion(String jobID) throws IOException {
+        String url = retryUntilTestAssetAvailable(getSpecificDeviceJob(jobID), TestAsset.APPIUM_LOG).frameworkLogUrl;
+
+        try (Response response = request(url, HttpMethod.GET);
+             BufferedSource source = response.body().source()) {
+
+            Moshi moshi = MoshiSingleton.getInstance();
+            JsonReader reader = JsonReader.of(source);
+            List<String> versions = new ArrayList<>();
+
+            JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
+            reader.beginArray();
+            while (reader.hasNext()) {
+                JsonReader.Token token = reader.peek();
+                if (token == JsonReader.Token.BEGIN_OBJECT) {
+                    LogEntry logEntry = adapter.fromJson(reader);
+                    if (logEntry != null && logEntry.getTime() != null && logEntry.getLevel() != null && logEntry.getMessage() != null) {
+                        versions.add(logEntry + System.lineSeparator());
+                    }
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.endArray();
+
+            String appiumVersion = extractAppiumVersion(versions);
+            if (appiumVersion != null) {
+                return appiumVersion;
+            } else {
+                logger.log(Level.WARNING, "Appium version not found in the log file");
+                return null;
+            }
+        }
+    }
+
+    private static String extractAppiumVersion(List<String> versions) {
+        String regex = "Appium v(\\d+\\.\\d+\\.\\d+)";
+        Pattern pattern = Pattern.compile(regex);
+
+        for (String line : versions) {
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+        }
+
+        return null; // Return null if the Appium version is not found in the log file
     }
 
     /**

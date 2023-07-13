@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -176,14 +177,29 @@ public class RealDevicesEndpointTest {
         //realDevices.get().downloadDeviceVitals(deviceJob.id, tempDir.toString());
 
         assertAll(
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4"))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "device.log"))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "commands.json"))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "appium-server.log"))),
-                () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "0.png")))
-                //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "network.har"))),
-                //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "insights.json")))
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "video.mp4"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "device.log"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "commands.json"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "appium-server.log"))),
+            () -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "0.png")))
+            //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "network.har"))),
+            //() -> assertTrue(Files.exists(Paths.get(tempDir.toString(), "insights.json")))
         );
+    }
+
+    @ParameterizedTest
+    @EnumSource(Region.class)
+    public void getAppiumServerVersionTest(Region region) throws IOException {
+        setup(region);
+
+        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
+        DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
+
+        String appiumServerVersion = realDevices.get().getAppiumServerVersion(deviceJob.id);
+
+        String regex = "^\\d+\\.\\d+\\.\\d+$";
+
+        assertTrue(Pattern.matches(regex, appiumServerVersion));
     }
 
     /**
