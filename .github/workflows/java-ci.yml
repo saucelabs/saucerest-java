@@ -88,14 +88,6 @@ jobs:
           tunnelName: github-action-tunnel-eu-central
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
 
-      - name: Setup Sauce Connect APAC-Southeast
-        uses: saucelabs/sauce-connect-action@v2
-        with:
-          username: ${{ secrets.SAUCE_USERNAME }}
-          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
-          tunnelName: github-action-tunnel-apac-southeast
-          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-apac-southeast.yaml
-
       - name: Build with Maven
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
