@@ -247,7 +247,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
         Moshi moshi = MoshiSingleton.getInstance();
         // failOnUnknown() will make sure that API changes in SL are caught ASAP, so we can update SauceREST
-        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz).failOnUnknown();
+        JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
         try {
             return jsonAdapter.fromJson(jsonResponse);
         } catch (IOException e) {
