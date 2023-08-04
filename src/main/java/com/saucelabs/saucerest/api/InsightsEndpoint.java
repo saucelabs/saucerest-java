@@ -2,12 +2,14 @@ package com.saucelabs.saucerest.api;
 
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.Unfinished;
 import com.saucelabs.saucerest.model.insights.TestResult;
 import com.saucelabs.saucerest.model.insights.TestResultParameter;
 
 import java.io.IOException;
 import java.util.Map;
 
+@Unfinished("This endpoint is not yet completely implemented")
 public class InsightsEndpoint extends AbstractEndpoint {
     public InsightsEndpoint(DataCenter dataCenter) {
         super(dataCenter);

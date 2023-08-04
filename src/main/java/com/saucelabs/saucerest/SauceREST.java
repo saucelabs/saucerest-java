@@ -160,4 +160,15 @@ public class SauceREST implements Serializable {
         return new InsightsEndpoint(this.username, this.accessKey, dataCenter);
     }
 
+    public PerformanceEndpoint getPerformanceEndpoint() {
+        return new PerformanceEndpoint(this.username, this.accessKey, this.apiServer);
+    }
+
+    public PerformanceEndpoint getPerformanceEndpoint(String apiServer) {
+        return new PerformanceEndpoint(this.username, this.accessKey, apiServer);
+    }
+
+    public PerformanceEndpoint getPerformanceEndpoint(DataCenter dataCenter) {
+        return new PerformanceEndpoint(this.username, this.accessKey, dataCenter);
+    }
 }
