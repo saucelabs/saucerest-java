@@ -49,11 +49,11 @@ SauceREST sauceREST = new SauceREST("username", "access-key", DataCenter.EU_CENT
 
 Parameters:
 
-| Name        | Type                            | Details                                                     |
-|-------------|---------------------------------|-------------------------------------------------------------|
-| username    | String (required)               | Your sauce labs username                                    |
-| access-key  | String (required)               | Your sauce labs accesskey                                   |
-| data_center | String or DataCenter (required) | One of `US_WEST`, `US_EAST`, `EU_CENTRAL`, `APAC_SOUTHEAST` |
+| Name        | Type                            | Details                                   |
+|-------------|---------------------------------|-------------------------------------------|
+| username    | String (required)               | Your sauce labs username                  |
+| access-key  | String (required)               | Your sauce labs accesskey                 |
+| data_center | String or DataCenter (required) | One of `US_WEST`, `US_EAST`, `EU_CENTRAL` |
 
 ## Code examples
 
