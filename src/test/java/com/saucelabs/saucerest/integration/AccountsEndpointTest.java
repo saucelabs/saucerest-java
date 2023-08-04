@@ -6,6 +6,7 @@ import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.AccountsEndpoint;
 import com.saucelabs.saucerest.model.accounts.*;
 import com.saucelabs.saucerest.model.realdevices.Concurrency;
+import okhttp3.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,15 +22,16 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountsEndpointTest {
+
     private static User createTestUser(AccountsEndpoint accountsEndpoint) throws IOException {
         CreateUser createUser = new CreateUser.Builder()
-                .setEmail(RandomStringUtils.randomAlphabetic(8) + "@saucelabs.com")
-                .setFirstName(RandomStringUtils.randomAlphabetic(8))
-                .setLastName(RandomStringUtils.randomAlphabetic(8))
-                .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
-                .setOrganization(accountsEndpoint.getOrganization().results.get(0).id)
-                .setRole(Roles.MEMBER)
-                .setUserName("sl-test-del-" + RandomStringUtils.randomAlphabetic(8))
+            .setEmail(RandomStringUtils.randomAlphabetic(8) + "@saucelabs.com")
+            .setFirstName(RandomStringUtils.randomAlphabetic(8))
+            .setLastName(RandomStringUtils.randomAlphabetic(8))
+            .setPassword(RandomStringUtils.randomNumeric(4) + RandomStringUtils.randomAlphabetic(4) + "!$%" + "Aa")
+            .setOrganization(accountsEndpoint.getOrganization().results.get(0).id)
+            .setRole(Roles.MEMBER)
+            .setUserName("sl-test-del-" + RandomStringUtils.randomAlphabetic(8))
                 .build();
 
         return accountsEndpoint.createUser(createUser);
@@ -52,25 +54,9 @@ public class AccountsEndpointTest {
         for (DataCenter dataCenter : DataCenter.values()) {
             SauceREST sauceREST = new SauceREST(dataCenter);
             AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
-
-            // TODO: add user deletion when Sauce Labs has a delete user API. meanwhile, we'll just deactivate them
-            List<Result> users = accountsEndpoint.lookupUsers().results;
-            for (Result user : users) {
-                if (user.username.startsWith("saucerest-java-integration-test-user-")) {
-                    try {
-                        accountsEndpoint.deactivateUser(user.id);
-                    } catch (SauceException.NotFound e) {
-                        // ignore
-                    }
-                }
-            }
-
             List<Result> teams = accountsEndpoint.lookupTeams().results;
-            for (Result team : teams) {
-                if (team.name.startsWith("000")) {
-                    accountsEndpoint.deleteTeam(team.id);
-                }
-            }
+
+            TeamDeletionHelper.deleteTeamsWithPrefix(teams, accountsEndpoint);
         }
     }
 
@@ -156,7 +142,9 @@ public class AccountsEndpointTest {
         assertNotNull(createTeam);
         assertEquals(teamName, createTeam.name);
 
-        assertEquals(204, accountsEndpoint.deleteTeam(createTeam.id).code());
+        try (Response response = accountsEndpoint.deleteTeam(createTeam.id)) {
+            assertEquals(204, response.code());
+        }
     }
 
     @ParameterizedTest
@@ -180,7 +168,10 @@ public class AccountsEndpointTest {
         assertEquals("Updated description", updateTeam.description);
         assertEquals("Updated" + teamName, updateTeam.name);
         assertEquals(0, updateTeam.settings.virtualMachines);
-        assertEquals(204, accountsEndpoint.deleteTeam(createTeam.id).code());
+
+        try (Response response = accountsEndpoint.deleteTeam(createTeam.id)) {
+            assertEquals(204, response.code());
+        }
     }
 
     @ParameterizedTest
@@ -206,7 +197,10 @@ public class AccountsEndpointTest {
         UpdateTeam updateTeam = accountsEndpoint.partiallyUpdateTeam(createTeam.id, partiallyUpdateTeam);
 
         assertEquals("Updated" + teamName, updateTeam.name);
-        assertEquals(204, accountsEndpoint.deleteTeam(createTeam.id).code());
+
+        try (Response response = accountsEndpoint.deleteTeam(createTeam.id)) {
+            assertEquals(204, response.code());
+        }
     }
 
     @ParameterizedTest
@@ -237,6 +231,15 @@ public class AccountsEndpointTest {
         List<ResetAccessKeyForTeam> resetAccessKeyForTeam = accountsEndpoint.resetAccessKeyForTeam(createTeam.id);
 
         assertEquals(2, resetAccessKeyForTeam.size());
+
+        String resetAccessKey = resetAccessKeyForTeam.stream()
+            .filter(r -> r.id.equals(user1.id))
+            .map(r -> r.accessKey)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Access key not found for user1"));
+
+        assertNotEquals(accessKeyUser1, resetAccessKey, "Access key for user1 should not match reset access key");
+
         assertNotEquals(accessKeyUser1, resetAccessKeyForTeam.stream().filter(r -> r.id.equals(user1.id)).findFirst().get().accessKey);
         assertNotEquals(accessKeyUser2, resetAccessKeyForTeam.stream().filter(r -> r.id.equals(user2.id)).findFirst().get().accessKey);
     }
@@ -394,11 +397,11 @@ public class AccountsEndpointTest {
         user = accountsEndpoint.setMember(user.id);
         assertEquals((int) user.roles.get(0).role, Roles.MEMBER.getValue());
 
-        accountsEndpoint.deleteTeam(createTeam.id);
+        try (Response response = accountsEndpoint.deleteTeam(createTeam.id)) {
+            assertTrue(response.isSuccessful());
+        }
 
-        assertThrows(SauceException.class, () -> {
-            accountsEndpoint.getSpecificTeam(createTeam.id);
-        });
+        assertThrows(SauceException.class, () -> accountsEndpoint.getSpecificTeam(createTeam.id));
     }
 
     @ParameterizedTest

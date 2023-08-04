@@ -1,0 +1,60 @@
+{
+  "builds": [
+    {
+      "creation_time": 1683570254,
+      "deletion_time": null,
+      "end_time": 1683570276,
+      "group_id": "GROUP_ID_1",
+      "id": "BUILD_ID_1",
+      "jobs": {
+        "completed": 0,
+        "errored": 0,
+        "failed": 0,
+        "finished": 28,
+        "passed": 28,
+        "public": 0,
+        "queued": 0,
+        "running": 4
+      },
+      "modification_time": 1683570281,
+      "name": "Smoke-Tests-1.6620",
+      "org_id": "ORG_ID_1",
+      "owner_id": "OWNER_ID_1",
+      "passed": null,
+      "public": false,
+      "run": 0,
+      "source": "vdc",
+      "start_time": 1683570255,
+      "status": "running",
+      "team_id": "TEAM_ID_1"
+    },
+    {
+      "creation_time": 1683527266,
+      "deletion_time": null,
+      "end_time": 1683527449,
+      "group_id": "GROUP_ID_1",
+      "id": "BUILD_ID_2",
+      "jobs": {
+        "completed": 0,
+        "errored": 0,
+        "failed": 0,
+        "finished": 4,
+        "passed": 4,
+        "public": 0,
+        "queued": 0,
+        "running": 0
+      },
+      "modification_time": 1683527454,
+      "name": "MyDemoApp-EmuSim-1.6606",
+      "org_id": "ORG_ID_1",
+      "owner_id": "OWNER_ID_1",
+      "passed": null,
+      "public": false,
+      "run": 0,
+      "source": "vdc",
+      "start_time": 1683527265,
+      "status": "success",
+      "team_id": "TEAM_ID_1"
+    }
+  ]
+}
