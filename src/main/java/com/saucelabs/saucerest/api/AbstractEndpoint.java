@@ -246,7 +246,6 @@ public abstract class AbstractEndpoint extends AbstractModel {
         Objects.requireNonNull(clazz, "Class object cannot be null");
 
         Moshi moshi = MoshiSingleton.getInstance();
-        // failOnUnknown() will make sure that API changes in SL are caught ASAP, so we can update SauceREST
         JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
         try {
             return jsonAdapter.fromJson(jsonResponse);
@@ -272,8 +271,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
         Moshi moshi = MoshiSingleton.getInstance();
         JsonAdapter<List<T>> jsonAdapter = moshi.adapter(Types.newParameterizedType(List.class, clazz.get(0)));
-        try {
-            JsonReader reader = JsonReader.of(Okio.buffer(Okio.source(new ByteArrayInputStream(jsonResponse.getBytes()))));
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonResponse.getBytes());
+             JsonReader reader = JsonReader.of(Okio.buffer(Okio.source(inputStream)))) {
             reader.beginObject();
             reader.nextName();
             List<T> list = jsonAdapter.fromJson(reader);
