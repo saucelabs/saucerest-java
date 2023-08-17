@@ -7,6 +7,8 @@ import com.saucelabs.saucerest.model.storage.*;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -14,10 +16,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class StorageEndpoint extends AbstractEndpoint {
-    private static final Logger logger = Logger.getLogger(StorageEndpoint.class.getName());
+    private static final Logger logger = LogManager.getLogger();
     public StorageEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
@@ -264,7 +265,7 @@ public class StorageEndpoint extends AbstractEndpoint {
         try (Response response = makeRequest(request)) {
             if (!response.isSuccessful()) {
                 if (response.body() != null) {
-                    logger.severe("Error uploading file: " + response.body().string());
+                    logger.fatal("Error uploading file: " + response.body().string());
                 }
                 throw new IOException("Unexpected code" + response);
             }
