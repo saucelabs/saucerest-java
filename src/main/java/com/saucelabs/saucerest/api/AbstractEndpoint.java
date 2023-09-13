@@ -8,6 +8,7 @@ import net.jodah.failsafe.RetryPolicy;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
+import org.apache.commons.lang3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -15,6 +16,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,16 +35,41 @@ public abstract class AbstractEndpoint extends AbstractModel {
     private static final int MAX_RETRIES = 5;
     private static final int BACKOFF_INITIAL_DELAY = 30;
     private static final int BACKOFF_MULTIPLIER = 500;
-    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-        .connectTimeout(300, TimeUnit.SECONDS)
-        .readTimeout(300, TimeUnit.SECONDS)
-        .writeTimeout(300, TimeUnit.SECONDS)
-        .build();
+    private static OkHttpClient CLIENT;
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
     protected final String accessKey;
     protected final String credentials;
+
+    private void setupProxy() {
+            Proxy proxy = Proxy.NO_PROXY;
+
+            String host = System.getProperty("http.proxyHost");
+            String portStr = System.getProperty("http.proxyPort");
+            int port = 0;
+
+            try {
+                    port = Integer.parseInt(portStr);
+            } catch (NumberFormatException ex) {
+                    logger.debug("Failed to parse proxy port");
+            }
+
+            if (!StringUtils.isBlank(host) && port != 0) {
+                    proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+
+                    logger.debug("Using proxy=%s:%d", host, port);
+            } else {
+                    logger.debug("Not using proxy");
+            }
+
+            this.CLIENT = new OkHttpClient.Builder()
+                    .connectTimeout(300, TimeUnit.SECONDS)
+                    .readTimeout(300, TimeUnit.SECONDS)
+                    .writeTimeout(300, TimeUnit.SECONDS)
+                    .proxy(proxy)
+                    .build();
+    }
 
     protected AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");
