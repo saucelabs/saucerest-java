@@ -29,6 +29,25 @@ import java.util.concurrent.TimeUnit;
 
 import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
+class ProxyAuthenticator implements Authenticator {
+	private final String credentials;
+
+	protected ProxyAuthenticator(String user, String pass) {
+		this.credentials = Credentials.basic(user, pass);
+	}
+
+	@Override
+	public Request authenticate(Route route, Response response) throws IOException {
+		if (response.request().header("Proxy-Authorization") != null) {
+			// Authentication has already been attempted
+			return null;
+		}
+		return response.request().newBuilder()
+			.header("Proxy-Authorization", this.credentials)
+			.build();
+	}
+}
+
 public abstract class AbstractEndpoint extends AbstractModel {
     private static final Logger logger = LogManager.getLogger();
     private static final String JSON_MEDIA_TYPE = "application/json";
@@ -44,6 +63,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
     private void setupProxy() {
             Proxy proxy = Proxy.NO_PROXY;
+	    Authenticator auth = Authenticator.NONE;
 
             String host = System.getProperty("http.proxyHost");
             String portStr = System.getProperty("http.proxyPort");
@@ -58,7 +78,14 @@ public abstract class AbstractEndpoint extends AbstractModel {
             if (!StringUtils.isBlank(host) && port != 0) {
                     proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
 
-                    logger.debug("Using proxy=%s:%d", host, port);
+		    String user = System.getProperty("http.proxyUser");
+		    String pass = System.getProperty("http.proxyPass");
+
+		    if (!StringUtils.isBlank(user)) {
+			auth = new ProxyAuthenticator(user, pass);
+		    }
+
+                    logger.debug("Using proxy=%s:%d user=%s", host, port, user);
             } else {
                     logger.debug("Not using proxy");
             }
@@ -68,6 +95,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
                     .readTimeout(300, TimeUnit.SECONDS)
                     .writeTimeout(300, TimeUnit.SECONDS)
                     .proxy(proxy)
+		    .proxyAuthenticator(auth)
                     .build();
     }
 
