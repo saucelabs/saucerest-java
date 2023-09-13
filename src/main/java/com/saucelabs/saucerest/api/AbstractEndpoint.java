@@ -76,6 +76,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
         this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
+
+	setupProxy();
     }
 
     protected AbstractEndpoint(String apiServer) {
@@ -83,6 +85,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
         this.credentials = initializeCredentials();
         this.baseURL = apiServer;
+
+	setupProxy();
     }
 
     protected AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
@@ -90,6 +94,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.accessKey = accessKey;
         this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
+
+	setupProxy();
     }
 
     protected AbstractEndpoint(String username, String accessKey, String apiServer) {
@@ -97,6 +103,8 @@ public abstract class AbstractEndpoint extends AbstractModel {
         this.accessKey = accessKey;
         this.credentials = initializeCredentials();
         this.baseURL = apiServer;
+
+	setupProxy();
     }
 
     private String initializeCredentials() {
