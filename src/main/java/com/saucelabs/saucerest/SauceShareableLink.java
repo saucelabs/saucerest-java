@@ -15,7 +15,7 @@ public class SauceShareableLink {
         throw new IllegalStateException("Utility class");
     }
 
-    private static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
+    public static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
         try {
             String key = String.format("%s:%s", username, accessKey);
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.US_ASCII), "HmacMD5");
