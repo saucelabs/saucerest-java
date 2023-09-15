@@ -56,7 +56,7 @@ public class Job extends AbstractModel {
     @Json(name = "record_video")
     public Boolean recordVideo;
     @Json(name = "build")
-    public Object build;
+    public String build;
     @Json(name = "passed")
     public Boolean passed;
     @Json(name = "log_url")
@@ -93,7 +93,7 @@ public class Job extends AbstractModel {
     public Job() {
     }
 
-    public Job(String status, BaseConfig baseConfig, CommandCounts commandCounts, Object deletionTime, Object url, String orgId, Integer creationTime, String id, String teamId, Object performanceEnabled, Object assignedTunnelId, Boolean container, String groupId, String _public, Object breakpointed, String browserShortVersion, String videoUrl, Map<String, String> customData, String browserVersion, String owner, String automationBackend, Boolean collectsAutomatorLog, Boolean recordScreenshots, Boolean recordVideo, Object build, Boolean passed, String logUrl, Integer startTime, Boolean proxied, Integer modificationTime, String name, Integer commandsNotSuccessful, String consolidatedStatus, Object seleniumVersion, Boolean manual, Integer endTime, Object error, String os, String browser, List<String> tags, String videoSecret) {
+    public Job(String status, BaseConfig baseConfig, CommandCounts commandCounts, Object deletionTime, Object url, String orgId, Integer creationTime, String id, String teamId, Object performanceEnabled, Object assignedTunnelId, Boolean container, String groupId, String _public, Object breakpointed, String browserShortVersion, String videoUrl, Map<String, String> customData, String browserVersion, String owner, String automationBackend, Boolean collectsAutomatorLog, Boolean recordScreenshots, Boolean recordVideo, String build, Boolean passed, String logUrl, Integer startTime, Boolean proxied, Integer modificationTime, String name, Integer commandsNotSuccessful, String consolidatedStatus, Object seleniumVersion, Boolean manual, Integer endTime, Object error, String os, String browser, List<String> tags, String videoSecret) {
         this.status = status;
         this.baseConfig = baseConfig;
         this.commandCounts = commandCounts;
