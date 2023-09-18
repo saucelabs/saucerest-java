@@ -5,6 +5,8 @@ import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.JobSource;
 import com.saucelabs.saucerest.model.builds.Build;
 import com.saucelabs.saucerest.model.builds.LookupBuildsParameters;
+import com.saucelabs.saucerest.model.builds.LookupJobsParameters;
+import com.saucelabs.saucerest.model.jobs.Job;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -57,6 +59,22 @@ public class BuildsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint(jobSource);
 
         return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, parameters.toMap()), Collections.singletonList(Build.class));
+    }
+
+    /**
+     * Queries the requesting account and returns a summary of each job matching the query, including the ID value, which may be a required parameter of other API calls related to a specific job.
+     * <p>
+     * You can narrow the results of your query using any of the optional filtering parameters.
+     *
+     * @param jobSource The type of device for which you are getting builds. Valid values are: {@link JobSource}
+     * @param parameters A {@link LookupJobsParameters} object containing the parameters to filter the results
+     * @return A list of {@link Job} objects
+     * @throws IOException when the request fails
+     */
+    public List<Job> lookupJobsForBuild(JobSource jobSource, String buildID, LookupJobsParameters parameters) throws IOException {
+        String url = getBaseEndpoint(jobSource) + buildID + "/jobs/";
+
+        return deserializeJSONObject(requestWithQueryParameters(url, HttpMethod.GET, parameters.toMap()), Collections.singletonList(Job.class));
     }
 
     /**
