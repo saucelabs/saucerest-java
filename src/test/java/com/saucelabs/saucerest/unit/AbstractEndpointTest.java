@@ -106,11 +106,6 @@ public class AbstractEndpointTest {
         assertEquals(1, builds.size());
     }
 
-    @Test
-    public void testConstructorWithNullCredentials() {
-        assertThrows(SauceException.MissingCredentials.class, () -> new PersonEndpoint(null, null, null));
-    }
-
     public static class Person {
         private String name;
         private int age;

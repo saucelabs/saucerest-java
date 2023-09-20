@@ -74,7 +74,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
     private String initializeCredentials() {
         if (username == null || accessKey == null) {
             logger.warn("Credentials are null. Please set the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables.");
-            throw new SauceException.MissingCredentials(ErrorExplainers.missingCreds());
+            return null;
         }
         return Credentials.basic(username, accessKey);
     }
