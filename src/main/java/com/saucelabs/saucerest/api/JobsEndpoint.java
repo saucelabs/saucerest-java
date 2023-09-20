@@ -6,12 +6,11 @@ import com.saucelabs.saucerest.model.jobs.Job;
 import com.saucelabs.saucerest.model.jobs.JobAssets;
 import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
 import okhttp3.Response;
-import org.apache.commons.io.FileUtils;
 import org.awaitility.Awaitility;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -145,7 +144,10 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets/" + testAsset.label;
 
         try (Response response = request(url, HttpMethod.GET)) {
-            FileUtils.writeByteArrayToFile(new File(path.toFile().toURI()), Objects.requireNonNull(response.body()).bytes());
+            byte[] bytes = Objects.requireNonNull(response.body()).bytes();
+            try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
+                fos.write(bytes);
+            }
         }
     }
 
@@ -160,7 +162,10 @@ public class JobsEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + jobID + "/assets/screenshots.zip";
 
         try (Response response = request(url, HttpMethod.GET)) {
-            FileUtils.writeByteArrayToFile(new File(path.toFile().toURI()), Objects.requireNonNull(response.body()).bytes());
+            byte[] bytes = Objects.requireNonNull(response.body()).bytes();
+            try (FileOutputStream fos = new FileOutputStream(path.toFile())) {
+                fos.write(bytes);
+            }
         }
     }
 

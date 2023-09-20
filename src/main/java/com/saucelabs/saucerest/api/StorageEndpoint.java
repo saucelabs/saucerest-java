@@ -1,6 +1,5 @@
 package com.saucelabs.saucerest.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.storage.*;
@@ -124,7 +123,6 @@ public class StorageEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
-
     }
 
     /**
@@ -196,7 +194,7 @@ public class StorageEndpoint extends AbstractEndpoint {
     public EditFileDescription updateFileDescription(String fileId, String description) throws IOException {
         String url = getBaseEndpoint() + "/files/" + fileId;
 
-        JSONObject json = new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
+        JSONObject json = new JSONObject(Map.of("item", Map.of("description", description)));
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, json.toString()), EditFileDescription.class);
     }

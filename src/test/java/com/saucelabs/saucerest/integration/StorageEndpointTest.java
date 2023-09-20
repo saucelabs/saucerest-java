@@ -1,12 +1,12 @@
 package com.saucelabs.saucerest.integration;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
 import com.saucelabs.saucerest.api.StorageEndpoint;
 import com.saucelabs.saucerest.model.storage.*;
+import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -194,19 +195,19 @@ public class StorageEndpointTest {
     @EnumSource(Region.class)
     public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
         setup(region);
-        ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "DemoApp", "per_page", "5");
+        Map<String, Object> queryParameters = Map.of("q", "DemoApp", "per_page", "5");
         GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
         assertNotNull(getAppFiles);
         assertEquals(5, getAppFiles.perPage);
         assertTrue(getAppFiles.links.self.contains("DemoApp"));
 
-        queryParameters = ImmutableMap.of("kind", "android");
+        queryParameters = Map.of("kind", "android");
         getAppFiles = storage.get().getFiles(queryParameters);
 
         getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
 
-        queryParameters = ImmutableMap.of("kind", "ios");
+        queryParameters = Map.of("kind", "ios");
         getAppFiles = storage.get().getFiles(queryParameters);
 
         getAppFiles.items.forEach(item -> assertEquals("ios", item.kind));
@@ -216,7 +217,7 @@ public class StorageEndpointTest {
     @EnumSource(Region.class)
     public void getAppFilesWithQueryParametersTest_404(Region region) throws IOException {
         setup(region);
-        ImmutableMap<String, Object> queryParameters = ImmutableMap.of("q", "abc123");
+        Map<String, Object> queryParameters = Map.of("q", "abc123");
         GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
         assertEquals(0, getAppFiles.items.size());

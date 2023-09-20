@@ -3,8 +3,6 @@ package com.saucelabs.saucerest.api;
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.*;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
@@ -213,25 +211,21 @@ public abstract class AbstractEndpoint extends AbstractModel {
      * @throws IOException If an I/O error occurs while executing the request.
      */
     private Response retryRequest(Request request) throws IOException {
-        Response response;
-        try {
-            logger.debug("Retrying request {} {}", request.method(), request.url());
-            response = Failsafe.with(new RetryPolicy<>()
-                    .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
-                    .withBackoff(BACKOFF_INITIAL_DELAY, BACKOFF_MULTIPLIER, ChronoUnit.MILLIS)
-                    .withMaxRetries(MAX_RETRIES)
-                    .onRetry(e -> {
-                        if (e.getLastFailure() != null) {
-                            logger.warn("Retrying because of: {}", e.getLastFailure().getClass().getSimpleName());
-                        } else {
-                            logger.warn("Retrying");
-                        }
-                    }))
-                .get(() -> CLIENT.newCall(request).execute());
-        } catch (Exception e) {
-            logger.fatal("Error retrying request", e);
-            throw new IOException(String.format("Error retrying request: %s", e.getMessage()), e);
-        }
+        Response response = null;
+        int retries = 0;
+        do {
+            try {
+                response = CLIENT.newCall(request).execute();
+                break;
+            } catch (RuntimeException e) {
+                retries++;
+                logger.warn("Retrying because of: {}", e.getClass().getSimpleName());
+                try {
+                    Thread.sleep((long) BACKOFF_INITIAL_DELAY * (retries - 1) * BACKOFF_MULTIPLIER);
+                } catch (InterruptedException ignored) {}
+            }
+        } while (retries < MAX_RETRIES);
+
         logger.debug("Request {} {} succeeded after retry", request.method(), request.url());
         return response;
     }

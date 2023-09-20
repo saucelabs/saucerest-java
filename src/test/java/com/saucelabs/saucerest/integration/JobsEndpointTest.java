@@ -1,7 +1,5 @@
 package com.saucelabs.saucerest.integration;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.JobVisibility;
 import com.saucelabs.saucerest.SauceREST;
@@ -294,7 +292,7 @@ public class JobsEndpointTest {
     @EnumSource(DataCenter.class)
     public void addTags(DataCenter param, TestInfo testInfo) throws IOException {
         runTest(param, testInfo);
-        List<String> tags = ImmutableList.of("tag1", "tag2", "tag3");
+        List<String> tags = List.of("tag1", "tag2", "tag3");
 
         Job job = jobs.get().addTags(sessionID.get(), tags);
 
@@ -305,7 +303,7 @@ public class JobsEndpointTest {
     @EnumSource(DataCenter.class)
     public void addCustomData(DataCenter param, TestInfo testInfo) throws IOException {
         runTest(param, testInfo);
-        Map<String, String> customData = ImmutableMap.of("key1", "value1", "key2", "value2", "key3", "value3");
+        Map<String, String> customData = Map.of("key1", "value1", "key2", "value2", "key3", "value3");
 
         Job job = jobs.get().addCustomData(sessionID.get(), customData);
 

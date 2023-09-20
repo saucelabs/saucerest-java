@@ -1,5 +1,6 @@
 package com.saucelabs.saucerest.model.platform;
 
+import com.squareup.moshi.Moshi;
 import okhttp3.Response;
 import org.json.JSONObject;
 
