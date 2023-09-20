@@ -32,16 +32,21 @@ public abstract class AbstractEndpoint extends AbstractModel {
     private static final int MAX_RETRIES = 5;
     private static final int BACKOFF_INITIAL_DELAY = 30;
     private static final int BACKOFF_MULTIPLIER = 500;
-    private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
+    private static OkHttpClient CLIENT = new OkHttpClient.Builder()
         .connectTimeout(300, TimeUnit.SECONDS)
         .readTimeout(300, TimeUnit.SECONDS)
         .writeTimeout(300, TimeUnit.SECONDS)
         .build();
+
     protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
     protected final String baseURL;
     protected final String username;
     protected final String accessKey;
     protected final String credentials;
+
+    public void setClient(OkHttpClient client) {
+        this.CLIENT = client;
+    }
 
     protected AbstractEndpoint(DataCenter dataCenter) {
         this.username = System.getenv("SAUCE_USERNAME");

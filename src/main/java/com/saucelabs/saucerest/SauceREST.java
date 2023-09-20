@@ -11,10 +11,10 @@ import java.io.Serializable;
  * They are modelled after this documentation: <a href="https://docs.saucelabs.com/dev/api/">here</a>
  */
 public class SauceREST implements Serializable {
-    private final String server;
-    private final String apiServer;
-    private final String edsServer;
-    private final String appServer;
+    protected final String server;
+    protected final String apiServer;
+    protected final String edsServer;
+    protected final String appServer;
     protected String username;
     protected String accessKey;
 
