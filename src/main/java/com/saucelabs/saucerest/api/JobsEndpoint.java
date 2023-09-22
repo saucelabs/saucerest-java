@@ -73,6 +73,26 @@ public class JobsEndpoint extends AbstractEndpoint {
         return deserializeJSONObject(request(url, HttpMethod.GET), Job.class);
     }
 
+
+    /**
+     * Get detailed information about a list of jobs.
+     *
+     * @param jobIDs The Sauce Labs identifiers of the jobs to be retrieved. You can look up job IDs using the {@link #getJobs()} endpoint.
+     * @return {@link ArrayList} of {@link Job} objects
+     * @throws IOException if the request fails
+     */
+    public List<Job> getJobDetails(List<String> jobIDs) throws IOException {
+        List<Job> jobs = new ArrayList<Job>();
+
+        for (String jobID: jobIDs) {
+            String url = getBaseEndpoint() + jobID;
+
+            jobs.add(deserializeJSONObject(request(url, HttpMethod.GET), Job.class));
+        }
+
+        return jobs;
+    }
+
     /**
      * Edit job attributes based on parameters passed in the request, including setting the status and name of the job.
      * Any parameter for which a new value is provided in the request will replace the existing value.
