@@ -1,5 +1,9 @@
 package com.saucelabs.saucerest.integration;
 
+import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
+import static com.saucelabs.saucerest.DataCenter.US_WEST;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
@@ -13,18 +17,6 @@ import com.saucelabs.saucerest.model.jobs.JobAssets;
 import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import okhttp3.Response;
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,10 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
-import static com.saucelabs.saucerest.DataCenter.US_WEST;
-import static org.junit.jupiter.api.Assertions.*;
+import okhttp3.Response;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class JobsEndpointTest {
     private static final Logger logger = Logger.getLogger(JobsEndpointTest.class.getName());

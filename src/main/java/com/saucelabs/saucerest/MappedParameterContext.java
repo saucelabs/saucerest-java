@@ -1,14 +1,13 @@
 package com.saucelabs.saucerest;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.platform.commons.util.AnnotationUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.platform.commons.util.AnnotationUtils;
 
 @AllArgsConstructor
 @Getter

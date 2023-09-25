@@ -2,7 +2,6 @@ package com.saucelabs.saucerest.model.jobs;
 
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.Json;
-
 import java.util.List;
 import java.util.Map;
 

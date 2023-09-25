@@ -1,9 +1,9 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.JobVisibility;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class JobVisibilityTest {
 

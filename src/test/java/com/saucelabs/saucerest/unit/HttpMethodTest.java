@@ -1,10 +1,10 @@
 package com.saucelabs.saucerest.unit;
 
-import com.saucelabs.saucerest.HttpMethod;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.saucelabs.saucerest.HttpMethod;
+import org.junit.jupiter.api.Test;
 
 public class HttpMethodTest {
     @Test
