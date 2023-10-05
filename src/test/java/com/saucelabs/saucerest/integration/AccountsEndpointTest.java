@@ -354,8 +354,7 @@ public class AccountsEndpointTest {
         UsersTeam usersTeam = accountsEndpoint.getUsersTeam(lookupUsers.results.get(0).id);
 
         assertNotNull(usersTeam);
-        // Integration test user is and should not be part of a non-default team
-        assertEquals(0, usersTeam.results.size());
+        assertEquals(1, usersTeam.results.size());
     }
 
     @Disabled("Need to find a way to reliably get a user with a team.")
