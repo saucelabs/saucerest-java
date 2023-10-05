@@ -53,7 +53,7 @@ Parameters:
 |-------------|---------------------------------|-------------------------------------------|
 | username    | String (required)               | Your sauce labs username                  |
 | access-key  | String (required)               | Your sauce labs accesskey                 |
-| data_center | String or DataCenter (required) | One of `US_WEST`, `US_EAST`, `EU_CENTRAL` |
+| data_center | String or DataCenter (required) | One of `US_WEST` or `EU_CENTRAL`          |
 
 ## Code examples
 
