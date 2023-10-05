@@ -290,20 +290,19 @@ public class AccountsEndpointTest {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
-        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
                 .setUserID(user.id)
-                .setFirstName("Updated " + timeStamp)
-                .setLastName("Updated " + timeStamp)
+                .setFirstName("Updated " + user.firstName)
+                .setLastName("Updated " + user.lastName)
                 .setPhone("+123456789")
                 .build();
 
         User updatedUser = accountsEndpoint.updateUser(updateUser);
 
         assertAll("User",
-            () -> assertEquals("Updated " + timeStamp, updatedUser.firstName),
-            () -> assertEquals("Updated " + timeStamp, updatedUser.lastName),
+            () -> assertEquals("Updated " + user.firstName, updatedUser.firstName),
+            () -> assertEquals("Updated " + user.lastName, updatedUser.lastName),
             () -> assertEquals("+123456789", updatedUser.phone));
     }
 
@@ -314,16 +313,15 @@ public class AccountsEndpointTest {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
-        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
                 .setUserID(user.id)
-                .setFirstName("Updated " + timeStamp)
+                .setFirstName("Updated " + user.firstName)
                 .build();
 
         User updatedUser = accountsEndpoint.partiallyUpdateUser(updateUser);
 
-        assertEquals("Updated " + timeStamp, updatedUser.firstName);
+        assertEquals("Updated " + user.firstName, updatedUser.firstName);
     }
 
     @ParameterizedTest
