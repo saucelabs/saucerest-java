@@ -1,5 +1,8 @@
 package com.saucelabs.saucerest.unit;
 
+import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.SauceException;
@@ -11,9 +14,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ResponseHandlerTest {
 

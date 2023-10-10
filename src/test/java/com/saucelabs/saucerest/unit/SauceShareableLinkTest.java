@@ -1,10 +1,10 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceShareableLink;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class SauceShareableLinkTest {
     @Test

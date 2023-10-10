@@ -1,5 +1,8 @@
 package com.saucelabs.saucerest;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -8,10 +11,6 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.engine.execution.BeforeEachMethodAdapter;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Optional;
 
 public class AfterBeforeParameterResolver implements BeforeEachMethodAdapter, ParameterResolver {
     private ParameterResolver parameterisedTestParameterResolver = null;

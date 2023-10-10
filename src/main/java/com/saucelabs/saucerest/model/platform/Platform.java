@@ -1,7 +1,6 @@
 package com.saucelabs.saucerest.model.platform;
 
 import com.squareup.moshi.Json;
-
 import java.util.List;
 
 public class Platform {

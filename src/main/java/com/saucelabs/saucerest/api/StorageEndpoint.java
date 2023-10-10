@@ -4,18 +4,17 @@ import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.storage.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.Objects;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
 
 public class StorageEndpoint extends AbstractEndpoint {
     private static final Logger logger = LogManager.getLogger();

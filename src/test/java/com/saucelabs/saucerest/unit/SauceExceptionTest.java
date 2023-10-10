@@ -1,9 +1,9 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.SauceException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class SauceExceptionTest {
 

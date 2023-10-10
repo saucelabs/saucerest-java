@@ -1,12 +1,11 @@
 package com.saucelabs.saucerest.unit;
 
-import com.saucelabs.saucerest.Helper;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.saucelabs.saucerest.Helper;
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 class HelperTest {
 
