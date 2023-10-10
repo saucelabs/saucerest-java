@@ -5,7 +5,6 @@ import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
-
 import java.io.IOException;
 
 public class PlatformEndpoint extends AbstractEndpoint {

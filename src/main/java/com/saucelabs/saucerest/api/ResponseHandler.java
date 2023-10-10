@@ -1,11 +1,11 @@
 package com.saucelabs.saucerest.api;
 
+import static java.net.HttpURLConnection.*;
+
 import com.saucelabs.saucerest.ErrorExplainers;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.SauceException;
 import okhttp3.Response;
-
-import static java.net.HttpURLConnection.*;
 
 /**
  * Handle non-200 HTTP responses differently if needed per endpoint.
