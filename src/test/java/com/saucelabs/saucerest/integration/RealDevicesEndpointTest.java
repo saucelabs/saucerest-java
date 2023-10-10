@@ -1,20 +1,13 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.model.realdevices.*;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.remote.CapabilityType;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,8 +16,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.remote.CapabilityType;
 
 public class RealDevicesEndpointTest {
     private final ThreadLocal<RealDevicesEndpoint> realDevices = new ThreadLocal<>();

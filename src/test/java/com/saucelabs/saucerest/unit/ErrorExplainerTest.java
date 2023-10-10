@@ -1,9 +1,9 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.saucelabs.saucerest.ErrorExplainers;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ErrorExplainerTest {
     @Test

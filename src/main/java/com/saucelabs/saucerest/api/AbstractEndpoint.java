@@ -1,17 +1,10 @@
 package com.saucelabs.saucerest.api;
 
+import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
+
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.*;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import okhttp3.*;
-import okio.BufferedSink;
-import okio.Okio;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,8 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+import okhttp3.*;
+import okio.BufferedSink;
+import okio.Okio;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 public abstract class AbstractEndpoint extends AbstractModel {
     private static final Logger logger = LogManager.getLogger();

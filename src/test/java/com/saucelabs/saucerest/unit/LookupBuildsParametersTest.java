@@ -1,12 +1,11 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.model.builds.LookupBuildsParameters;
 import com.saucelabs.saucerest.model.builds.Status;
-import org.junit.jupiter.api.Test;
-
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class LookupBuildsParametersTest {
 

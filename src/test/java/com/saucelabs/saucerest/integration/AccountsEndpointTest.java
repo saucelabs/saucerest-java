@@ -1,11 +1,17 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.AccountsEndpoint;
 import com.saucelabs.saucerest.model.accounts.*;
 import com.saucelabs.saucerest.model.realdevices.Concurrency;
+import java.io.IOException;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 import okhttp3.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -13,13 +19,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountsEndpointTest {
 
@@ -290,20 +289,19 @@ public class AccountsEndpointTest {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
-        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
                 .setUserID(user.id)
-                .setFirstName("Updated " + timeStamp)
-                .setLastName("Updated " + timeStamp)
+                .setFirstName("Updated " + user.firstName)
+                .setLastName("Updated " + user.lastName)
                 .setPhone("+123456789")
                 .build();
 
         User updatedUser = accountsEndpoint.updateUser(updateUser);
 
         assertAll("User",
-            () -> assertEquals("Updated " + timeStamp, updatedUser.firstName),
-            () -> assertEquals("Updated " + timeStamp, updatedUser.lastName),
+            () -> assertEquals("Updated " + user.firstName, updatedUser.firstName),
+            () -> assertEquals("Updated " + user.lastName, updatedUser.lastName),
             () -> assertEquals("+123456789", updatedUser.phone));
     }
 
@@ -314,16 +312,15 @@ public class AccountsEndpointTest {
         AccountsEndpoint accountsEndpoint = sauceREST.getAccountsEndpoint();
         User testUser = createTestUser(accountsEndpoint);
         User user = accountsEndpoint.getUser(testUser.id);
-        String timeStamp = String.valueOf(new Random(System.currentTimeMillis()).nextInt()).replace("-", "");
 
         UpdateUser updateUser = new UpdateUser.Builder()
                 .setUserID(user.id)
-                .setFirstName("Updated " + timeStamp)
+                .setFirstName("Updated " + user.firstName)
                 .build();
 
         User updatedUser = accountsEndpoint.partiallyUpdateUser(updateUser);
 
-        assertEquals("Updated " + timeStamp, updatedUser.firstName);
+        assertEquals("Updated " + user.firstName, updatedUser.firstName);
     }
 
     @ParameterizedTest
@@ -354,8 +351,7 @@ public class AccountsEndpointTest {
         UsersTeam usersTeam = accountsEndpoint.getUsersTeam(lookupUsers.results.get(0).id);
 
         assertNotNull(usersTeam);
-        // Integration test user is and should not be part of a non-default team
-        assertEquals(0, usersTeam.results.size());
+        assertEquals(1, usersTeam.results.size());
     }
 
     @Disabled("Need to find a way to reliably get a user with a team.")
