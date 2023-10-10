@@ -1,11 +1,11 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.storage.*;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class EditAppGroupSettingsTest {
 

@@ -1,11 +1,10 @@
 package com.saucelabs.saucerest.model.platform;
 
-import okhttp3.Response;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import okhttp3.Response;
+import org.json.JSONObject;
 
 public class EndOfLifeAppiumVersions {
 

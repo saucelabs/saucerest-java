@@ -4,11 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.accounts.*;
-import okhttp3.Response;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import okhttp3.Response;
 
 /**
  * Account Management API Methods <br>

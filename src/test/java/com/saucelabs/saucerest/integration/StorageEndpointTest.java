@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceException;
@@ -7,12 +9,6 @@ import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
 import com.saucelabs.saucerest.api.StorageEndpoint;
 import com.saucelabs.saucerest.model.storage.*;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,8 +16,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.logging.Logger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 public class StorageEndpointTest {
     private final ThreadLocal<StorageEndpoint> storage = new ThreadLocal<>();

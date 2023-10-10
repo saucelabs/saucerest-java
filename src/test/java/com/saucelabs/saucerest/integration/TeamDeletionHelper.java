@@ -2,12 +2,11 @@ package com.saucelabs.saucerest.integration;
 
 import com.saucelabs.saucerest.api.AccountsEndpoint;
 import com.saucelabs.saucerest.model.accounts.Result;
-import okhttp3.Response;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import okhttp3.Response;
 
 public class TeamDeletionHelper {
     private static final Logger logger = Logger.getLogger(TeamDeletionHelper.class.getName());
