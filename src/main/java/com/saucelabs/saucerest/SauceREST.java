@@ -1,7 +1,6 @@
 package com.saucelabs.saucerest;
 
 import com.saucelabs.saucerest.api.*;
-
 import java.io.Serializable;
 
 /**

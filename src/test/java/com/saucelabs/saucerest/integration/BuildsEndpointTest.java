@@ -1,5 +1,8 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.JobSource;
 import com.saucelabs.saucerest.SauceREST;
@@ -7,14 +10,10 @@ import com.saucelabs.saucerest.api.BuildsEndpoint;
 import com.saucelabs.saucerest.model.builds.Build;
 import com.saucelabs.saucerest.model.builds.LookupBuildsParameters;
 import com.saucelabs.saucerest.model.builds.Status;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
 import java.io.IOException;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 public class BuildsEndpointTest {
     @ParameterizedTest

@@ -6,7 +6,6 @@ import com.saucelabs.saucerest.model.sauceconnect.JobsForATunnel;
 import com.saucelabs.saucerest.model.sauceconnect.StopTunnel;
 import com.saucelabs.saucerest.model.sauceconnect.TunnelInformation;
 import com.saucelabs.saucerest.model.sauceconnect.Versions;
-
 import java.io.IOException;
 import java.util.List;
 
