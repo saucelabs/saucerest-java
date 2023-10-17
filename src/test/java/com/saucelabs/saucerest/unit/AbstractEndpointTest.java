@@ -3,6 +3,7 @@ package com.saucelabs.saucerest.unit;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.Helper;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
@@ -110,6 +111,13 @@ public class AbstractEndpointTest {
         assertThrows(SauceException.MissingCredentials.class, () -> new PersonEndpoint(null, null, null));
     }
 
+    @Test
+    public void testConstructorWithNullCredentialsAndNeedsAuthenticationFalse() {
+        PersonEndpoint endpoint = new PersonEndpoint(DataCenter.US_WEST);
+        assertNull(endpoint.getCredentials());
+    }
+
+
     public static class Person {
         private String name;
         private int age;
@@ -134,6 +142,10 @@ public class AbstractEndpointTest {
             super(apiServer);
         }
 
+        public PersonEndpoint(DataCenter dataCenter) {
+            super(dataCenter, false);
+        }
+
         public PersonEndpoint(String username, String accessKey, String apiServer) {
             super(username, accessKey, apiServer);
         }
@@ -149,5 +161,10 @@ public class AbstractEndpointTest {
         public <T> List<T> publicDeserializeJSONObject(String json, List<Class<? extends T>> clazz) throws IOException {
             return deserializeJSONObject(json, clazz);
         }
+
+        public String getCredentials() {
+            return credentials;
+        }
+
     }
 }
