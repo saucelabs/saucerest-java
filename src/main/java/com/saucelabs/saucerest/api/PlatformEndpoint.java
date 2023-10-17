@@ -10,11 +10,11 @@ import java.io.IOException;
 public class PlatformEndpoint extends AbstractEndpoint {
 
     public PlatformEndpoint(DataCenter dataCenter) {
-        super(dataCenter);
+        super(dataCenter, false);
     }
 
     public PlatformEndpoint(String apiServer) {
-        super(apiServer);
+        super(apiServer, false);
     }
 
     public PlatformEndpoint(String username, String accessKey, DataCenter dataCenter) {

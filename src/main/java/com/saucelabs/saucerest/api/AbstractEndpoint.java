@@ -41,24 +41,36 @@ public abstract class AbstractEndpoint extends AbstractModel {
     protected final String username;
     protected final String accessKey;
     protected final String credentials;
+    protected final boolean needsAuthentication;
 
     protected AbstractEndpoint(DataCenter dataCenter) {
+        this(dataCenter, true);
+    }
+
+    protected AbstractEndpoint(DataCenter dataCenter, boolean needsAuthentication) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-        this.credentials = initializeCredentials();
+        this.needsAuthentication = needsAuthentication;
+        this.credentials = this.needsAuthentication ? initializeCredentials() : null;
         this.baseURL = dataCenter.apiServer;
     }
 
     protected AbstractEndpoint(String apiServer) {
+        this(apiServer, true);
+    }
+
+    protected AbstractEndpoint(String apiServer, boolean needsAuthentication) {
         this.username = System.getenv("SAUCE_USERNAME");
         this.accessKey = System.getenv("SAUCE_ACCESS_KEY");
-        this.credentials = initializeCredentials();
+        this.needsAuthentication = needsAuthentication;
+        this.credentials = this.needsAuthentication ? initializeCredentials() : null;
         this.baseURL = apiServer;
     }
 
     protected AbstractEndpoint(String username, String accessKey, DataCenter dataCenter) {
         this.username = username;
         this.accessKey = accessKey;
+        this.needsAuthentication = true;
         this.credentials = initializeCredentials();
         this.baseURL = dataCenter.apiServer;
     }
@@ -66,12 +78,13 @@ public abstract class AbstractEndpoint extends AbstractModel {
     protected AbstractEndpoint(String username, String accessKey, String apiServer) {
         this.username = username;
         this.accessKey = accessKey;
+        this.needsAuthentication = true;
         this.credentials = initializeCredentials();
         this.baseURL = apiServer;
     }
 
     private String initializeCredentials() {
-        if (username == null || accessKey == null) {
+        if ((username == null || accessKey == null)) {
             logger.warn("Credentials are null. Please set the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables.");
             throw new SauceException.MissingCredentials(ErrorExplainers.missingCreds());
         }
