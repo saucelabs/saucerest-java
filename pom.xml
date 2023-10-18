@@ -21,10 +21,10 @@
     </organization>
     <developers>
         <developer>
-            <name>Yi Min Yang</name>
-            <email>yi-min.yang@saucelabs.com</email>
+            <name>Sauce Labs Open Source</name>
+            <email>opensource@saucelabs.com</email>
             <organization>Sauce Labs</organization>
-            <organizationUrl>https://www.saucelabs.com/</organizationUrl>
+            <organizationUrl>https://opensource.saucelabs.com/</organizationUrl>
         </developer>
     </developers>
     <scm>
