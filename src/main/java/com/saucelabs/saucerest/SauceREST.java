@@ -88,15 +88,15 @@ public class SauceREST implements Serializable {
     }
 
     public PlatformEndpoint getPlatformEndpoint() {
-        return new PlatformEndpoint(this.username, this.accessKey, this.apiServer);
+        return new PlatformEndpoint(this.apiServer);
     }
 
     public PlatformEndpoint getPlatformEndpoint(DataCenter dataCenter) {
-        return new PlatformEndpoint(this.username, this.accessKey, dataCenter);
+        return new PlatformEndpoint(dataCenter);
     }
 
     public PlatformEndpoint getPlatformEndpoint(String apiServer) {
-        return new PlatformEndpoint(this.username, this.accessKey, apiServer);
+        return new PlatformEndpoint(apiServer);
     }
 
     public RealDevicesEndpoint getRealDevicesEndpoint(DataCenter dataCenter) {
