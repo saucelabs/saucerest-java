@@ -7,7 +7,7 @@ import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.model.realdevices.*;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,7 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.remote.CapabilityType;
 
 public class RealDevicesEndpointTest {
     private final ThreadLocal<RealDevicesEndpoint> realDevices = new ThreadLocal<>();
@@ -32,24 +31,23 @@ public class RealDevicesEndpointTest {
 
     @BeforeAll
     public static void runRealDeviceTest() throws MalformedURLException {
-        MutableCapabilities capabilities = new MutableCapabilities();
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "^1[2-3].*");
-        capabilities.setCapability("appium:deviceName", ".*");
-        capabilities.setCapability(CapabilityType.BROWSER_NAME, "Chrome");
+        UiAutomator2Options uiAutomator2Options = new UiAutomator2Options();
+        uiAutomator2Options.setPlatformVersion("^1[2-3].*");
+        uiAutomator2Options.setDeviceName(".*");
+        uiAutomator2Options.withBrowserName("Chrome");
 
         MutableCapabilities sauceCapabilities = new MutableCapabilities();
         sauceCapabilities.setCapability("name", "SauceREST Android Real Device Integration Test");
 
-        capabilities.setCapability("sauce:options", sauceCapabilities);
+        uiAutomator2Options.setCapability("sauce:options", sauceCapabilities);
         URL euCentralSauceLabsUrl = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.eu-central-1.saucelabs.com/wd/hub");
         URL usWestSauceLabsUrl = new URL("https://" + System.getenv("SAUCE_USERNAME") + ":" + System.getenv("SAUCE_ACCESS_KEY") + "@ondemand.us-west-1.saucelabs.com/wd/hub");
 
-        AndroidDriver driverEU = new AndroidDriver(euCentralSauceLabsUrl, capabilities);
+        AndroidDriver driverEU = new AndroidDriver(euCentralSauceLabsUrl, uiAutomator2Options);
         driverEU.get("https://saucedemo.com");
         driverEU.getScreenshotAs(OutputType.FILE);
         driverEU.quit();
-        AndroidDriver driverUS = new AndroidDriver(usWestSauceLabsUrl, capabilities);
+        AndroidDriver driverUS = new AndroidDriver(usWestSauceLabsUrl, uiAutomator2Options);
         driverUS.get("https://saucedemo.com");
         driverUS.getScreenshotAs(OutputType.FILE);
         driverUS.quit();
@@ -67,7 +65,7 @@ public class RealDevicesEndpointTest {
         //Devices devices = realDevices.get().getDevices();
         List<Device> devices = realDevices.get().getDevices();
 
-        assertTrue(devices.size() > 0);
+        assertFalse(devices.isEmpty());
         assertFalse(devices.get(0).id.isEmpty());
     }
 
@@ -205,7 +203,7 @@ public class RealDevicesEndpointTest {
      * Use this instead of {@link com.saucelabs.saucerest.DataCenter} because not all regions support
      * app files yet.
      */
-    enum Region {
+    public enum Region {
         EU_CENTRAL, US_WEST
     }
 }

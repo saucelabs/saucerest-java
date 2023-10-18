@@ -567,7 +567,7 @@ public class JobsEndpointTest {
                 .until(() -> "complete".equals(jobs.get().getJobDetails(sessionID.get()).status));
     }
 
-    private enum TestType {
+    public enum TestType {
         EMULATOR,
         SIMULATOR,
         BROWSER
