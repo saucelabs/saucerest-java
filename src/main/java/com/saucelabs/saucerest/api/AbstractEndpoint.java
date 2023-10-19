@@ -2,9 +2,19 @@ package com.saucelabs.saucerest.api;
 
 import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
-import com.saucelabs.saucerest.*;
+import com.saucelabs.saucerest.BuildUtils;
+import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.ErrorExplainers;
+import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.MoshiSingleton;
+import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.*;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonDataException;
+import com.squareup.moshi.JsonReader;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -17,7 +27,14 @@ import java.util.Map;
 import java.util.Objects;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-import okhttp3.*;
+
+import okhttp3.Credentials;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 import org.apache.logging.log4j.LogManager;
