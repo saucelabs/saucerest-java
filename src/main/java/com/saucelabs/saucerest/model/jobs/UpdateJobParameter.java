@@ -1,7 +1,6 @@
 package com.saucelabs.saucerest.model.jobs;
 
 import com.saucelabs.saucerest.JobVisibility;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

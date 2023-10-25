@@ -1,11 +1,11 @@
 package com.saucelabs.saucerest;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Class providing a method to create a shareable test results link of a test executed on Sauce Labs.
@@ -15,7 +15,7 @@ public class SauceShareableLink {
         throw new IllegalStateException("Utility class");
     }
 
-    private static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
+    public static String getJobAuthDigest(String username, String accessKey, String sauceJobId) {
         try {
             String key = String.format("%s:%s", username, accessKey);
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.US_ASCII), "HmacMD5");

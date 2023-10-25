@@ -2,7 +2,7 @@ name: Java CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
@@ -10,6 +10,9 @@ on:
     # Run every 6 hours at minute 0: 06:00, 12:00, 18:00, 00:00
     - cron: '0 6,12,18,0 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}
+  
 permissions:
   contents: write
 
@@ -25,10 +28,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 20
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '20'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
       - name: Build with Maven
@@ -64,11 +67,11 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ env.NOT_FROM_FORK }} == 'true'
 
-      - name: Set up JDK 20
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         with:
-          java-version: '20'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 

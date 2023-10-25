@@ -1,18 +1,17 @@
 package com.saucelabs.saucerest.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.PlatformEndpoint;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class PlatformEndpointTest {
     private final ThreadLocal<PlatformEndpoint> platform = new ThreadLocal<>();

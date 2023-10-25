@@ -5,17 +5,16 @@ import com.saucelabs.saucerest.model.jobs.GetJobsParameters;
 import com.saucelabs.saucerest.model.jobs.Job;
 import com.saucelabs.saucerest.model.jobs.JobAssets;
 import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
-import okhttp3.Response;
-import org.apache.commons.io.FileUtils;
-import org.awaitility.Awaitility;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
+import okhttp3.Response;
+import org.apache.commons.io.FileUtils;
+import org.awaitility.Awaitility;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class JobsEndpoint extends AbstractEndpoint {
 

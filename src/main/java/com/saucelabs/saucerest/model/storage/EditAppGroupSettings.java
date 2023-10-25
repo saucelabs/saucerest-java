@@ -4,7 +4,6 @@ import com.saucelabs.saucerest.ErrorExplainers;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.AbstractModel;
 import com.squareup.moshi.Json;
-
 import java.util.stream.Stream;
 
 public class EditAppGroupSettings extends AbstractModel {
