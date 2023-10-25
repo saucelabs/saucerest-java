@@ -2,7 +2,7 @@ name: "Code Scanning - Action"
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
     types: [ opened, reopened, synchronize ]
   schedule:

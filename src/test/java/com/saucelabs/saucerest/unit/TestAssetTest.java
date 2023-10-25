@@ -1,12 +1,11 @@
 package com.saucelabs.saucerest.unit;
 
-import com.saucelabs.saucerest.TestAsset;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.saucelabs.saucerest.TestAsset;
 import java.util.Arrays;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class TestAssetTest {
     @Test

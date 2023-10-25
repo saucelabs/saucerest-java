@@ -7,7 +7,6 @@ import com.saucelabs.saucerest.model.builds.Build;
 import com.saucelabs.saucerest.model.builds.LookupBuildsParameters;
 import com.saucelabs.saucerest.model.builds.LookupJobsParameters;
 import com.saucelabs.saucerest.model.jobs.Job;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;

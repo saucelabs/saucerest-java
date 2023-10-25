@@ -1,14 +1,13 @@
 package com.saucelabs.saucerest.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
+import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.Helper;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.api.AbstractEndpoint;
 import com.saucelabs.saucerest.model.builds.Build;
-import okhttp3.HttpUrl;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -16,9 +15,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import okhttp3.HttpUrl;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class AbstractEndpointTest {
@@ -111,6 +111,13 @@ public class AbstractEndpointTest {
         assertThrows(SauceException.MissingCredentials.class, () -> new PersonEndpoint(null, null, null));
     }
 
+    @Test
+    public void testConstructorWithNullCredentialsAndNeedsAuthenticationFalse() {
+        PersonEndpoint endpoint = new PersonEndpoint(DataCenter.US_WEST);
+        assertNull(endpoint.getCredentials());
+    }
+
+
     public static class Person {
         private String name;
         private int age;
@@ -135,6 +142,10 @@ public class AbstractEndpointTest {
             super(apiServer);
         }
 
+        public PersonEndpoint(DataCenter dataCenter) {
+            super(dataCenter, false);
+        }
+
         public PersonEndpoint(String username, String accessKey, String apiServer) {
             super(username, accessKey, apiServer);
         }
@@ -150,5 +161,10 @@ public class AbstractEndpointTest {
         public <T> List<T> publicDeserializeJSONObject(String json, List<Class<? extends T>> clazz) throws IOException {
             return deserializeJSONObject(json, clazz);
         }
+
+        public String getCredentials() {
+            return credentials;
+        }
+
     }
 }

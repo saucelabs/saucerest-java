@@ -1,14 +1,13 @@
 package com.saucelabs.saucerest.unit;
 
-import com.saucelabs.saucerest.model.accounts.CreateUser;
-import com.saucelabs.saucerest.model.accounts.Roles;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.saucelabs.saucerest.model.accounts.CreateUser;
+import com.saucelabs.saucerest.model.accounts.Roles;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class CreateUserTest {
 
