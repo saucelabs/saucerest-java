@@ -37,12 +37,12 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEndpoint extends AbstractModel {
-  private static final Logger logger = LogManager.getLogger();
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEndpoint.class);
   private static final String JSON_MEDIA_TYPE = "application/json";
   private static final int MAX_RETRIES = 5;
   private static final int BACKOFF_INITIAL_DELAY = 30;
@@ -98,7 +98,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
   private String initializeCredentials() {
     if ((username == null || accessKey == null)) {
-      logger.warn(
+      LOGGER.warn(
           "Credentials are null. Please set the SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables.");
       throw new SauceException.MissingCredentials(ErrorExplainers.missingCreds());
     }
@@ -227,7 +227,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
           break;
       }
     }
-    logger.trace("Request {} {} with body {}", httpMethod.label, url, body);
+    LOGGER.trace("Request {} {} with body {}", httpMethod.label, url, body);
     return chain.build();
   }
 
@@ -236,32 +236,32 @@ public abstract class AbstractEndpoint extends AbstractModel {
     try {
       response = getHttpClient().newCall(request).execute();
     } catch (IOException e) {
-      logger.fatal("Error executing request", e);
+      LOGGER.error("Error executing request", e);
       throw new IOException(String.format("Error executing request: %s", e.getMessage()), e);
     }
 
     if (shouldRetryOnHttpError(response)) {
-      logger.debug(
-          "Retrying request {} {} because of HTTP error {}",
-          request.method(),
-          request.url(),
-          response.code());
+      LOGGER.atDebug()
+          .addArgument(request::method)
+          .addArgument(request::url)
+          .addArgument(response::code)
+          .log("Retrying request {} {} because of HTTP error {}");
       response = retryRequest(request);
     } else {
-      logger.trace(
-          "Not retrying request {} {} because of HTTP error {}",
-          request.method(),
-          request.url(),
-          response.code());
+        LOGGER.atTrace()
+            .addArgument(request::method)
+            .addArgument(request::url)
+            .addArgument(response::code)
+            .log("Not retrying request {} {} because of HTTP error {}");
     }
 
     if (!response.isSuccessful()) {
-      logger.warn(
-          "Request {} {} failed with response code {} and message \"{}\"",
-          request.method(),
-          request.url(),
-          response.code(),
-          response.message());
+        LOGGER.atWarn()
+            .addArgument(request::method)
+            .addArgument(request::url)
+            .addArgument(response::code)
+            .addArgument(response::message)
+            .log("Request {} {} failed with response code {} and message \"{}\"");
       responseHandler(this, response);
     }
 
@@ -290,7 +290,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
   private Response retryRequest(Request request) throws IOException {
     Response response;
     try {
-      logger.debug("Retrying request {} {}", request.method(), request.url());
+      LOGGER.atDebug()
+          .addArgument(request::method)
+          .addArgument(request::url)
+          .log("Retrying request {} {}");
       response =
           Failsafe.with(
                   new RetryPolicy<>()
@@ -301,19 +304,22 @@ public abstract class AbstractEndpoint extends AbstractModel {
                       .onRetry(
                           e -> {
                             if (e.getLastFailure() != null) {
-                              logger.warn(
-                                  "Retrying because of: {}",
-                                  e.getLastFailure().getClass().getSimpleName());
+                              LOGGER.atWarn()
+                                  .addArgument(() -> e.getLastFailure().getClass().getSimpleName())
+                                  .log("Retrying because of: {}");
                             } else {
-                              logger.warn("Retrying");
+                              LOGGER.warn("Retrying");
                             }
                           }))
               .get(() -> getHttpClient().newCall(request).execute());
     } catch (Exception e) {
-      logger.fatal("Error retrying request", e);
+      LOGGER.error("Error retrying request", e);
       throw new IOException(String.format("Error retrying request: %s", e.getMessage()), e);
     }
-    logger.debug("Request {} {} succeeded after retry", request.method(), request.url());
+    LOGGER.atDebug()
+        .addArgument(request::method)
+        .addArgument(request::url)
+        .log("Request {} {} succeeded after retry");
     return response;
   }
 
@@ -338,7 +344,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
       throw new IOException(
           "Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
     } catch (JsonDataException e) {
-      logger.warn("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+      LOGGER.atWarn()
+          .addArgument(System::lineSeparator)
+          .addArgument(jsonResponse)
+          .log("Could not deserialize JSON response:{}{}");
       throw e;
     }
   }
@@ -371,7 +380,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
       throw new IOException(
           "Error deserializing JSON response to " + clazz.get(0).getSimpleName() + " class", e);
     } catch (JsonDataException e) {
-      logger.warn("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+        LOGGER.atWarn()
+            .addArgument(System::lineSeparator)
+            .addArgument(jsonResponse)
+            .log("Could not deserialize JSON response:{}{}");
       throw e;
     }
   }
@@ -405,7 +417,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
       throw new IOException(
           "Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
     } catch (JsonDataException e) {
-      logger.warn("Could not deserialize JSON response:" + System.lineSeparator() + jsonResponse);
+        LOGGER.atWarn()
+            .addArgument(System::lineSeparator)
+            .addArgument(jsonResponse)
+            .log("Could not deserialize JSON response:{}{}");
       throw e;
     }
   }
@@ -422,8 +437,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
     try (BufferedSink sink = Okio.buffer(Okio.sink(Paths.get(path, fileName).toFile()))) {
       sink.writeAll(Objects.requireNonNull(request(url, HttpMethod.GET).body()).source());
     } catch (IOException e) {
-      logger.fatal(
-          String.format("Error downloading file to %s with filename %s", path, fileName), e);
+        LOGGER.error("Error downloading file to {} with filename {}", path, fileName, e);
     }
   }
 
