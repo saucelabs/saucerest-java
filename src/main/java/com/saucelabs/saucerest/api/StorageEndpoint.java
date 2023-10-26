@@ -12,12 +12,12 @@ import java.util.Objects;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StorageEndpoint extends AbstractEndpoint {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorageEndpoint.class);
     public StorageEndpoint(DataCenter dataCenter) {
         super(dataCenter);
     }
@@ -264,7 +264,7 @@ public class StorageEndpoint extends AbstractEndpoint {
         try (Response response = makeRequest(request)) {
             if (!response.isSuccessful()) {
                 if (response.body() != null) {
-                    logger.fatal("Error uploading file: " + response.body().string());
+                    LOGGER.error("Error uploading file: {}", response.body().string());
                 }
                 throw new IOException("Unexpected code" + response);
             }

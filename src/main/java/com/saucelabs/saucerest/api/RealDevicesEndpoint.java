@@ -20,13 +20,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import okhttp3.Response;
 import okio.BufferedSource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RealDevicesEndpoint extends AbstractEndpoint {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(RealDevicesEndpoint.class);
 
     public RealDevicesEndpoint(DataCenter dataCenter) {
         super(dataCenter);
@@ -246,7 +246,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             if (appiumVersion != null) {
                 return appiumVersion;
             } else {
-                logger.warn("Appium version not found in the log file");
+                LOGGER.warn("Appium version not found in the log file");
                 return null;
             }
         }
@@ -281,7 +281,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
                     .atMost(1, TimeUnit.MINUTES)
                     .until(testAssetAvailable(deviceJob, testAsset));
         } catch (ConditionTimeoutException e) {
-            logger.fatal(String.format("Timed out waiting for %s to be available for ID %s", testAsset.label, deviceJob.id));
+            LOGGER.error("Timed out waiting for {} to be available for ID {}", testAsset.label, deviceJob.id);
         }
 
         return getSpecificDeviceJob(deviceJob.id);
@@ -322,12 +322,12 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
      */
     private void downloadNonMalformedLog(Path path, Response response) throws IOException {
         if (response == null) {
-            logger.warn(String.format("Response is null for %s", path));
+            LOGGER.warn("Response is null for {}", path);
             throw new IOException("Response is null");
         }
 
         if (response.body() == null) {
-            logger.warn(String.format("Response body is null for %s", path));
+            LOGGER.warn("Response body is null for {}", path);
             throw new IOException("Response body is null");
         }
 
@@ -351,10 +351,10 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             }
             reader.endArray();
         } catch (IOException e) {
-            logger.warn(String.format("Failed to write to file %s", path));
+            LOGGER.warn("Failed to write to file {}", path);
             throw e;
         } catch (JsonDataException e) {
-            logger.warn(String.format("Failed to parse JSON response: %s", e.getMessage()));
+            LOGGER.atWarn().addArgument(e::getMessage).log("Failed to parse JSON response: {}");
             throw e;
         }
     }
