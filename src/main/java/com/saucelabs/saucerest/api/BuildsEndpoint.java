@@ -4,9 +4,10 @@ import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.JobSource;
 import com.saucelabs.saucerest.model.builds.Build;
+import com.saucelabs.saucerest.model.builds.JobInBuild;
+import com.saucelabs.saucerest.model.builds.JobsInBuild;
 import com.saucelabs.saucerest.model.builds.LookupBuildsParameters;
 import com.saucelabs.saucerest.model.builds.LookupJobsParameters;
-import com.saucelabs.saucerest.model.jobs.Job;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -81,16 +82,15 @@ public class BuildsEndpoint extends AbstractEndpoint {
    *     JobSource}
    * @param parameters A {@link LookupJobsParameters} object containing the parameters to filter the
    *     results
-   * @return A list of {@link Job} objects
+   * @return A {@link JobsInBuild} object containing a list of {@link JobInBuild} objects
    * @throws IOException when the request fails
    */
-  public List<Job> lookupJobsForBuild(
+  public JobsInBuild lookupJobsForBuild(
       JobSource jobSource, String buildID, LookupJobsParameters parameters) throws IOException {
     String url = getBaseEndpoint(jobSource) + buildID + "/jobs/";
 
     return deserializeJSONObject(
-        requestWithQueryParameters(url, HttpMethod.GET, parameters.toMap()),
-        Collections.singletonList(Job.class));
+        requestWithQueryParameters(url, HttpMethod.GET, parameters.toMap()), JobsInBuild.class);
   }
 
   /**
