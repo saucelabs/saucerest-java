@@ -2,7 +2,6 @@ package com.saucelabs.saucerest.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.model.realdevices.*;
@@ -15,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -107,7 +107,7 @@ public class RealDevicesEndpointTest {
     public void getDeviceJobsWithLimit_5(Region region) throws IOException {
         setup(region);
 
-        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("limit", 5));
+        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("limit", 5));
 
         assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.limit);
@@ -118,7 +118,7 @@ public class RealDevicesEndpointTest {
     public void getDeviceJobsWithOffset_5(Region region) throws IOException {
         setup(region);
 
-        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("offset", 5));
+        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("offset", 5));
 
         assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.offset);
@@ -129,7 +129,7 @@ public class RealDevicesEndpointTest {
     public void getDeviceJobsWithLimitAndOffset(Region region) throws IOException {
         setup(region);
 
-        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(ImmutableMap.of("offset", 5, "limit", 6));
+        DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("offset", 5, "limit", 6));
 
         assertNotNull(deviceJobs);
         Assertions.assertEquals(5, deviceJobs.metaData.offset);
