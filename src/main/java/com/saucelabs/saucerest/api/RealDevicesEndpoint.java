@@ -1,6 +1,5 @@
 package com.saucelabs.saucerest.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.realdevices.*;
 import com.squareup.moshi.JsonAdapter;
@@ -105,7 +104,7 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
    * @return {@link DeviceJobs}
    * @throws IOException API request failed
    */
-  public DeviceJobs getDeviceJobs(ImmutableMap<String, Object> params) throws IOException {
+  public DeviceJobs getDeviceJobs(Map<String, Object> params) throws IOException {
     String url = getBaseEndpoint() + "/jobs";
 
     return deserializeJSONObject(

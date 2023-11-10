@@ -1,6 +1,5 @@
 package com.saucelabs.saucerest.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.accounts.*;
@@ -85,7 +84,11 @@ public class AccountsEndpoint extends AbstractEndpoint {
      */
     public CreateTeam createTeam(String name, Settings settings, String description) throws IOException {
         String url = getBaseEndpoint() + "teams/";
-        Map<String, Object> map = ImmutableMap.of("name", name, "settings", settings, "description", description);
+        Map<String, Object> map = Map.of(
+            "name", name,
+            "settings", settings,
+            "description", description
+        );
 
         return deserializeJSONObject(request(url, HttpMethod.POST, map), CreateTeam.class);
     }
@@ -127,7 +130,11 @@ public class AccountsEndpoint extends AbstractEndpoint {
      */
     public UpdateTeam updateTeam(String teamID, String name, Settings settings, String description) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
-        Map<String, Object> map = ImmutableMap.of("name", name, "settings", settings, "description", description);
+        Map<String, Object> map = Map.of(
+            "name", name,
+            "settings", settings,
+            "description", description
+        );
 
         return deserializeJSONObject(request(url, HttpMethod.PUT, map), UpdateTeam.class);
     }
@@ -289,7 +296,10 @@ public class AccountsEndpoint extends AbstractEndpoint {
     public SetTeam setUsersTeam(String userID, String teamID) throws IOException {
         String url = getBaseEndpoint() + "membership";
 
-        Map<String, Object> map = ImmutableMap.of("user", userID, "team", teamID);
+        Map<String, Object> map = Map.of(
+            "user", userID,
+            "team", teamID
+        );
 
         return deserializeJSONObject(request(url, HttpMethod.POST, map), SetTeam.class);
     }
