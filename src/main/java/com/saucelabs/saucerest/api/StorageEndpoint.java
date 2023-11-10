@@ -1,6 +1,5 @@
 package com.saucelabs.saucerest.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.model.storage.DeleteAppFile;
@@ -213,8 +212,7 @@ public class StorageEndpoint extends AbstractEndpoint {
       throws IOException {
     String url = getBaseEndpoint() + "/files/" + fileId;
 
-    JSONObject json =
-        new JSONObject(ImmutableMap.of("item", ImmutableMap.of("description", description)));
+      JSONObject json = new JSONObject(Map.of("item", Map.of("description", description)));
 
     return deserializeJSONObject(
         request(url, HttpMethod.PUT, json.toString()), EditFileDescription.class);
