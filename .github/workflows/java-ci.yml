@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -68,7 +68,7 @@ jobs:
         if: ${{ env.NOT_FROM_FORK }} == 'true'
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         with:
           java-version: '21'
