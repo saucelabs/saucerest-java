@@ -54,7 +54,7 @@ jobs:
         run: mvn clean install -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
 
       - name: Upload JaCoCo report to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           flags: tests,release
 
