@@ -27,18 +27,24 @@ public class SauceConnectEndpoint extends AbstractEndpoint {
     }
 
     /**
-     * Returns Tunnel IDs or Tunnels Info for any currently running tunnels launched by or shared with the specified user.
-     * Documentation is
-     * <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>
+     * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
+     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
      */
     public List<String> getTunnelsForAUser() throws IOException {
         return getTunnelsForAUser(this.username);
     }
 
     /**
-     * Returns Tunnel IDs or Tunnels Info for any currently running tunnels launched by or shared with the specified user.
-     * Documentation is
-     * <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>
+     * Returns Tunnels Info for any currently running tunnels launched by the specified user.
+     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+     */
+    public List<TunnelInformation> getTunnelsInformationForAUser() throws IOException {
+        return getTunnelsInformationForAUser(this.username);
+    }
+
+    /**
+     * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
+     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
      *
      * @param username Sauce Labs username
      */
@@ -46,6 +52,18 @@ public class SauceConnectEndpoint extends AbstractEndpoint {
         String url = getBaseEndpoint() + username + "/tunnels";
 
         return deserializeJSONArray(request(url, HttpMethod.GET), String.class);
+    }
+
+    /**
+     * Returns Tunnels Info for any currently running tunnels launched by the specified user.
+     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+     *
+     * @param username Sauce Labs username
+     */
+    public List<TunnelInformation> getTunnelsInformationForAUser(String username) throws IOException {
+        String url = getBaseEndpoint() + username + "/tunnels?full=true";
+
+        return deserializeJSONArray(request(url, HttpMethod.GET), TunnelInformation.class);
     }
 
     /**
