@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -299,7 +298,7 @@ public class StorageEndpointTest {
         storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
 
         assertTrue(Files.exists(Paths.get(tempDir.toString(), "iOS.ipa")));
-        assertTrue(FileUtils.sizeOf(Paths.get(tempDir.toString(), "iOS.ipa").toFile()) > 0);
+        assertTrue(Files.size(Paths.get(tempDir.toString(), "iOS.ipa")) > 0);
     }
 
     @ParameterizedTest
