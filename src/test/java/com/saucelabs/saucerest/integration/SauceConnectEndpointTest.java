@@ -93,16 +93,26 @@ public class SauceConnectEndpointTest {
 
   @ParameterizedTest
   @EnumSource(DataCenter.class)
+  public void getTunnelsInformationForAUserTest(DataCenter dataCenter) throws IOException {
+    SauceREST sauceREST = new SauceREST(dataCenter);
+    SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
+
+    List<TunnelInformation> tunnelsInfo = sauceConnectEndpoint.getTunnelsInformationForAUser();
+
+    Assertions.assertFalse(tunnelsInfo.isEmpty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(DataCenter.class)
   public void getTunnelInformationTest(DataCenter dataCenter) throws IOException {
     SauceREST sauceREST = new SauceREST(dataCenter);
     SauceConnectEndpoint sauceConnectEndpoint = sauceREST.getSauceConnectEndpoint();
 
     List<String> tunnelIDs = sauceConnectEndpoint.getTunnelsForAUser();
 
+    Assertions.assertFalse(tunnelIDs.isEmpty());
     for (String tunnelID : tunnelIDs) {
       TunnelInformation tunnelInformation = sauceConnectEndpoint.getTunnelInformation(tunnelID);
-
-      Assertions.assertFalse(tunnelIDs.isEmpty());
       Assertions.assertNotNull(tunnelInformation);
     }
   }
