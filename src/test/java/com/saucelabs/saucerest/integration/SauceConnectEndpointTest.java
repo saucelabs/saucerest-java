@@ -38,6 +38,7 @@ public class SauceConnectEndpointTest {
         Assertions.assertNotNull(stopTunnel.jobsRunning);
       }
     }
+  }
 
   @ParameterizedTest
   @EnumSource(DataCenter.class)
@@ -89,7 +90,7 @@ public class SauceConnectEndpointTest {
 
     Assertions.assertFalse(tunnelIDs.isEmpty());
   }
-    
+
   @ParameterizedTest
   @EnumSource(DataCenter.class)
   public void getTunnelsInformationForAUserTest(DataCenter dataCenter) throws IOException {
@@ -111,7 +112,7 @@ public class SauceConnectEndpointTest {
 
     Assertions.assertFalse(tunnelIDs.isEmpty());
     for (String tunnelID : tunnelIDs) {
-      TunnelInformation tunnelInformation = sauceConnectEndpoint.getTunnelInformation(tunnelID);    
+      TunnelInformation tunnelInformation = sauceConnectEndpoint.getTunnelInformation(tunnelID);
       Assertions.assertNotNull(tunnelInformation);
     }
   }
