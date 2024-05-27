@@ -237,10 +237,15 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
 
       Moshi moshi = MoshiSingleton.getInstance();
       JsonReader reader = JsonReader.of(source);
+      // The response now comes with a newline-delimited JSON, set it to read malformed JSON.
+      reader.setLenient(true);
       List<String> versions = new ArrayList<>();
 
       JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
-      reader.beginArray();
+      JsonReader.Token peek = reader.peek();
+      if (peek == JsonReader.Token.BEGIN_ARRAY) {
+        reader.beginArray();
+      }
       while (reader.hasNext()) {
         JsonReader.Token token = reader.peek();
         if (token == JsonReader.Token.BEGIN_OBJECT) {
@@ -255,7 +260,9 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
           reader.skipValue();
         }
       }
-      reader.endArray();
+      if (peek == JsonReader.Token.BEGIN_ARRAY) {
+        reader.endArray();
+      }
 
       String appiumVersion = extractAppiumVersion(versions);
       if (appiumVersion != null) {
@@ -349,10 +356,15 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
     Moshi moshi = MoshiSingleton.getInstance();
     BufferedSource source = response.body().source();
     JsonReader reader = JsonReader.of(source);
+    // The response now comes with a newline-delimited JSON, set it to read malformed JSON.
+    reader.setLenient(true);
 
     try (BufferedWriter writer = Files.newBufferedWriter(path)) {
       JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
-      reader.beginArray();
+      JsonReader.Token peek = reader.peek();
+      if (peek == JsonReader.Token.BEGIN_ARRAY) {
+        reader.beginArray();
+      }
       while (reader.hasNext()) {
         JsonReader.Token token = reader.peek();
         if (token == JsonReader.Token.BEGIN_OBJECT) {
@@ -367,7 +379,9 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
           reader.skipValue();
         }
       }
-      reader.endArray();
+      if (peek == JsonReader.Token.BEGIN_ARRAY) {
+        reader.endArray();
+      }
     } catch (IOException e) {
       LOGGER.warn("Failed to write to file {}", path);
       throw e;
