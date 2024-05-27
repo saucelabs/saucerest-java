@@ -4,24 +4,22 @@ import com.squareup.moshi.Json;
 
 public class Linux {
 
-    @Json(name = "download_url")
-    public String downloadUrl;
-    @Json(name = "sha1")
-    public String sha1;
+  @Json(name = "download_url")
+  public String downloadUrl;
 
-    /**
-     * No args constructor for use in serialization
-     */
-    public Linux() {
-    }
+  @Json(name = "sha256")
+  public String sha256;
 
-    /**
-     * @param sha1
-     * @param downloadUrl
-     */
-    public Linux(String downloadUrl, String sha1) {
-        super();
-        this.downloadUrl = downloadUrl;
-        this.sha1 = sha1;
-    }
+  /** No args constructor for use in serialization */
+  public Linux() {}
+
+  /**
+   * @param sha256
+   * @param downloadUrl
+   */
+  public Linux(String downloadUrl, String sha256) {
+    super();
+    this.downloadUrl = downloadUrl;
+    this.sha256 = sha256;
+  }
 }
