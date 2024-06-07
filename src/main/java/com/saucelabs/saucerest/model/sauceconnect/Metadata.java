@@ -1,5 +1,7 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
+import java.math.BigInteger;
+
 import com.squareup.moshi.Json;
 
 public class Metadata {
@@ -25,7 +27,7 @@ public class Metadata {
     @Json(name = "host_cpu")
     public String hostCpu;
     @Json(name = "nofile_limit")
-    public Integer nofileLimit;
+    public BigInteger nofileLimit;
 
     /**
      * No args constructor for use in serialization
@@ -46,7 +48,7 @@ public class Metadata {
      * @param platform
      * @param command
      */
-    public Metadata(String hostname, Long hostMemory, String commandArgs, String gitVersion, String platform, String command, String build, String externalProxy, String release, String hostCpu, Integer nofileLimit) {
+    public Metadata(String hostname, Long hostMemory, String commandArgs, String gitVersion, String platform, String command, String build, String externalProxy, String release, String hostCpu, BigInteger nofileLimit) {
         super();
         this.hostname = hostname;
         this.hostMemory = hostMemory;

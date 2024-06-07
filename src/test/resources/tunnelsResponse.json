@@ -1,0 +1,46 @@
+[
+  {
+    "creation_time": 1717539836,
+    "direct_domains": null,
+    "domain_names": null,
+    "extra_info": "{\"runner\": \"false\", \"tunnel_cert\": \"public\", \"inject_job_id\": true, \"backend\": \"kgp\"}",
+    "host": "maki3763.eu-central-1.miso.saucelabs.com",
+    "id": "1aea0ee5dd7945d6bcdc016006de543a",
+    "ip_address": null,
+    "is_ready": true,
+    "last_connected": 1717539848,
+    "launch_time": 1717539846,
+    "metadata": {
+      "hostname": "fv-az731-352",
+      "host_memory": 17179398144,
+      "command_args": "{\"api-key\":\"****\",\"auth\":[],\"autodetect\":true,\"cainfo\":\"\",\"capath\":\"\",\"certificate\":\"\",\"config-file\":\"\",\"default-rest-url\":\"\",\"direct-domains\":[],\"dns\":[],\"doctor\":false,\"experimental\":[],\"ext\":\"127.0.0.1\",\"ext-port\":0,\"extra-info\":\"{\\\"runner\\\": \\\"false\\\"}\",\"fast-fail-regexps\":[],\"jobwaittimeout\":300,\"key\":\"\",\"kgp-handshake-timeout\":\"15s\",\"kgp-host\":\"\",\"kgp-hostname\":\"\",\"kgp-port\":443,\"log-stats\":\"0\",\"logfile\":\"\",\"max-logsize\":0,\"max-missed-acks\":300,\"metadata\":[],\"metrics-address\":\"\",\"no-autodetect\":false,\"no-cert-verify\":false,\"no-experimental\":false,\"no-http-cert-verify\":false,\"no-ocsp-verify\":false,\"no-proxy-caching\":false,\"no-remove-colliding-tunnels\":false,\"no-ssl-bump-domains\":[\"example.com\"],\"ocsp\":\"log-only\",\"output-config\":false,\"output-format\":\"pretty\",\"pac\":\"file:///C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\pac-saucelabs-98153760-7114-4eea-9a7b-c4048a20f2758181849572523160372.js\",\"pac-auth\":[],\"pidfile\":\"C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\sc_client-98153760-7114-4eea-9a7b-c4048a20f275-5957454500542236775.pid\",\"proxy\":\"\",\"proxy-localhost\":true,\"proxy-tunnel\":false,\"proxy-userpwd\":\"\",\"readyfile\":\"\",\"reconnect\":true,\"region\":\"\",\"rest-url\":\"https://api.eu-central-1.saucelabs.com/rest/v1\",\"scproxy-port\":0,\"scproxy-read-limit\":0,\"scproxy-write-limit\":0,\"se-port\":59428,\"server\":false,\"shared-tunnel\":false,\"start-timeout\":\"45s\",\"status-address\":\"\",\"tls-legacy\":false,\"tunnel-cainfo\":\"\",\"tunnel-capath\":\"\",\"tunnel-cert\":\"public\",\"tunnel-cert-suffix\":\"_maki12\",\"tunnel-domains\":[],\"tunnel-identifier\":\"\",\"tunnel-name\":\"98153760-7114-4eea-9a7b-c4048a20f275\",\"tunnel-pool\":true,\"user\":\"***\",\"verbose\":\"0\",\"vm-version\":\"\"}",
+      "git_version": "b491a8aa ",
+      "platform": "Windows_NT 6.2.9200  i386 25",
+      "command": "C:\\Users\\runneradmin\\sc-4.9.2-win32\\bin\\sc.exe -u *** -k **** -P 59428 --proxy-localhost --no-ssl-bump-domains example.com --tunnel-name 98153760-7114-4eea-9a7b-c4048a20f275 --pidfile C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\sc_client-98153760-7114-4eea-9a7b-c4048a20f275-5957454500542236775.pid --pac file:///C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\pac-saucelabs-98153760-7114-4eea-9a7b-c4048a20f2758181849572523160372.js --rest-url https://api.eu-central-1.saucelabs.com/rest/v1 --tunnel-pool --extra-info {\"runner\": \"false\"}",
+      "build": "2637",
+      "external_proxy": "{\"kgpProxy\":\"None\",\"restProxy\":\"PAC\"}",
+      "release": "4.9.2",
+      "host_cpu": "cpus:1,cores:4,model:AMD EPYC 7763 64-Core Processor                ",
+      "nofile_limit": 18446744073709551615
+    },
+    "no_proxy_caching": false,
+    "no_ssl_bump_domains": [
+      "example.com"
+    ],
+    "owner": "***",
+    "protocol": "kgp",
+    "shared_tunnel": false,
+    "shutdown_reason": null,
+    "shutdown_time": null,
+    "ssh_port": 443,
+    "status": "running",
+    "team_ids": [
+      "edd5e0dc2c724547b5b8b5b093c2a374"
+    ],
+    "tunnel_identifier": "98153760-7114-4eea-9a7b-c4048a20f275",
+    "use_caching_proxy": null,
+    "use_kgp": true,
+    "user_shutdown": null,
+    "vm_version": null
+  }
+]
