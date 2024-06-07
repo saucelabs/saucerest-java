@@ -16,12 +16,12 @@ public class Helper {
      * @throws IOException if read fails for any reason
      * @see <a href="https://stackoverflow.com/a/46613809">https://stackoverflow.com/a/46613809</a>
      */
-    public String getResourceFileAsString(String fileName) throws IOException {
+    public static String getResourceFileAsString(String fileName) throws IOException {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("File name cannot be null or empty.");
         }
 
-        try (InputStream is = Objects.requireNonNull(getClass().getResource(fileName), "File not found: " + fileName).openStream()) {
+        try (InputStream is = Objects.requireNonNull(Helper.class.getResource(fileName), "File not found: " + fileName).openStream()) {
 
             try (InputStreamReader isr = new InputStreamReader(is);
                  BufferedReader reader = new BufferedReader(isr)) {

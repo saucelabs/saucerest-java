@@ -88,8 +88,7 @@ public class AbstractEndpointTest {
 
     @Test
     void testDeserializeJSONObjectWithListOfClassTypes_WithTwoItems() throws IOException {
-        Helper helper = new Helper();
-        String jsonResponse = helper.getResourceFileAsString("/buildsResponses.json");
+        String jsonResponse = Helper.getResourceFileAsString("/buildsResponses.json");
 
         List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
 
@@ -98,8 +97,7 @@ public class AbstractEndpointTest {
 
     @Test
     void testDeserializeJSONObjectWithListOfClassTypes_WithOneItem() throws IOException {
-        Helper helper = new Helper();
-        String jsonResponse = helper.getResourceFileAsString("/buildsResponse.json");
+        String jsonResponse = Helper.getResourceFileAsString("/buildsResponse.json");
 
         List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
 
