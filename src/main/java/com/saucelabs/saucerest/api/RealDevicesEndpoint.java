@@ -1,18 +1,34 @@
 package com.saucelabs.saucerest.api;
 
-import com.saucelabs.saucerest.*;
-import com.saucelabs.saucerest.model.realdevices.*;
+import com.saucelabs.saucerest.DataCenter;
+import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.LogEntry;
+import com.saucelabs.saucerest.MoshiSingleton;
+import com.saucelabs.saucerest.TestAsset;
+import com.saucelabs.saucerest.model.realdevices.AvailableDevices;
+import com.saucelabs.saucerest.model.realdevices.Concurrency;
+import com.saucelabs.saucerest.model.realdevices.Device;
+import com.saucelabs.saucerest.model.realdevices.DeviceJob;
+import com.saucelabs.saucerest.model.realdevices.DeviceJobs;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonDataException;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -231,47 +247,55 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
     String url =
         retryUntilTestAssetAvailable(getSpecificDeviceJob(jobID), TestAsset.APPIUM_LOG)
             .frameworkLogUrl;
+    // Retry policy to handle the case where the Appium version is not found in the log file
+    RetryPolicy<String> retryPolicy =
+        new RetryPolicy<String>()
+            .handleResultIf(Objects::isNull)
+            .withMaxRetries(5)
+            .withDelay(Duration.ofSeconds(20));
 
-    try (Response response = request(url, HttpMethod.GET);
-        BufferedSource source = response.body().source()) {
+    String appiumVersion =
+        Failsafe.with(retryPolicy)
+            .get(
+                () -> {
+                  List<String> logEntries = getLogEntries(url);
+                  return extractAppiumVersion(logEntries);
+                });
+    if (appiumVersion != null) {
+      return appiumVersion;
+    } else {
+      LOGGER.warn("Appium version not found in the log file");
+      return null;
+    }
+  }
 
-      Moshi moshi = MoshiSingleton.getInstance();
-      JsonReader reader = JsonReader.of(source);
-      // The response now comes with a newline-delimited JSON, set it to read malformed JSON.
-      reader.setLenient(true);
-      List<String> versions = new ArrayList<>();
-
-      JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
-      JsonReader.Token peek = reader.peek();
-      if (peek == JsonReader.Token.BEGIN_ARRAY) {
-        reader.beginArray();
+  private List<String> getLogEntries(String url) throws IOException {
+    List<String> logEntries = new ArrayList<>();
+    try (Response response = request(url, HttpMethod.GET)) {
+      if (response == null || response.body() == null) {
+        LOGGER.warn("Response or response body is null for {}", url);
+        return null;
       }
-      while (reader.hasNext()) {
-        JsonReader.Token token = reader.peek();
-        if (token == JsonReader.Token.BEGIN_OBJECT) {
-          LogEntry logEntry = adapter.fromJson(reader);
+      String responseBody = response.body().string();
+      Moshi moshi = new Moshi.Builder().build();
+      JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
+      BufferedReader reader = new BufferedReader(new StringReader(responseBody));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        try {
+          LogEntry logEntry = adapter.fromJson(line);
           if (logEntry != null
               && logEntry.getTime() != null
               && logEntry.getLevel() != null
               && logEntry.getMessage() != null) {
-            versions.add(logEntry + System.lineSeparator());
+            logEntries.add(logEntry + System.lineSeparator());
           }
-        } else {
-          reader.skipValue();
+        } catch (JsonDataException e) {
+          LOGGER.warn("Failed to parse line: {}, error: {}", line, e.getMessage());
         }
       }
-      if (peek == JsonReader.Token.BEGIN_ARRAY) {
-        reader.endArray();
-      }
-
-      String appiumVersion = extractAppiumVersion(versions);
-      if (appiumVersion != null) {
-        return appiumVersion;
-      } else {
-        LOGGER.warn("Appium version not found in the log file");
-        return null;
-      }
     }
+    return logEntries;
   }
 
   private static String extractAppiumVersion(List<String> versions) {
