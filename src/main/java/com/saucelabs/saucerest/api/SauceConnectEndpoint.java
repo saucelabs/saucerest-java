@@ -10,154 +10,159 @@ import java.io.IOException;
 import java.util.List;
 
 public class SauceConnectEndpoint extends AbstractEndpoint {
-    public SauceConnectEndpoint(DataCenter dataCenter) {
-        super(dataCenter);
-    }
+  public SauceConnectEndpoint(DataCenter dataCenter) {
+    super(dataCenter);
+  }
 
-    public SauceConnectEndpoint(String apiServer) {
-        super(apiServer);
-    }
+  public SauceConnectEndpoint(String apiServer) {
+    super(apiServer);
+  }
 
-    public SauceConnectEndpoint(String username, String accessKey, String apiServer) {
-        super(username, accessKey, apiServer);
-    }
+  public SauceConnectEndpoint(String username, String accessKey, String apiServer) {
+    super(username, accessKey, apiServer);
+  }
 
-    public SauceConnectEndpoint(String username, String accessKey, DataCenter dataCenter) {
-        super(username, accessKey, dataCenter);
-    }
+  public SauceConnectEndpoint(String username, String accessKey, DataCenter dataCenter) {
+    super(username, accessKey, dataCenter);
+  }
 
-    /**
-     * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
-     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
-     */
-    public List<String> getTunnelsForAUser() throws IOException {
-        return getTunnelsForAUser(this.username);
-    }
+  /**
+   * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
+   * Documentation is <a
+   * href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+   */
+  public List<String> getTunnelsForAUser() throws IOException {
+    return getTunnelsForAUser(this.username);
+  }
 
-    /**
-     * Returns Tunnels Info for any currently running tunnels launched by the specified user.
-     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
-     */
-    public List<TunnelInformation> getTunnelsInformationForAUser() throws IOException {
-        return getTunnelsInformationForAUser(this.username);
-    }
+  /**
+   * Returns Tunnels Info for any currently running tunnels launched by the specified user.
+   * Documentation is <a
+   * href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+   */
+  public List<TunnelInformation> getTunnelsInformationForAUser() throws IOException {
+    return getTunnelsInformationForAUser(this.username);
+  }
 
-    /**
-     * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
-     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
-     *
-     * @param username Sauce Labs username
-     */
-    public List<String> getTunnelsForAUser(String username) throws IOException {
-        String url = getBaseEndpoint() + username + "/tunnels";
+  /**
+   * Returns Tunnel IDs for any currently running tunnels launched by the specified user.
+   * Documentation is <a
+   * href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+   *
+   * @param username Sauce Labs username
+   */
+  public List<String> getTunnelsForAUser(String username) throws IOException {
+    String url = getBaseEndpoint() + username + "/tunnels";
 
-        return deserializeJSONArray(request(url, HttpMethod.GET), String.class);
-    }
+    return deserializeJSONArray(request(url, HttpMethod.GET), String.class);
+  }
 
-    /**
-     * Returns Tunnels Info for any currently running tunnels launched by the specified user.
-     * Documentation is <a href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
-     *
-     * @param username Sauce Labs username
-     */
-    public List<TunnelInformation> getTunnelsInformationForAUser(String username) throws IOException {
-        String url = getBaseEndpoint() + username + "/tunnels?full=true";
+  /**
+   * Returns Tunnels Info for any currently running tunnels launched by the specified user.
+   * Documentation is <a
+   * href="https://docs.saucelabs.com/dev/api/connect/#get-tunnels-for-a-user">here</a>.
+   *
+   * @param username Sauce Labs username
+   */
+  public List<TunnelInformation> getTunnelsInformationForAUser(String username) throws IOException {
+    String url = getBaseEndpoint() + username + "/tunnels?full=true";
 
-        return deserializeJSONArray(request(url, HttpMethod.GET), TunnelInformation.class);
-    }
+    return deserializeJSONArray(request(url, HttpMethod.GET), TunnelInformation.class);
+  }
 
-    /**
-     * Returns information about the specified tunnel.
-     *
-     * @param username The authentication username of the owner of the requested tunnel.
-     * @param tunnelID The unique identifier of the requested tunnel.
-     * @return {@link TunnelInformation}
-     * @throws IOException
-     */
-    public TunnelInformation getTunnelInformation(String username, String tunnelID) throws IOException {
-        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
+  /**
+   * Returns information about the specified tunnel.
+   *
+   * @param username The authentication username of the owner of the requested tunnel.
+   * @param tunnelID The unique identifier of the requested tunnel.
+   * @return {@link TunnelInformation}
+   * @throws IOException API request failed
+   */
+  public TunnelInformation getTunnelInformation(String username, String tunnelID)
+      throws IOException {
+    String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return deserializeJSONObject(request(url, HttpMethod.GET), TunnelInformation.class);
-    }
+    return deserializeJSONObject(request(url, HttpMethod.GET), TunnelInformation.class);
+  }
 
-    /**
-     * Returns information about the specified tunnel.
-     *
-     * @param tunnelID The unique identifier of the requested tunnel.
-     * @return {@link TunnelInformation}
-     * @throws IOException
-     */
-    public TunnelInformation getTunnelInformation(String tunnelID) throws IOException {
-        return getTunnelInformation(this.username, tunnelID);
-    }
+  /**
+   * Returns information about the specified tunnel.
+   *
+   * @param tunnelID The unique identifier of the requested tunnel.
+   * @return {@link TunnelInformation}
+   * @throws IOException API request failed
+   */
+  public TunnelInformation getTunnelInformation(String tunnelID) throws IOException {
+    return getTunnelInformation(this.username, tunnelID);
+  }
 
-    /**
-     * Returns the number of currently running jobs for the specified tunnel.
-     *
-     * @param username The authentication username of the user whose tunnels you are requesting.
-     * @param tunnelID The unique identifier of the requested tunnel.
-     * @return {@link JobsForATunnel}
-     * @throws IOException API request failed
-     */
-    public JobsForATunnel getCurrentJobsForATunnel(String username, String tunnelID) throws IOException {
-        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID + "/num_jobs";
+  /**
+   * Returns the number of currently running jobs for the specified tunnel.
+   *
+   * @param username The authentication username of the user whose tunnels you are requesting.
+   * @param tunnelID The unique identifier of the requested tunnel.
+   * @return {@link JobsForATunnel}
+   * @throws IOException API request failed
+   */
+  public JobsForATunnel getCurrentJobsForATunnel(String username, String tunnelID)
+      throws IOException {
+    String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID + "/num_jobs";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET), JobsForATunnel.class);
-    }
+    return deserializeJSONObject(request(url, HttpMethod.GET), JobsForATunnel.class);
+  }
 
-    /**
-     * Returns the number of currently running jobs for the specified tunnel.
-     *
-     * @param tunnelID The unique identifier of the requested tunnel.
-     * @return {@link JobsForATunnel}
-     * @throws IOException API request failed
-     */
-    public JobsForATunnel getCurrentJobsForATunnel(String tunnelID) throws IOException {
-        return getCurrentJobsForATunnel(this.username, tunnelID);
-    }
+  /**
+   * Returns the number of currently running jobs for the specified tunnel.
+   *
+   * @param tunnelID The unique identifier of the requested tunnel.
+   * @return {@link JobsForATunnel}
+   * @throws IOException API request failed
+   */
+  public JobsForATunnel getCurrentJobsForATunnel(String tunnelID) throws IOException {
+    return getCurrentJobsForATunnel(this.username, tunnelID);
+  }
 
-    /**
-     * Shuts down the specified tunnel.
-     *
-     * @param username The authentication username of the user whose tunnels you are requesting.
-     * @param tunnelID The unique identifier of the tunnel to stop.
-     * @return {@link StopTunnel}
-     * @throws IOException API request failed
-     */
-    public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
-        String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
+  /**
+   * Shuts down the specified tunnel.
+   *
+   * @param username The authentication username of the user whose tunnels you are requesting.
+   * @param tunnelID The unique identifier of the tunnel to stop.
+   * @return {@link StopTunnel}
+   * @throws IOException API request failed
+   */
+  public StopTunnel stopTunnel(String username, String tunnelID) throws IOException {
+    String url = getBaseEndpoint() + username + "/tunnels/" + tunnelID;
 
-        return deserializeJSONObject(request(url, HttpMethod.DELETE), StopTunnel.class);
-    }
+    return deserializeJSONObject(request(url, HttpMethod.DELETE), StopTunnel.class);
+  }
 
-    /**
-     * Shuts down the specified tunnel.
-     *
-     * @param tunnelID The unique identifier of the tunnel to stop.
-     * @return {@link StopTunnel}
-     * @throws IOException API request failed
-     */
-    public StopTunnel stopTunnel(String tunnelID) throws IOException {
-        return stopTunnel(this.username, tunnelID);
-    }
+  /**
+   * Shuts down the specified tunnel.
+   *
+   * @param tunnelID The unique identifier of the tunnel to stop.
+   * @return {@link StopTunnel}
+   * @throws IOException API request failed
+   */
+  public StopTunnel stopTunnel(String tunnelID) throws IOException {
+    return stopTunnel(this.username, tunnelID);
+  }
 
-    /**
-     * No authentication API to retrieve the latest version of Sauce Connect for all supported platforms.
-     *
-     * @return {@link Versions}
-     * @throws IOException API request failed
-     */
-    public Versions getLatestVersions() throws IOException {
-        String url = getBaseEndpoint() + "public/tunnels/info/versions";
+  /**
+   * No authentication API to retrieve the latest version of Sauce Connect for all supported
+   * platforms.
+   *
+   * @return {@link Versions}
+   * @throws IOException API request failed
+   */
+  public Versions getLatestVersions() throws IOException {
+    String url = getBaseEndpoint() + "public/tunnels/info/versions";
 
-        return deserializeJSONObject(request(url, HttpMethod.GET), Versions.class);
-    }
+    return deserializeJSONObject(request(url, HttpMethod.GET), Versions.class);
+  }
 
-    /**
-     * The base endpoint of the Sauce Connect endpoint APIs.
-     */
-    @Override
-    public String getBaseEndpoint() {
-        return super.getBaseEndpoint() + "rest/v1/";
-    }
+  /** The base endpoint of the Sauce Connect endpoint APIs. */
+  @Override
+  public String getBaseEndpoint() {
+    return super.getBaseEndpoint() + "rest/v1/";
+  }
 }
