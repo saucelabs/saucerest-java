@@ -1,14 +1,9 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Allowed {
 
-    @Json(name = "vms")
     public Integer vms;
-    @Json(name = "rds")
     public Integer rds;
-    @Json(name = "mac_vms")
     public Integer macVms;
 
     /**

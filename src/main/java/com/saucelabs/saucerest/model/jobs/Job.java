@@ -1,92 +1,52 @@
 package com.saucelabs.saucerest.model.jobs;
 
-import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.Json;
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
-public class Job extends AbstractModel {
-    @Json(name = "status")
+public class Job {
     public String status;
-    @Json(name = "base_config")
     public BaseConfig baseConfig;
-    @Json(name = "command_counts")
     public CommandCounts commandCounts;
-    @Json(name = "deletion_time")
     public Object deletionTime;
-    @Json(name = "url")
     public Object url;
-    @Json(name = "org_id")
     public String orgId;
-    @Json(name = "creation_time")
     public Integer creationTime;
-    @Json(name = "id")
     public String id;
-    @Json(name = "team_id")
     public String teamId;
-    @Json(name = "performance_enabled")
     public Object performanceEnabled;
-    @Json(name = "assigned_tunnel_id")
     public Object assignedTunnelId;
-    @Json(name = "container")
     public Boolean container;
-    @Json(name = "group_id")
     public String groupId;
-    @Json(name = "public")
+    @SerializedName("public")
     public String _public;
-    @Json(name = "breakpointed")
     public Object breakpointed;
-    @Json(name = "browser_short_version")
     public String browserShortVersion;
-    @Json(name = "video_url")
     public String videoUrl;
-    @Json(name = "custom-data")
+    @SerializedName("custom-data")
     public Map<String, String> customData;
-    @Json(name = "browser_version")
     public String browserVersion;
-    @Json(name = "owner")
     public String owner;
-    @Json(name = "automation_backend")
     public String automationBackend;
-    @Json(name = "collects_automator_log")
     public Boolean collectsAutomatorLog;
-    @Json(name = "record_screenshots")
     public Boolean recordScreenshots;
-    @Json(name = "record_video")
     public Boolean recordVideo;
-    @Json(name = "build")
     public Object build;
-    @Json(name = "passed")
     public Boolean passed;
-    @Json(name = "log_url")
     public String logUrl;
-    @Json(name = "start_time")
     public Integer startTime;
-    @Json(name = "proxied")
     public Boolean proxied;
-    @Json(name = "modification_time")
     public Integer modificationTime;
-    @Json(name = "name")
     public String name;
-    @Json(name = "commands_not_successful")
     public Integer commandsNotSuccessful;
-    @Json(name = "consolidated_status")
     public String consolidatedStatus;
-    @Json(name = "selenium_version")
     public Object seleniumVersion;
-    @Json(name = "manual")
     public Boolean manual;
-    @Json(name = "end_time")
     public Integer endTime;
-    @Json(name = "error")
     public Object error;
-    @Json(name = "os")
     public String os;
-    @Json(name = "browser")
     public String browser;
-    @Json(name = "tags")
     public List<String> tags;
-    @Json(name = "video_secret")
     public String videoSecret;
 
     public Job() {

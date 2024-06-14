@@ -1,29 +1,16 @@
 package com.saucelabs.saucerest.model.storage;
 
-import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.Json;
+public class Settings {
 
-public class Settings extends AbstractModel {
-
-    @Json(name = "proxy")
     public Proxy proxy;
-    @Json(name = "audio_capture")
     public Boolean audioCapture;
-    @Json(name = "proxy_enabled")
     public Boolean proxyEnabled;
-    @Json(name = "lang")
     public String lang;
-    @Json(name = "orientation")
     public String orientation;
-    @Json(name = "resigning_enabled")
     public Boolean resigningEnabled;
-    @Json(name = "resigning")
     public Resigning resigning;
-    @Json(name = "instrumentation")
     public Instrumentation instrumentation;
-    @Json(name = "setup_device_lock")
     public Boolean setupDeviceLock;
-    @Json(name = "instrumentation_enabled")
     public Boolean instrumentationEnabled;
 
     private Settings(Builder builder) {

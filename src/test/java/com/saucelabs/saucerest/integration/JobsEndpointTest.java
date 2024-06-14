@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -339,7 +338,7 @@ public class JobsEndpointTest {
 
     GetJobsParameters parameters = new GetJobsParameters.Builder().setLimit(10).build();
 
-    ArrayList<Job> jobList = jobsEndpoint.getJobs(parameters);
+    List<Job> jobList = jobsEndpoint.getJobs(parameters);
 
     assertEquals(10, jobList.size());
   }

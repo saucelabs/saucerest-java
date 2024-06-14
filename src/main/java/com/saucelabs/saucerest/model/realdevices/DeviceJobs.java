@@ -1,13 +1,10 @@
 package com.saucelabs.saucerest.model.realdevices;
 
-import com.squareup.moshi.Json;
 import java.util.List;
 
 public class DeviceJobs {
 
-    @Json(name = "entities")
     public List<Entity> entities = null;
-    @Json(name = "metaData")
     public MetaData metaData;
 
     public DeviceJobs() {
