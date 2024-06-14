@@ -1,14 +1,9 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
-
 public class StopTunnel {
 
-    @Json(name = "result")
     public Boolean result;
-    @Json(name = "id")
     public String id;
-    @Json(name = "jobs_running")
     public Integer jobsRunning;
 
     /**

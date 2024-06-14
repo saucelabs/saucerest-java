@@ -150,7 +150,7 @@ public class AccountsEndpoint extends AbstractEndpoint {
     public UpdateTeam partiallyUpdateTeam(String teamID, UpdateTeam updateTeam) throws IOException {
         String url = getBaseEndpoint() + "teams/" + teamID;
 
-        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam.toJson()), UpdateTeam.class);
+        return deserializeJSONObject(request(url, HttpMethod.PATCH, updateTeam), UpdateTeam.class);
     }
 
     /**

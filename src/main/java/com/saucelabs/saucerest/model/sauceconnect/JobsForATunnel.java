@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
-
 public class JobsForATunnel {
 
-    @Json(name = "id")
     public String id;
-    @Json(name = "jobs_running")
     public Integer jobsRunning;
 
     /**

@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.realdevices;
 
-import com.squareup.moshi.Json;
-
 public class Organization {
 
-    @Json(name = "current")
     public Integer current;
-    @Json(name = "maximum")
     public Integer maximum;
 
     /**

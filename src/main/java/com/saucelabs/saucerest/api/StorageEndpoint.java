@@ -20,7 +20,6 @@ import java.util.Objects;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,24 +119,16 @@ public class StorageEndpoint extends AbstractEndpoint {
    * href="https://docs.saucelabs.com/dev/api/storage/#get-app-storage-group-settings">here</a>
    *
    * @param groupId The ID of the group
-   * @param jsonBody The app group's settings
+   * @param editAppGroupSettings The app group's settings
    * @return {@link EditAppGroupSettings}
    * @throws IOException API request failed
    */
-  public EditAppGroupSettings updateAppStorageGroupSettings(int groupId, String jsonBody)
-      throws IOException {
-    String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
-
-    return deserializeJSONObject(
-        request(url, HttpMethod.PUT, jsonBody), EditAppGroupSettings.class);
-  }
-
   public EditAppGroupSettings updateAppStorageGroupSettings(
       int groupId, EditAppGroupSettings editAppGroupSettings) throws IOException {
     String url = getBaseEndpoint() + "/groups/" + groupId + "/settings";
 
     return deserializeJSONObject(
-        request(url, HttpMethod.PUT, editAppGroupSettings.toJson()), EditAppGroupSettings.class);
+        request(url, HttpMethod.PUT, editAppGroupSettings), EditAppGroupSettings.class);
   }
 
   /**
@@ -212,10 +203,9 @@ public class StorageEndpoint extends AbstractEndpoint {
       throws IOException {
     String url = getBaseEndpoint() + "/files/" + fileId;
 
-      JSONObject json = new JSONObject(Map.of("item", Map.of("description", description)));
+    Map<String, Object> map = Map.of("item", Map.of("description", description));
 
-    return deserializeJSONObject(
-        request(url, HttpMethod.PUT, json.toString()), EditFileDescription.class);
+    return deserializeJSONObject(request(url, HttpMethod.PUT, map), EditFileDescription.class);
   }
 
   /**
@@ -259,10 +249,10 @@ public class StorageEndpoint extends AbstractEndpoint {
    * @param file App file
    * @param fileName A different filename for the uploaded app. Default is its local filename
    * @param description An optional description of the app
-   * @return A string with the response as a string
+   * @return Response HTTP response
    * @throws IOException API request failed
    */
-  private String postMultipartResponse(String url, File file, String fileName, String description)
+  private Response postMultipartResponse(String url, File file, String fileName, String description)
       throws IOException {
     RequestBody requestBody =
         new MultipartBody.Builder()
@@ -290,8 +280,7 @@ public class StorageEndpoint extends AbstractEndpoint {
         throw new IOException("Unexpected code" + response);
       }
 
-      Objects.requireNonNull(response.body());
-      return response.body().string();
+      return response;
     }
   }
 }

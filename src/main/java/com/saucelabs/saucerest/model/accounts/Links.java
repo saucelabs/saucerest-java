@@ -1,16 +1,10 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Links {
 
-    @Json(name = "next")
     public Object next;
-    @Json(name = "previous")
     public Object previous;
-    @Json(name = "first")
     public String first;
-    @Json(name = "last")
     public String last;
 
     /**

@@ -1,17 +1,12 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
 import java.util.List;
 
 public class Versions {
 
-    @Json(name = "downloads")
     public Downloads downloads;
-    @Json(name = "info_url")
     public String infoUrl;
-    @Json(name = "latest_version")
     public String latestVersion;
-    @Json(name = "warning")
     public List<String> warning = null;
 
     /**

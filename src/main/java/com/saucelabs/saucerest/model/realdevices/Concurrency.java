@@ -1,10 +1,7 @@
 package com.saucelabs.saucerest.model.realdevices;
 
-import com.squareup.moshi.Json;
-
 public class Concurrency {
 
-    @Json(name = "organization")
     public Organization organization;
 
     /**

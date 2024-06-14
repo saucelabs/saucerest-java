@@ -1,34 +1,23 @@
 package com.saucelabs.saucerest.model.builds;
 
-import com.squareup.moshi.Json;
-
 public class State {
 
-  @Json(name = "completed")
   public Boolean completed;
 
-  @Json(name = "errored")
   public Boolean errored;
 
-  @Json(name = "failed")
   public Boolean failed;
 
-  @Json(name = "finished")
   public Boolean finished;
 
-  @Json(name = "new")
   public Boolean _new;
 
-  @Json(name = "passed")
   public Boolean passed;
 
-  @Json(name = "public")
   public Boolean _public;
 
-  @Json(name = "queued")
   public Boolean queued;
 
-  @Json(name = "running")
   public Boolean running;
 
   /** No args constructor for use in serialization */
