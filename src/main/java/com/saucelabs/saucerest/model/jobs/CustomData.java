@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.jobs;
 
-import com.squareup.moshi.Json;
-
 public class CustomData {
 
-    @Json(name = "tcd")
     public String tcd;
-    @Json(name = "editor")
     public String editor;
 
     /**

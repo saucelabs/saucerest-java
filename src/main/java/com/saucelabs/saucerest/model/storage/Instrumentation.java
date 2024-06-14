@@ -1,17 +1,10 @@
 package com.saucelabs.saucerest.model.storage;
 
-import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.Json;
+public class Instrumentation {
 
-public class Instrumentation extends AbstractModel {
-
-    @Json(name = "image_injection")
     public Boolean imageInjection;
-    @Json(name = "bypass_screenshot_restriction")
     public Boolean bypassScreenshotRestriction;
-    @Json(name = "biometrics")
     public Boolean biometrics;
-    @Json(name = "network_capture")
     public Boolean networkCapture;
 
     private Instrumentation(Builder builder) {

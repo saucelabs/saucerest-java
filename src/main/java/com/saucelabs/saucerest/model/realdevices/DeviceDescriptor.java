@@ -1,83 +1,45 @@
 package com.saucelabs.saucerest.model.realdevices;
 
-import com.squareup.moshi.Json;
 import java.util.List;
 
 public class DeviceDescriptor {
 
-    @Json(name = "abiType")
     public String abiType;
-    @Json(name = "apiLevel")
     public Integer apiLevel;
-    @Json(name = "cpuCores")
     public Integer cpuCores;
-    @Json(name = "cpuFrequency")
     public Integer cpuFrequency;
-    @Json(name = "defaultOrientation")
     public String defaultOrientation;
-    @Json(name = "dpi")
     public Integer dpi;
-    @Json(name = "hasOnScreenButtons")
     public Boolean hasOnScreenButtons;
-    @Json(name = "id")
     public String id;
-    @Json(name = "internalOrientation")
     public String internalOrientation;
-    @Json(name = "internalStorageSize")
     public Integer internalStorageSize;
-    @Json(name = "isArm")
     public Boolean isArm;
-    @Json(name = "isKeyGuardDisabled")
     public Boolean isKeyGuardDisabled;
-    @Json(name = "isPrivate")
     public Boolean isPrivate;
-    @Json(name = "isRooted")
     public Boolean isRooted;
-    @Json(name = "isTablet")
     public Boolean isTablet;
-    @Json(name = "manufacturer")
     public List<String> manufacturer = null;
-    @Json(name = "modelNumber")
     public String modelNumber;
-    @Json(name = "name")
     public String name;
-    @Json(name = "os")
     public String os;
-    @Json(name = "osVersion")
     public String osVersion;
-    @Json(name = "pixelsPerPoint")
     public Integer pixelsPerPoint;
-    @Json(name = "ramSize")
     public Integer ramSize;
-    @Json(name = "resolutionHeight")
     public Integer resolutionHeight;
-    @Json(name = "resolutionWidth")
     public Integer resolutionWidth;
-    @Json(name = "screenSize")
     public Float screenSize;
-    @Json(name = "sdCardSize")
     public Integer sdCardSize;
-    @Json(name = "supportsAppiumWebAppTesting")
     public Boolean supportsAppiumWebAppTesting;
-    @Json(name = "supportsGlobalProxy")
     public Boolean supportsGlobalProxy;
-    @Json(name = "supportsMinicapSocketConnection")
     public Boolean supportsMinicapSocketConnection;
-    @Json(name = "supportsMockLocations")
     public Boolean supportsMockLocations;
-    @Json(name = "cpuType")
     public String cpuType;
-    @Json(name = "deviceFamily")
     public String deviceFamily;
-    @Json(name = "dpiName")
     public String dpiName;
-    @Json(name = "isAlternativeIoEnabled")
     public Boolean isAlternativeIoEnabled;
-    @Json(name = "supportsManualWebTesting")
     public Boolean supportsManualWebTesting;
-    @Json(name = "supportsMultiTouch")
     public Boolean supportsMultiTouch;
-    @Json(name = "supportsXcuiTest")
     public Boolean supportsXcuiTest;
 
     public DeviceDescriptor() {

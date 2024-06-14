@@ -2,31 +2,18 @@ package com.saucelabs.saucerest.model.sauceconnect;
 
 import java.math.BigInteger;
 
-import com.squareup.moshi.Json;
-
 public class Metadata {
 
-    @Json(name = "hostname")
     public String hostname;
-    @Json(name = "host_memory")
     public Long hostMemory;
-    @Json(name = "command_args")
     public String commandArgs;
-    @Json(name = "git_version")
     public String gitVersion;
-    @Json(name = "platform")
     public String platform;
-    @Json(name = "command")
     public String command;
-    @Json(name = "build")
     public String build;
-    @Json(name = "external_proxy")
     public String externalProxy;
-    @Json(name = "release")
     public String release;
-    @Json(name = "host_cpu")
     public String hostCpu;
-    @Json(name = "nofile_limit")
     public BigInteger nofileLimit;
 
     /**

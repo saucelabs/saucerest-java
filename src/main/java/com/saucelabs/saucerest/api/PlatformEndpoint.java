@@ -1,11 +1,17 @@
 package com.saucelabs.saucerest.api;
 
+import com.google.gson.reflect.TypeToken;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
+import com.saucelabs.saucerest.model.platform.AppiumVersion;
 import com.saucelabs.saucerest.model.platform.EndOfLifeAppiumVersions;
+import com.saucelabs.saucerest.model.platform.Platform;
 import com.saucelabs.saucerest.model.platform.SupportedPlatforms;
 import com.saucelabs.saucerest.model.platform.TestStatus;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlatformEndpoint extends AbstractEndpoint {
 
@@ -49,7 +55,7 @@ public class PlatformEndpoint extends AbstractEndpoint {
     public SupportedPlatforms getSupportedPlatforms(String automationApi) throws IOException {
         String url = getBaseEndpoint() + "/platforms/" + automationApi;
 
-        return new SupportedPlatforms(deserializeJSONArray(request(url, HttpMethod.GET), com.saucelabs.saucerest.model.platform.Platform.class));
+        return new SupportedPlatforms(deserializeJSONArray(request(url, HttpMethod.GET), Platform.class));
     }
 
     /**
@@ -62,7 +68,12 @@ public class PlatformEndpoint extends AbstractEndpoint {
     public EndOfLifeAppiumVersions getEndOfLifeAppiumVersions() throws IOException {
         String url = getBaseEndpoint() + "/platforms/appium/eol";
 
-        return new EndOfLifeAppiumVersions(request(url, HttpMethod.GET));
+        Type type = TypeToken.getParameterized(Map.class, String.class, Integer.class).getType();
+        Map<String, Integer> mapOfVersions = deserializeJSON(request(url, HttpMethod.GET), type);
+        return new EndOfLifeAppiumVersions(mapOfVersions.entrySet().stream()
+            .map(entry -> new AppiumVersion(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList())
+        );
     }
 
     /**

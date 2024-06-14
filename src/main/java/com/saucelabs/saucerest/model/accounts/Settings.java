@@ -1,58 +1,31 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Settings {
 
-    @Json(name = "allow_integrations_page")
     public Boolean allowIntegrationsPage;
-    @Json(name = "can_use_tunnels_with_public_real_devices")
     public Boolean canUseTunnelsWithPublicRealDevices;
-    @Json(name = "country")
     public String country;
-    @Json(name = "disable_email_verification")
     public Boolean disableEmailVerification;
-    @Json(name = "groups_enabled")
     public Boolean groupsEnabled;
-    @Json(name = "jit_default_team")
     public Object jitDefaultTeam;
-    @Json(name = "jit_username_prefix")
     public String jitUsernamePrefix;
-    @Json(name = "jobs_cross_team_sharing")
     public Boolean jobsCrossTeamSharing;
-    @Json(name = "live_only")
     public Boolean liveOnly;
-    @Json(name = "logout_url")
     public String logoutUrl;
-    @Json(name = "mac_virtual_machines")
     public Integer macVirtualMachines;
-    @Json(name = "performance_enabled")
     public Boolean performanceEnabled;
-    @Json(name = "rdc_enabled")
     public Boolean rdcEnabled;
-    @Json(name = "real_devices")
     public Integer realDevices;
-    @Json(name = "sso_enabled")
     public Boolean ssoEnabled;
-    @Json(name = "sso_only")
     public Boolean ssoOnly;
-    @Json(name = "team_limit")
     public Integer teamLimit;
-    @Json(name = "team_limit_reached")
     public Boolean teamLimitReached;
-    @Json(name = "to_plan")
     public Object toPlan;
-    @Json(name = "trial_period")
     public Object trialPeriod;
-    @Json(name = "tunnels_lockdown")
     public Boolean tunnelsLockdown;
-    @Json(name = "user_type")
     public String userType;
-    @Json(name = "virtual_machines")
     public Integer virtualMachines;
-    @Json(name = "vm_lockdown")
     public Boolean vmLockdown;
-    @Json(name = "sso_legacy_enabled")
     public Boolean ssoLegacyEnabled;
 
     /**

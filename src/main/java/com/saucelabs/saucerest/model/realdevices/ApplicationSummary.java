@@ -1,32 +1,18 @@
 package com.saucelabs.saucerest.model.realdevices;
 
-import com.squareup.moshi.Json;
-
 public class ApplicationSummary {
 
-    @Json(name = "appStorageId")
     public String appStorageId;
-    @Json(name = "groupId")
     public Integer groupId;
-    @Json(name = "filename")
     public String filename;
-    @Json(name = "name")
     public String name;
-    @Json(name = "packageName")
     public String packageName;
-    @Json(name = "version")
     public String version;
-    @Json(name = "versionCode")
     public String versionCode;
-    @Json(name = "shortVersion")
     public Object shortVersion;
-    @Json(name = "minSdkLevel")
     public Integer minSdkLevel;
-    @Json(name = "targetSdkLevel")
     public Integer targetSdkLevel;
-    @Json(name = "minOsVersion")
     public Object minOsVersion;
-    @Json(name = "targetOsVersion")
     public Object targetOsVersion;
 
     public ApplicationSummary() {

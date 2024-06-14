@@ -1,19 +1,20 @@
 package com.saucelabs.saucerest.api;
 
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.saucelabs.saucerest.*;
 import com.saucelabs.saucerest.model.jobs.GetJobsParameters;
 import com.saucelabs.saucerest.model.jobs.Job;
 import com.saucelabs.saucerest.model.jobs.JobAssets;
 import com.saucelabs.saucerest.model.jobs.UpdateJobParameter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import okhttp3.Response;
 import org.awaitility.Awaitility;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class JobsEndpoint extends AbstractEndpoint {
 
@@ -36,28 +37,26 @@ public class JobsEndpoint extends AbstractEndpoint {
   /**
    * Get a list of recent jobs run by the specified user.
    *
-   * @return {@link ArrayList} of {@link Job} objects
+   * @return {@link List} of {@link Job} objects
    * @throws IOException if the request fails
    */
   public List<Job> getJobs() throws IOException {
     String url = super.getBaseEndpoint() + "rest/v1/" + username + "/jobs";
 
-    return new ArrayList<>(deserializeJSONArray(request(url, HttpMethod.GET), Job.class));
+    return deserializeJSONArray(request(url, HttpMethod.GET), Job.class);
   }
 
   /**
    * Get a list of recent jobs run by the specified user.
    *
    * @param getJobsParameters {@link GetJobsParameters} object
-   * @return {@link ArrayList} of {@link Job} objects
+   * @return {@link List} of {@link Job} objects
    * @throws IOException if the request fails
    */
-  public ArrayList<Job> getJobs(GetJobsParameters getJobsParameters) throws IOException {
+  public List<Job> getJobs(GetJobsParameters getJobsParameters) throws IOException {
     String url = super.getBaseEndpoint() + "rest/v1/" + username + "/jobs";
 
-    return new ArrayList<>(
-        deserializeJSONArray(
-            requestWithQueryParameters(url, HttpMethod.GET, getJobsParameters.toMap()), Job.class));
+    return deserializeJSONArray(requestWithQueryParameters(url, HttpMethod.GET, getJobsParameters.toMap()), Job.class);
   }
 
   /**
@@ -109,8 +108,7 @@ public class JobsEndpoint extends AbstractEndpoint {
   public Job updateJob(String jobID, UpdateJobParameter updateJobParameter) throws IOException {
     String url = getBaseEndpoint() + jobID;
 
-    return deserializeJSONObject(
-        request(url, HttpMethod.PUT, updateJobParameter.toMap()), Job.class);
+      return deserializeJSONObject(request(url, HttpMethod.PUT, updateJobParameter), Job.class);
   }
 
   /**
@@ -315,16 +313,19 @@ public class JobsEndpoint extends AbstractEndpoint {
   private void waitForBasicTestAssets(String jobID) {
     String url = getBaseEndpoint() + jobID + "/assets";
 
+    Type type = TypeToken.getParameterized(Map.class, String.class, Object.class).getType();
+
     Awaitility.await()
-        .ignoreExceptionsMatching(e -> e.getClass().equals(JSONException.class))
+        .ignoreExceptionsMatching(e -> e.getClass().equals(JsonSyntaxException.class))
         .atMost(Duration.ofMinutes(5))
         .pollInterval(Duration.ofSeconds(10))
         .until(
             () -> {
-              JSONObject response = new JSONObject(request(url, HttpMethod.GET).body().string());
-              return response.has("video")
-                  && response.has(TestAsset.SAUCE_LOG.jsonKey)
-                  && response.has("selenium-log");
+
+              Map<String, Object> response = deserializeJSON(request(url, HttpMethod.GET), type);
+              return response.containsKey("video")
+                  && response.containsKey(TestAsset.SAUCE_LOG.jsonKey)
+                  && response.containsKey("selenium-log");
             });
   }
 }

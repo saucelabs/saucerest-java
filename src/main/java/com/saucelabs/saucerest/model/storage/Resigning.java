@@ -1,19 +1,11 @@
 package com.saucelabs.saucerest.model.storage;
 
-import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.Json;
+public class Resigning {
 
-public class Resigning extends AbstractModel {
-
-    @Json(name = "image_injection")
     public Boolean imageInjection;
-    @Json(name = "group_directory")
     public Boolean groupDirectory;
-    @Json(name = "biometrics")
     public Boolean biometrics;
-    @Json(name = "sys_alerts_delay")
     public Boolean sysAlertsDelay;
-    @Json(name = "network_capture")
     public Boolean networkCapture;
 
     private Resigning(Builder builder) {

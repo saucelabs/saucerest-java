@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class UserConcurrency {
 
-    @Json(name = "timestamp")
     public Float timestamp;
-    @Json(name = "concurrency")
     public Concurrency concurrency;
 
     /**

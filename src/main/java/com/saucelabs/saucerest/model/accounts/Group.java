@@ -1,16 +1,10 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Group {
 
-    @Json(name = "id")
     public String id;
-    @Json(name = "name")
     public String name;
-    @Json(name = "virtual_machines")
     public Integer virtualMachines;
-    @Json(name = "real_devices")
     public Integer realDevices;
 
     /**

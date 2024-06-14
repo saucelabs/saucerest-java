@@ -1,5 +1,6 @@
 package com.saucelabs.saucerest.model.jobs;
 
+import com.google.gson.annotations.SerializedName;
 import com.saucelabs.saucerest.JobVisibility;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ public class UpdateJobParameter {
     private final JobVisibility visibility;
     private final Boolean passed;
     private final String build;
+    @SerializedName("custom-data")
     private final Map<String, String> customData;
 
     public UpdateJobParameter(String name, List<String> tags, JobVisibility visibility, boolean passed, String build, Map<String, String> customData) {
@@ -29,36 +31,6 @@ public class UpdateJobParameter {
         passed = builder.passed;
         build = builder.build;
         customData = builder.customData;
-    }
-
-    public Map<String, Object> toMap() {
-        Map<String, Object> parameters = new HashMap<>();
-
-        if (this.name != null) {
-            parameters.put("name", this.name);
-        }
-
-        if (this.tags != null) {
-            parameters.put("tags", this.tags);
-        }
-
-        if (this.visibility != null) {
-            parameters.put("public", this.visibility.value);
-        }
-
-        if (this.passed != null) {
-            parameters.put("passed", this.passed);
-        }
-
-        if (this.build != null) {
-            parameters.put("build", this.build);
-        }
-
-        if (this.customData != null) {
-            parameters.put("custom-data", this.customData);
-        }
-
-        return parameters;
     }
 
     public static final class Builder {

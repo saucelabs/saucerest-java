@@ -4,28 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.model.storage.*;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 class EditAppGroupSettingsTest {
-
-    @Test
-    void toJson() {
-        Settings settings = new Settings.Builder()
-                .setAudioCapture(true)
-                .setInstrumentation(new Instrumentation.Builder().setImageInjection(true).build())
-                .build();
-
-        EditAppGroupSettings editAppGroupSettings = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-                .setSettings(settings)
-                .build();
-
-        JSONObject jsonObject = new JSONObject(editAppGroupSettings.toJson());
-
-        assertTrue(jsonObject.has("settings"));
-        assertTrue(jsonObject.getJSONObject("settings").has("audio_capture"));
-        assertTrue(jsonObject.getJSONObject("settings").getJSONObject("instrumentation").has("image_injection"));
-    }
 
     @Test
     public void testBuilder() {
@@ -40,7 +21,12 @@ class EditAppGroupSettingsTest {
             .build();
 
         assertNotNull(editAppGroupSettings);
-        System.out.println(editAppGroupSettings.toJson());
+        assertNotNull(editAppGroupSettings.settings);
+        assertAll(
+            () -> assertTrue(editAppGroupSettings.settings.audioCapture),
+            () -> assertTrue(editAppGroupSettings.settings.setupDeviceLock),
+            () -> assertTrue(editAppGroupSettings.settings.instrumentation.imageInjection)
+        );
     }
 
     @Test
@@ -130,18 +116,5 @@ class EditAppGroupSettingsTest {
         assertTrue(editAppGroupSettings.settings.instrumentationEnabled);
         assertTrue(editAppGroupSettings.settings.instrumentation.imageInjection);
         assertNull(editAppGroupSettings.settings.instrumentation.biometrics);
-    }
-
-    @Test
-    public void testBuilderToJson() {
-        Settings settings = new Settings.Builder()
-            .setAudioCapture(true)
-            .build();
-
-        EditAppGroupSettings editAppGroupSettings = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.ANDROID)
-            .setSettings(settings)
-            .build();
-
-        assertDoesNotThrow(() -> new JSONObject(editAppGroupSettings.toJson()));
     }
 }

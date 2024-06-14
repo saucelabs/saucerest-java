@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Concurrency {
 
-    @Json(name = "organization")
     public Organization organization;
-    @Json(name = "team")
     public Team team;
 
     /**

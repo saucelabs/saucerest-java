@@ -1,25 +1,24 @@
 package com.saucelabs.saucerest.model.jobs;
 
-import com.squareup.moshi.Json;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JobAssets {
 
-    @Json(name = "video.mp4")
+    @SerializedName("video.mp4")
     public String videoMp4;
-    @Json(name = "selenium-log")
+    @SerializedName("selenium-log")
     public String seleniumLog;
-    @Json(name = "ios-syslog.log")
+    @SerializedName("ios-syslog.log")
     public String iosSyslogLog;
-    @Json(name = "sauce-log")
+    @SerializedName("sauce-log")
     public String sauceLog;
-    @Json(name = "video")
     public String video;
-    @Json(name = "screenshots")
     public List<String> screenshots;
-    @Json(name = "logcat.log")
+    @SerializedName("logcat.log")
     public String logcatLog;
 
     public JobAssets() {

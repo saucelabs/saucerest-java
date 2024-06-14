@@ -1,16 +1,13 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
+import com.google.gson.annotations.SerializedName;
 
 public class Downloads {
 
-    @Json(name = "linux")
     public Linux linux;
-    @Json(name = "linux-arm64")
+    @SerializedName("linux-arm64")
     public LinuxArm64 linuxArm64;
-    @Json(name = "osx")
     public Osx osx;
-    @Json(name = "win32")
     public Win32 win32;
 
     /**
