@@ -11,8 +11,6 @@ import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.api.SauceConnectEndpoint;
 import com.saucelabs.saucerest.api.StorageEndpoint;
 
-import lombok.Getter;
-
 import java.io.Serializable;
 
 /**
@@ -23,13 +21,13 @@ import java.io.Serializable;
  * href="https://docs.saucelabs.com/dev/api/">here</a>
  */
 public class SauceREST implements Serializable {
-  @Getter private final String server;
+  private final String server;
   private final String apiServer;
-  @Getter private final String edsServer;
-  @Getter private final String appServer;
+  private final String edsServer;
+  private final String appServer;
   private final HttpClientConfig config;
-  @Getter protected String username;
-  @Getter protected String accessKey;
+  protected String username;
+  protected String accessKey;
 
   public SauceREST(DataCenter dataCenter) {
     this(System.getenv("SAUCE_USERNAME"), System.getenv("SAUCE_ACCESS_KEY"), dataCenter);
@@ -235,5 +233,25 @@ public class SauceREST implements Serializable {
         new PerformanceEndpoint(this.username, this.accessKey, dataCenter);
     endpoint.createHttpClient(this.config);
     return endpoint;
+  }
+
+  public String getServer() {
+    return this.server;
+  }
+
+  public String getEdsServer() {
+    return this.edsServer;
+  }
+
+  public String getAppServer() {
+    return this.appServer;
+  }
+
+  public String getUsername() {
+    return this.username;
+  }
+
+  public String getAccessKey() {
+    return this.accessKey;
   }
 }
