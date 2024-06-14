@@ -1,25 +1,15 @@
 
 package com.saucelabs.saucerest.model.builds;
 
-import com.squareup.moshi.Json;
-
 public class Jobs {
 
-    @Json(name = "completed")
     public Integer completed;
-    @Json(name = "errored")
     public Integer errored;
-    @Json(name = "failed")
     public Integer failed;
-    @Json(name = "finished")
     public Integer finished;
-    @Json(name = "passed")
     public Integer passed;
-    @Json(name = "public")
     public Integer _public;
-    @Json(name = "queued")
     public Integer queued;
-    @Json(name = "running")
     public Integer running;
 
     /**

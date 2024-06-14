@@ -267,7 +267,7 @@ public class StorageEndpointTest {
             .setSettings(settings)
             .build();
 
-        EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, editAppGroupSettings1.toJson());
+        EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, editAppGroupSettings1);
 
         assertTrue(editAppGroupSettings.settings.audioCapture);
     }

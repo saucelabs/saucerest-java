@@ -1,21 +1,18 @@
 package com.saucelabs.saucerest.api;
 
+import static com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES;
 import static com.saucelabs.saucerest.api.ResponseHandler.responseHandler;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.saucelabs.saucerest.BuildUtils;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.ErrorExplainers;
 import com.saucelabs.saucerest.HttpMethod;
-import com.saucelabs.saucerest.MoshiSingleton;
 import com.saucelabs.saucerest.SauceException;
-import com.saucelabs.saucerest.model.AbstractModel;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonDataException;
-import com.squareup.moshi.JsonReader;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -37,16 +34,17 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractEndpoint extends AbstractModel {
+public abstract class AbstractEndpoint {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEndpoint.class);
   private static final String JSON_MEDIA_TYPE = "application/json";
   private static final int MAX_RETRIES = 5;
   private static final int BACKOFF_INITIAL_DELAY = 30;
   private static final int BACKOFF_MULTIPLIER = 500;
+
+  protected static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(LOWER_CASE_WITH_UNDERSCORES).create();
 
   private OkHttpClient httpClient;
   protected final String userAgent = "SauceREST/" + BuildUtils.getCurrentVersion();
@@ -151,15 +149,10 @@ public abstract class AbstractEndpoint extends AbstractModel {
   }
 
   public Response request(String url, HttpMethod httpMethod) throws IOException {
-    return request(url, httpMethod, (String) null);
+    return request(url, httpMethod, null);
   }
 
-  public Response request(String url, HttpMethod httpMethod, Map<String, Object> body)
-      throws IOException {
-    return request(url, httpMethod, new JSONObject(body).toString());
-  }
-
-  public Response request(String url, HttpMethod httpMethod, String body) throws IOException {
+  public Response request(String url, HttpMethod httpMethod, Object body) throws IOException {
     Request request = createRequest(url, httpMethod, body);
     return makeRequest(request);
   }
@@ -199,7 +192,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
     httpClient = builder.build();
   }
 
-  private Request createRequest(String url, HttpMethod httpMethod, String body) {
+  private Request createRequest(String url, HttpMethod httpMethod, Object body) {
     Request.Builder chain = new Request.Builder().url(url).header("User-Agent", userAgent);
 
     if (credentials != null) {
@@ -208,10 +201,7 @@ public abstract class AbstractEndpoint extends AbstractModel {
 
     if (body != null) {
       MediaType mediaType = MediaType.parse(JSON_MEDIA_TYPE);
-      RequestBody requestBody =
-          (body.isEmpty())
-              ? RequestBody.create(body, mediaType)
-              : RequestBody.create(new JSONObject(body).toString(), mediaType);
+      RequestBody requestBody = RequestBody.create(body instanceof String ? (String) body : GSON.toJson(body), mediaType);
       chain.method(httpMethod.label, requestBody);
     } else {
       switch (httpMethod) {
@@ -317,107 +307,48 @@ public abstract class AbstractEndpoint extends AbstractModel {
     return response;
   }
 
+  protected <T> List<T> deserializeListFromJSONObject(Response response, Class<T> elementClass) throws IOException {
+    Type type = TypeToken.getParameterized(Map.class, Object.class,
+            TypeToken.getParameterized(List.class, elementClass).getType()).getType();
+    Map<Object, List<T>> fullJson = deserializeJSON(response, type);
+    return fullJson.values().iterator().next();
+  }
+
   /**
    * This method is used to deserialize a JSON object response from an API endpoint.
    *
-   * @param jsonResponse JSON object response from API endpoint
+   * @param response HTTP response containing JSON object from API endpoint
    * @param clazz The class to deserialize the JSON object into
    * @param <T> The type of the object to deserialize
    * @return The deserialized object
    * @throws IOException If the JSON object cannot be deserialized
    */
-  protected <T> T deserializeJSONObject(String jsonResponse, Class<T> clazz) throws IOException {
-    Objects.requireNonNull(jsonResponse, "JSON response cannot be null");
-    Objects.requireNonNull(clazz, "Class object cannot be null");
-
-    Moshi moshi = MoshiSingleton.getInstance();
-    JsonAdapter<T> jsonAdapter = moshi.adapter(clazz);
-    try {
-      return jsonAdapter.fromJson(jsonResponse);
-    } catch (IOException e) {
-      throw new IOException(
-          "Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
-    } catch (JsonDataException e) {
-      LOGGER.warn(
-          "Could not deserialize JSON response: {}{}", System.lineSeparator(), jsonResponse);
-      throw e;
-    }
-  }
-
-  protected <T> List<T> deserializeJSONObject(Response response, List<Class<? extends T>> clazz)
-      throws IOException {
-    if (response.body() != null) {
-      return deserializeJSONObject(response.body().string(), clazz);
-    } else {
-      throw new IOException("Response body is null");
-    }
-  }
-
-  protected <T> List<T> deserializeJSONObject(String jsonResponse, List<Class<? extends T>> clazz)
-      throws IOException {
-    Objects.requireNonNull(jsonResponse, "JSON response cannot be null");
-    Objects.requireNonNull(clazz, "Class object cannot be null");
-
-    Moshi moshi = MoshiSingleton.getInstance();
-    JsonAdapter<List<T>> jsonAdapter =
-        moshi.adapter(Types.newParameterizedType(List.class, clazz.get(0)));
-    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonResponse.getBytes());
-        JsonReader reader = JsonReader.of(Okio.buffer(Okio.source(inputStream)))) {
-      reader.beginObject();
-      reader.nextName();
-      List<T> list = jsonAdapter.fromJson(reader);
-      reader.endObject();
-      return list;
-    } catch (IOException e) {
-      throw new IOException(
-          "Error deserializing JSON response to " + clazz.get(0).getSimpleName() + " class", e);
-    } catch (JsonDataException e) {
-      LOGGER.warn(
-          "Could not deserialize JSON response: {}{}", System.lineSeparator(), jsonResponse);
-      throw e;
-    }
-  }
-
   protected <T> T deserializeJSONObject(Response response, Class<T> clazz) throws IOException {
-    if (response.body() != null) {
-      return deserializeJSONObject(response.body().string(), clazz);
-    } else {
-      throw new IOException("Response body is null");
-    }
+    return deserializeJSON(response, clazz);
   }
 
   /**
    * This method is used to deserialize a JSON array response from an API endpoint.
    *
-   * @param jsonResponse JSON array response from API endpoint
-   * @param clazz The class to deserialize the JSON array into
+   * @param response HTTP response containing JSON array from API endpoint
+   * @param elementClass The class to deserialize the JSON array elements into
    * @param <T> The type of the object to deserialize
    * @return The deserialized list of objects
-   * @throws IOException If the JSON array cannot be deserialized
    */
-  protected <T> List<T> deserializeJSONArray(String jsonResponse, Class<T> clazz)
-      throws IOException {
-    Moshi moshi = MoshiSingleton.getInstance();
-
-    Type listPlatform = Types.newParameterizedType(List.class, clazz);
-    JsonAdapter<List<T>> jsonAdapter = moshi.adapter(listPlatform);
-    try {
-      return jsonAdapter.fromJson(jsonResponse);
-    } catch (IOException e) {
-      throw new IOException(
-          "Error deserializing JSON response to " + clazz.getSimpleName() + " class", e);
-    } catch (JsonDataException e) {
-      LOGGER.warn(
-          "Could not deserialize JSON response: {}{}", System.lineSeparator(), jsonResponse);
-      throw e;
-    }
+  protected <T> List<T> deserializeJSONArray(Response response, Class<T> elementClass) throws IOException {
+      return deserializeJSON(response, TypeToken.getParameterized(List.class, elementClass).getType());
   }
 
-  protected <T> List<T> deserializeJSONArray(Response response, Class<T> clazz) throws IOException {
-    if (response.body() != null) {
-      return deserializeJSONArray(response.body().string(), clazz);
-    } else {
+  protected <T> T deserializeJSON(Response response, Type typeOfT) throws IOException {
+    if (response.body() == null) {
       throw new IOException("Response body is null");
+    }
+    String jsonResponse = response.body().string();
+    try (response) {
+      return GSON.fromJson(jsonResponse, typeOfT);
+    } catch (JsonSyntaxException e) {
+      LOGGER.warn("Could not deserialize JSON response: {}{}", System.lineSeparator(), jsonResponse);
+      throw e;
     }
   }
 

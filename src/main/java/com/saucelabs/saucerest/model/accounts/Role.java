@@ -1,12 +1,8 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Role {
 
-    @Json(name = "name")
     public String name;
-    @Json(name = "role")
     public Integer role;
 
     /**

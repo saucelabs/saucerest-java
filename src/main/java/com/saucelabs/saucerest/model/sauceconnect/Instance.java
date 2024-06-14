@@ -1,14 +1,9 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
-
 public class Instance {
 
-    @Json(name = "instance_id")
     public String instanceId;
-    @Json(name = "allocation_prefix")
     public String allocationPrefix;
-    @Json(name = "status")
     public String status;
 
     /**

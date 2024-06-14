@@ -1,14 +1,9 @@
 package com.saucelabs.saucerest.model.storage;
 
-import com.squareup.moshi.Json;
-
 public class Links {
 
-    @Json(name = "prev")
     public String prev;
-    @Json(name = "next")
     public String next;
-    @Json(name = "self")
     public String self;
 
     public Links() {

@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.unit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.Helper;
@@ -11,13 +12,17 @@ import com.saucelabs.saucerest.model.builds.Build;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import okhttp3.HttpUrl;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,11 +60,13 @@ public class AbstractEndpointTest {
 
     @Test
     void testDeserializeJSONArray() throws IOException {
-        // Create a JSON response string
-        String jsonResponse = "[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]";
+        ResponseBody body = mock();
+        when(body.string()).thenReturn("[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]");
+        Response response = mock();
+        when(response.body()).thenReturn(body);
 
         // Deserialize the JSON response string into a list of Person objects
-        List<Person> persons = new PersonEndpoint("").publicDeserializeJSONArray(jsonResponse, Person.class);
+        List<Person> persons = new PersonEndpoint("").publicDeserializeJSONArray(response, Person.class);
 
         // Verify that the deserialized list contains the expected objects
         assertAll("persons",
@@ -73,11 +80,13 @@ public class AbstractEndpointTest {
 
     @Test
     void testDeserializeJSONObject() throws IOException {
-        // Create a JSON response string
-        String jsonResponse = "{\"name\":\"John\",\"age\":30}";
+        ResponseBody body = mock();
+        when(body.string()).thenReturn("{\"name\":\"John\",\"age\":30}");
+        Response response = mock();
+        when(response.body()).thenReturn(body);
 
         // Deserialize the JSON response string into a list of Person objects
-        Person person = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Person.class);
+        Person person = new PersonEndpoint("").publicDeserializeJSONObject(response, Person.class);
 
         // Verify that the deserialized list contains the expected objects
         assertAll("persons",
@@ -86,22 +95,20 @@ public class AbstractEndpointTest {
         );
     }
 
-    @Test
-    void testDeserializeJSONObjectWithListOfClassTypes_WithTwoItems() throws IOException {
-        String jsonResponse = Helper.getResourceFileAsString("/buildsResponses.json");
+    @ParameterizedTest
+    @CsvSource({
+        "/buildsResponses.json, 2",
+        "/buildsResponse.json, 1"
+    })
+    void testDeserializeListFromJSONObject(String resource, int expectedNumberOfItems) throws IOException {
+        ResponseBody body = mock();
+        when(body.string()).thenReturn(Helper.getResourceFileAsString(resource));
+        Response response = mock();
+        when(response.body()).thenReturn(body);
 
-        List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
+        List<Build> builds = new PersonEndpoint("").publicDeserializeListFromJSONObject(response, Build.class);
 
-        assertEquals(2, builds.size());
-    }
-
-    @Test
-    void testDeserializeJSONObjectWithListOfClassTypes_WithOneItem() throws IOException {
-        String jsonResponse = Helper.getResourceFileAsString("/buildsResponse.json");
-
-        List<Build> builds = new PersonEndpoint("").publicDeserializeJSONObject(jsonResponse, Collections.singletonList(Build.class));
-
-        assertEquals(1, builds.size());
+        assertEquals(expectedNumberOfItems, builds.size());
     }
 
     @Test
@@ -137,7 +144,7 @@ public class AbstractEndpointTest {
     public static class PersonEndpoint extends AbstractEndpoint {
 
         public PersonEndpoint(String apiServer) {
-            super(apiServer);
+            super(apiServer, false);
         }
 
         public PersonEndpoint(DataCenter dataCenter) {
@@ -148,16 +155,16 @@ public class AbstractEndpointTest {
             super(username, accessKey, apiServer);
         }
 
-        public <T> List<T> publicDeserializeJSONArray(String json, Class<T> clazz) throws IOException {
-            return deserializeJSONArray(json, clazz);
+        public <T> List<T> publicDeserializeJSONArray(Response json, Class<T> elementClass) throws IOException {
+            return deserializeJSONArray(json, elementClass);
         }
 
-        public <T> T publicDeserializeJSONObject(String json, Class<T> clazz) throws IOException {
+        public <T> T publicDeserializeJSONObject(Response json, Class<T> clazz) throws IOException {
             return deserializeJSONObject(json, clazz);
         }
 
-        public <T> List<T> publicDeserializeJSONObject(String json, List<Class<? extends T>> clazz) throws IOException {
-            return deserializeJSONObject(json, clazz);
+        public <T> List<T> publicDeserializeListFromJSONObject(Response json, Class<T> elementClass) throws IOException {
+            return deserializeListFromJSONObject(json, elementClass);
         }
 
         public String getCredentials() {

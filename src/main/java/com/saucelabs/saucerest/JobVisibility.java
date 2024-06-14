@@ -1,15 +1,16 @@
 package com.saucelabs.saucerest;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum JobVisibility {
-    PUBLIC("public"),
-    PUBLIC_RESTRICTED("public restricted"),
-    SHARE("share"),
-    TEAM("team"),
-    PRIVATE("private");
-
-    public final String value;
-
-    JobVisibility(String value) {
-        this.value = value;
-    }
+    @SerializedName("public")
+    PUBLIC,
+    @SerializedName("public restricted")
+    PUBLIC_RESTRICTED,
+    @SerializedName("share")
+    SHARE,
+    @SerializedName("team")
+    TEAM,
+    @SerializedName("private")
+    PRIVATE
 }

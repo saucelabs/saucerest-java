@@ -1,19 +1,15 @@
 package com.saucelabs.saucerest.api;
 
+import com.google.gson.JsonSyntaxException;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.HttpMethod;
 import com.saucelabs.saucerest.LogEntry;
-import com.saucelabs.saucerest.MoshiSingleton;
 import com.saucelabs.saucerest.TestAsset;
 import com.saucelabs.saucerest.model.realdevices.AvailableDevices;
 import com.saucelabs.saucerest.model.realdevices.Concurrency;
 import com.saucelabs.saucerest.model.realdevices.Device;
 import com.saucelabs.saucerest.model.realdevices.DeviceJob;
 import com.saucelabs.saucerest.model.realdevices.DeviceJobs;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.JsonDataException;
-import com.squareup.moshi.JsonReader;
-import com.squareup.moshi.Moshi;
 
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
@@ -34,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import okhttp3.Response;
-import okio.BufferedSource;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.slf4j.Logger;
@@ -277,20 +272,18 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
         return null;
       }
       String responseBody = response.body().string();
-      Moshi moshi = new Moshi.Builder().build();
-      JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
       BufferedReader reader = new BufferedReader(new StringReader(responseBody));
       String line;
       while ((line = reader.readLine()) != null) {
         try {
-          LogEntry logEntry = adapter.fromJson(line);
+          LogEntry logEntry = GSON.fromJson(line, LogEntry.class);
           if (logEntry != null
               && logEntry.getTime() != null
               && logEntry.getLevel() != null
               && logEntry.getMessage() != null) {
             logEntries.add(logEntry + System.lineSeparator());
           }
-        } catch (JsonDataException e) {
+        } catch (JsonSyntaxException e) {
           LOGGER.warn("Failed to parse line: {}, error: {}", line, e.getMessage());
         }
       }
@@ -377,40 +370,25 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
       throw new IOException("Response body is null");
     }
 
-    Moshi moshi = MoshiSingleton.getInstance();
-    BufferedSource source = response.body().source();
-    JsonReader reader = JsonReader.of(source);
-    // The response now comes with a newline-delimited JSON, set it to read malformed JSON.
-    reader.setLenient(true);
-
+    String responseBody = response.body().string();
+    BufferedReader reader = new BufferedReader(new StringReader(responseBody));
+    String line;
     try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-      JsonAdapter<LogEntry> adapter = moshi.adapter(LogEntry.class);
-      JsonReader.Token peek = reader.peek();
-      if (peek == JsonReader.Token.BEGIN_ARRAY) {
-        reader.beginArray();
-      }
-      while (reader.hasNext()) {
-        JsonReader.Token token = reader.peek();
-        if (token == JsonReader.Token.BEGIN_OBJECT) {
-          LogEntry logEntry = adapter.fromJson(reader);
+      while ((line = reader.readLine()) != null) {
+        try {
+          LogEntry logEntry = GSON.fromJson(line, LogEntry.class);
           if (logEntry != null
               && logEntry.getTime() != null
               && logEntry.getLevel() != null
               && logEntry.getMessage() != null) {
             writer.write(logEntry + System.lineSeparator());
           }
-        } else {
-          reader.skipValue();
+        } catch (JsonSyntaxException e) {
+          LOGGER.warn("Failed to parse line: {}, error: {}", line, e.getMessage());
         }
-      }
-      if (peek == JsonReader.Token.BEGIN_ARRAY) {
-        reader.endArray();
       }
     } catch (IOException e) {
       LOGGER.warn("Failed to write to file {}", path);
-      throw e;
-    } catch (JsonDataException e) {
-      LOGGER.warn("Failed to parse JSON response: {}", e.getMessage());
       throw e;
     }
   }

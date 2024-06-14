@@ -1,30 +1,17 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class Team {
 
-    @Json(name = "id")
     public String id;
-    @Json(name = "settings")
     public Settings settings;
-    @Json(name = "created_at")
     public String createdAt;
-    @Json(name = "description")
     public String description;
-    @Json(name = "group")
     public Group group;
-    @Json(name = "is_default")
     public Boolean isDefault;
-    @Json(name = "name")
     public String name;
-    @Json(name = "org_uuid")
     public String orgUuid;
-    @Json(name = "updated_at")
     public String updatedAt;
-    @Json(name = "current")
     public Current current;
-    @Json(name = "allowed")
     public Allowed allowed;
 
     /**

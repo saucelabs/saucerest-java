@@ -71,12 +71,6 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <!-- Remove org.json:json in favor of Moshi when migration done -->
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20240303</version>
-    </dependency>
     <dependency>
       <groupId>net.jodah</groupId>
       <artifactId>failsafe</artifactId>
@@ -123,9 +117,9 @@
       <version>4.2.1</version>
     </dependency>
     <dependency>
-      <groupId>com.squareup.moshi</groupId>
-      <artifactId>moshi</artifactId>
-      <version>1.15.1</version>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.11.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

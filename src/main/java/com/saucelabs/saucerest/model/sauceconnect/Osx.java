@@ -1,13 +1,9 @@
 package com.saucelabs.saucerest.model.sauceconnect;
 
-import com.squareup.moshi.Json;
-
 public class Osx {
 
-  @Json(name = "download_url")
   public String downloadUrl;
 
-  @Json(name = "sha256")
   public String sha256;
 
   /** No args constructor for use in serialization */

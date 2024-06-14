@@ -1,14 +1,9 @@
 package com.saucelabs.saucerest.model.accounts;
 
-import com.squareup.moshi.Json;
-
 public class ResetAccessKeyForTeam {
 
-    @Json(name = "id")
     public String id;
-    @Json(name = "username")
     public String username;
-    @Json(name = "access_key")
     public String accessKey;
 
     /**
