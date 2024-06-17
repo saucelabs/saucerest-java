@@ -2,6 +2,7 @@ package com.saucelabs.saucerest.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import com.saucelabs.saucerest.api.RealDevicesEndpoint;
 import com.saucelabs.saucerest.model.realdevices.*;
@@ -16,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,14 +54,14 @@ public class RealDevicesEndpointTest {
         driverUS.quit();
     }
 
-    public void setup(Region region) {
-        realDevices.set(new SauceREST(com.saucelabs.saucerest.DataCenter.fromString(region.toString())).getRealDevicesEndpoint());
+    public void setup(DataCenter dataCenter) {
+        realDevices.set(new SauceREST(dataCenter).getRealDevicesEndpoint());
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getDevices(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getDevices(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         //Devices devices = realDevices.get().getDevices();
         List<Device> devices = realDevices.get().getDevices();
@@ -70,9 +71,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getSpecificDevice(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getSpecificDevice(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         List<Device> devices = realDevices.get().getDevices();
         String deviceId = devices.get(0).id;
@@ -83,9 +84,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAvailableDevices(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getAvailableDevices(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         AvailableDevices availableDevices = realDevices.get().getAvailableDevices();
 
@@ -93,9 +94,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getDeviceJobs(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getDeviceJobs(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
 
@@ -103,43 +104,43 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getDeviceJobsWithLimit_5(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getDeviceJobsWithLimit_5(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("limit", 5));
 
         assertNotNull(deviceJobs);
-        Assertions.assertEquals(5, deviceJobs.metaData.limit);
+        assertEquals(5, deviceJobs.metaData.limit);
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getDeviceJobsWithOffset_5(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getDeviceJobsWithOffset_5(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("offset", 5));
 
         assertNotNull(deviceJobs);
-        Assertions.assertEquals(5, deviceJobs.metaData.offset);
+        assertEquals(5, deviceJobs.metaData.offset);
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getDeviceJobsWithLimitAndOffset(Region region) throws IOException {
-        setup(region);
+    @EnumSource(value = DataCenter.class)
+    public void getDeviceJobsWithLimitAndOffset(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs(Map.of("offset", 5, "limit", 6));
 
         assertNotNull(deviceJobs);
-        Assertions.assertEquals(5, deviceJobs.metaData.offset);
-        Assertions.assertEquals(6, deviceJobs.metaData.limit);
+        assertEquals(5, deviceJobs.metaData.offset);
+        assertEquals(6, deviceJobs.metaData.limit);
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getSpecificDeviceJob(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getSpecificDeviceJob(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
         DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
@@ -148,9 +149,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getConcurrency(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getConcurrency(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         Concurrency concurrency = realDevices.get().getConcurrency();
 
@@ -158,9 +159,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getTestAssetTest(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getTestAssetTest(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
         DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
@@ -185,9 +186,9 @@ public class RealDevicesEndpointTest {
     }
 
     @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppiumServerVersionTest(Region region) throws IOException {
-        setup(region);
+    @EnumSource(DataCenter.class)
+    public void getAppiumServerVersionTest(DataCenter dataCenter) throws IOException {
+        setup(dataCenter);
 
         DeviceJobs deviceJobs = realDevices.get().getDeviceJobs();
         DeviceJob deviceJob = realDevices.get().getSpecificDeviceJob(deviceJobs.entities.get(0).id);
@@ -197,13 +198,5 @@ public class RealDevicesEndpointTest {
         String regex = "^\\d+\\.\\d+\\.\\d+$";
 
         assertTrue(Pattern.matches(regex, appiumServerVersion));
-    }
-
-    /**
-     * Use this instead of {@link com.saucelabs.saucerest.DataCenter} because not all regions support
-     * app files yet.
-     */
-    public enum Region {
-        EU_CENTRAL, US_WEST
     }
 }

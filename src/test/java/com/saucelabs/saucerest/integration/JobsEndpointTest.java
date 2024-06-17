@@ -246,7 +246,7 @@ public class JobsEndpointTest {
 
     Job job = jobs.get().changeVisibility(sessionID.get(), JobVisibility.PRIVATE);
 
-    assertEquals(JobVisibility.PRIVATE.value, job._public);
+    assertEquals("private", job._public);
   }
 
   @ParameterizedTest
