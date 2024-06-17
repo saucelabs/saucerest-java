@@ -344,7 +344,7 @@ public abstract class AbstractEndpoint {
       throw new IOException("Response body is null");
     }
     String jsonResponse = response.body().string();
-    try {
+    try (response) {
       return GSON.fromJson(jsonResponse, typeOfT);
     } catch (JsonSyntaxException e) {
       LOGGER.warn("Could not deserialize JSON response: {}{}", System.lineSeparator(), jsonResponse);

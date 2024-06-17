@@ -272,15 +272,13 @@ public class StorageEndpoint extends AbstractEndpoint {
             .post(requestBody)
             .build();
 
-    try (Response response = makeRequest(request)) {
-      if (!response.isSuccessful()) {
-        if (response.body() != null) {
-          LOGGER.error("Error uploading file: {}", response.body().string());
-        }
-        throw new IOException("Unexpected code" + response);
+    Response response = makeRequest(request);
+    if (!response.isSuccessful()) {
+      if (response.body() != null) {
+        LOGGER.error("Error uploading file: {}", response.body().string());
       }
-
-      return response;
+      throw new IOException("Unexpected code" + response);
     }
+    return response;
   }
 }
