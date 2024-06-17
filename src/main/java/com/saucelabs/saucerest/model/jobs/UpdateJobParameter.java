@@ -9,6 +9,7 @@ import java.util.Map;
 public class UpdateJobParameter {
     private final String name;
     private final List<String> tags;
+    @SerializedName("public")
     private final JobVisibility visibility;
     private final Boolean passed;
     private final String build;
