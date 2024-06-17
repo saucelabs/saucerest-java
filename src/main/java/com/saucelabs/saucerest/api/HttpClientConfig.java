@@ -1,13 +1,11 @@
 package com.saucelabs.saucerest.api;
 
-import lombok.Getter;
 import okhttp3.Authenticator;
 import okhttp3.Interceptor;
 
 import java.net.Proxy;
 import java.time.Duration;
 
-@Getter
 public class HttpClientConfig {
 
   private final Duration connectTimeout;
@@ -70,5 +68,29 @@ public class HttpClientConfig {
   public HttpClientConfig interceptor(Interceptor interceptor) {
     return new HttpClientConfig(
         connectTimeout, readTimeout, writeTimeout, proxy, authenticator, interceptor);
+  }
+
+  public Duration getConnectTimeout() {
+    return this.connectTimeout;
+  }
+
+  public Duration getReadTimeout() {
+    return this.readTimeout;
+  }
+
+  public Duration getWriteTimeout() {
+    return this.writeTimeout;
+  }
+
+  public Proxy getProxy() {
+    return this.proxy;
+  }
+
+  public Authenticator getAuthenticator() {
+    return this.authenticator;
+  }
+
+  public Interceptor getInterceptor() {
+    return this.interceptor;
   }
 }
