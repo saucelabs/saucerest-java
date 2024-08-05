@@ -22,8 +22,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import dev.failsafe.Failsafe;
+import dev.failsafe.RetryPolicy;
 
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
@@ -283,21 +283,20 @@ public abstract class AbstractEndpoint {
       LOGGER.debug("Retrying request {} {}", request.method(), request.url());
       response =
           Failsafe.with(
-                  new RetryPolicy<>()
-                      .handle(
-                          RuntimeException.class, IOException.class, IllegalStateException.class)
+                  RetryPolicy.builder()
+                      .handle(RuntimeException.class, IOException.class, IllegalStateException.class)
                       .withBackoff(BACKOFF_INITIAL_DELAY, BACKOFF_MULTIPLIER, ChronoUnit.MILLIS)
                       .withMaxRetries(MAX_RETRIES)
                       .onRetry(
                           e -> {
-                            if (e.getLastFailure() != null) {
-                              LOGGER.warn(
-                                  "Retrying because of: {}",
-                                  e.getLastFailure().getClass().getSimpleName());
+                            Throwable lastException = e.getLastException();
+                            if (lastException != null) {
+                              LOGGER.warn("Retrying because of: {}", lastException.getClass().getSimpleName());
                             } else {
                               LOGGER.warn("Retrying");
                             }
-                          }))
+                          })
+                      .build())
               .get(() -> getHttpClient().newCall(request).execute());
     } catch (Exception e) {
       LOGGER.error("Error retrying request", e);

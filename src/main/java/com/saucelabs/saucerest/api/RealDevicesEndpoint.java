@@ -11,8 +11,8 @@ import com.saucelabs.saucerest.model.realdevices.Device;
 import com.saucelabs.saucerest.model.realdevices.DeviceJob;
 import com.saucelabs.saucerest.model.realdevices.DeviceJobs;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import dev.failsafe.Failsafe;
+import dev.failsafe.RetryPolicy;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -244,10 +244,11 @@ public class RealDevicesEndpoint extends AbstractEndpoint {
             .frameworkLogUrl;
     // Retry policy to handle the case where the Appium version is not found in the log file
     RetryPolicy<String> retryPolicy =
-        new RetryPolicy<String>()
+        RetryPolicy.<String> builder()
             .handleResultIf(Objects::isNull)
             .withMaxRetries(5)
-            .withDelay(Duration.ofSeconds(20));
+            .withDelay(Duration.ofSeconds(20))
+            .build();
 
     String appiumVersion =
         Failsafe.with(retryPolicy)
