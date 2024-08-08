@@ -91,9 +91,14 @@ jobs:
           tunnelName: github-action-tunnel-eu-central
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
 
-      - name: Build with Maven
+      - name: Build and Run Integration Tests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
-        run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dsurefire.rerunFailingTestsCount=2 -V
+        uses: nick-invision/retry@v3.0.0
+        with:
+          timeout_minutes: 20
+          max_attempts: 3
+          command: |
+            mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dsurefire.rerunFailingTestsCount=2 -V
 
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v4
