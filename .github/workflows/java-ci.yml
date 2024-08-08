@@ -12,7 +12,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}
-  
+
 permissions:
   contents: write
 
@@ -93,7 +93,7 @@ jobs:
 
       - name: Build with Maven
         if: ${{ env.NOT_FROM_FORK }} == 'true'
-        run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
+        run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dsurefire.rerunFailingTestsCount=2 -V
 
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v4
