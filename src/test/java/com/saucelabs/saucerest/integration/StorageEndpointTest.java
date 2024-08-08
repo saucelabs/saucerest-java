@@ -22,356 +22,396 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 public class StorageEndpointTest {
-    private final ThreadLocal<StorageEndpoint> storage = new ThreadLocal<>();
-    private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
+  private final ThreadLocal<StorageEndpoint> storage = new ThreadLocal<>();
+  private static final Logger logger = Logger.getLogger(AbstractEndpoint.class.getName());
 
-    @TempDir
-    private Path tempDir;
+  @TempDir private Path tempDir;
 
-    private EditAppGroupSettings getAppGroupResetSettings(EditAppGroupSettings.Builder.Platform platform) {
-        Settings.Builder settingsBuilder = new Settings.Builder()
-                .setAudioCapture(true)
-                .setResigningEnabled(platform == EditAppGroupSettings.Builder.Platform.IOS)
-                .setInstrumentationEnabled(platform == EditAppGroupSettings.Builder.Platform.ANDROID);
+  private EditAppGroupSettings getAppGroupResetSettings(
+      EditAppGroupSettings.Builder.Platform platform) {
+    Settings.Builder settingsBuilder =
+        new Settings.Builder()
+            .setAudioCapture(true)
+            .setResigningEnabled(platform == EditAppGroupSettings.Builder.Platform.IOS)
+            .setInstrumentationEnabled(platform == EditAppGroupSettings.Builder.Platform.ANDROID);
 
-        switch (platform) {
-            case ANDROID:
-                settingsBuilder.setOrientation("Portrait")
-                    .setSetupDeviceLock(true)
-                    .setInstrumentation(new Instrumentation.Builder()
-                        .setBiometrics(true)
-                        .setImageInjection(true)
-                        .setNetworkCapture(true)
-                        .build());
-                break;
-            case IOS:
-                settingsBuilder.setResigning(new Resigning.Builder()
+    switch (platform) {
+      case ANDROID:
+        settingsBuilder
+            .setOrientation("Portrait")
+            .setSetupDeviceLock(true)
+            .setInstrumentation(
+                new Instrumentation.Builder()
                     .setBiometrics(true)
                     .setImageInjection(true)
                     .setNetworkCapture(true)
                     .build());
-                break;
-            default:
-                System.out.println("Unknown platform - cannot create AppGroupSettings");
-                return null;
+        break;
+      case IOS:
+        settingsBuilder.setResigning(
+            new Resigning.Builder()
+                .setBiometrics(true)
+                .setImageInjection(true)
+                .setNetworkCapture(true)
+                .build());
+        break;
+      default:
+        System.out.println("Unknown platform - cannot create AppGroupSettings");
+        return null;
+    }
+
+    return new EditAppGroupSettings.Builder(platform).setSettings(settingsBuilder.build()).build();
+  }
+
+  public void setup(Region region) {
+    storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorageEndpoint());
+  }
+
+  @AfterEach
+  public void resetAppGroupSettings() {
+    try {
+      for (ItemInteger itemInteger : storage.get().getGroups().items) {
+        EditAppGroupSettings.Builder.Platform platform =
+            EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind);
+        if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID)
+            || platform.equals(EditAppGroupSettings.Builder.Platform.IOS)) {
+          resetAppGroupSettingsForPlatform(itemInteger.id, platform);
+        } else {
+          System.out.println("Not an app - do nothing");
         }
-
-        return new EditAppGroupSettings.Builder(platform)
-            .setSettings(settingsBuilder.build())
-            .build();
+      }
+    } catch (IOException | SauceException e) {
+      logger.warning("Failed to reset app group settings" + e.getMessage());
     }
+  }
 
-    public void setup(Region region) {
-        storage.set(new SauceREST(DataCenter.fromString(region.toString())).getStorageEndpoint());
+  private void resetAppGroupSettingsForPlatform(
+      int id, EditAppGroupSettings.Builder.Platform platform) {
+    try {
+      storage
+          .get()
+          .updateAppStorageGroupSettings(
+              id, Objects.requireNonNull(getAppGroupResetSettings(platform)));
+    } catch (IOException ignored) {
+      System.out.println(
+          "Failed to reset app group settings for "
+              + platform.name()
+              + " ("
+              + id
+              + ")"
+              + " in EU Central");
     }
+  }
 
-    @AfterEach
-    public void resetAppGroupSettings() {
-        try {
-            for (ItemInteger itemInteger : storage.get().getGroups().items) {
-                EditAppGroupSettings.Builder.Platform platform = EditAppGroupSettings.Builder.Platform.fromString(itemInteger.recent.kind);
-                if (platform.equals(EditAppGroupSettings.Builder.Platform.ANDROID) || platform.equals(EditAppGroupSettings.Builder.Platform.IOS)) {
-                    resetAppGroupSettingsForPlatform(itemInteger.id, platform);
-                } else {
-                    System.out.println("Not an app - do nothing");
-                }
-            }
-        } catch (IOException | SauceException e) {
-            logger.warning("Failed to reset app group settings" + e.getMessage());
-        }
-    }
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void uploadAppFileTest(Region region) throws IOException {
+    setup(region);
+    File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+    UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile);
 
-    private void resetAppGroupSettingsForPlatform(int id, EditAppGroupSettings.Builder.Platform platform) {
-        try {
-            storage.get().updateAppStorageGroupSettings(id, Objects.requireNonNull(getAppGroupResetSettings(platform)));
-        } catch (IOException ignored) {
-            System.out.println("Failed to reset app group settings for " + platform.name() + " (" + id + ")" + " in EU Central");
-        }
-    }
+    assertEquals(ipaFile.getName(), uploadFileApp.item.name);
+    assertEquals("", uploadFileApp.item.description);
+    assertEquals("ios", uploadFileApp.item.kind);
 
+    File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+    uploadFileApp = storage.get().uploadFile(apkFile);
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void uploadAppFileTest(Region region) throws IOException {
-        setup(region);
-        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile);
+    assertEquals(apkFile.getName(), uploadFileApp.item.name);
+    assertEquals("", uploadFileApp.item.description);
+    assertEquals("android", uploadFileApp.item.kind);
+  }
 
-        assertEquals(ipaFile.getName(), uploadFileApp.item.name);
-        assertEquals("", uploadFileApp.item.description);
-        assertEquals("ios", uploadFileApp.item.kind);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void uploadAppFileWithFileNameTest(Region region) throws IOException {
+    setup(region);
+    File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+    UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa");
 
-        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile);
+    assertEquals("test-file-name.ipa", uploadFileApp.item.name);
+    assertEquals("", uploadFileApp.item.description);
+    assertEquals("ios", uploadFileApp.item.kind);
 
-        assertEquals(apkFile.getName(), uploadFileApp.item.name);
-        assertEquals("", uploadFileApp.item.description);
-        assertEquals("android", uploadFileApp.item.kind);
-    }
+    File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+    uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk");
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void uploadAppFileWithFileNameTest(Region region) throws IOException {
-        setup(region);
-        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa");
+    assertEquals("test-file-name.apk", uploadFileApp.item.name);
+    assertEquals("", uploadFileApp.item.description);
+    assertEquals("android", uploadFileApp.item.kind);
+  }
 
-        assertEquals("test-file-name.ipa", uploadFileApp.item.name);
-        assertEquals("", uploadFileApp.item.description);
-        assertEquals("ios", uploadFileApp.item.kind);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void uploadAppFileWithFileNameAndDescriptionTest(Region region) throws IOException {
+    setup(region);
+    File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
+    UploadFileApp uploadFileApp =
+        storage.get().uploadFile(ipaFile, "test-file-name.ipa", "My App File Description");
 
-        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk");
+    assertEquals("test-file-name.ipa", uploadFileApp.item.name);
+    assertEquals("My App File Description", uploadFileApp.item.description);
 
-        assertEquals("test-file-name.apk", uploadFileApp.item.name);
-        assertEquals("", uploadFileApp.item.description);
-        assertEquals("android", uploadFileApp.item.kind);
-    }
+    File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
+    uploadFileApp =
+        storage.get().uploadFile(apkFile, "test-file-name.apk", "My App File Description");
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void uploadAppFileWithFileNameAndDescriptionTest(Region region) throws IOException {
-        setup(region);
-        File ipaFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.IPA);
-        UploadFileApp uploadFileApp = storage.get().uploadFile(ipaFile, "test-file-name.ipa", "My App File Description");
+    assertEquals("test-file-name.apk", uploadFileApp.item.name);
+    assertEquals("My App File Description", uploadFileApp.item.description);
+  }
 
-        assertEquals("test-file-name.ipa", uploadFileApp.item.name);
-        assertEquals("My App File Description", uploadFileApp.item.description);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppFilesTest(Region region) throws IOException {
+    setup(region);
+    GetAppFiles getAppFiles = storage.get().getFiles();
 
-        File apkFile = new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK);
-        uploadFileApp = storage.get().uploadFile(apkFile, "test-file-name.apk", "My App File Description");
+    assertNotNull(getAppFiles.items);
+    assertNotNull(getAppFiles.totalItems);
+  }
 
-        assertEquals("test-file-name.apk", uploadFileApp.item.name);
-        assertEquals("My App File Description", uploadFileApp.item.description);
-    }
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppFilesTestWithBuilder(Region region) throws IOException {
+    setup(region);
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppFilesTest(Region region) throws IOException {
-        setup(region);
-        GetAppFiles getAppFiles = storage.get().getFiles();
+    StorageParameter storageParameter =
+        new StorageParameter.Builder().setQ("DemoApp").setKind(new String[] {"android"}).build();
 
-        assertNotNull(getAppFiles.items);
-        assertNotNull(getAppFiles.totalItems);
-    }
+    GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppFilesTestWithBuilder(Region region) throws IOException {
-        setup(region);
+    assertNotNull(getAppFiles.items);
+    assertNotNull(getAppFiles.totalItems);
+    getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
+  }
 
-        StorageParameter storageParameter = new StorageParameter.Builder()
-                .setQ("DemoApp")
-                .setKind(new String[]{"android"})
-                .build();
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppFilesTestWithTwoKinds(Region region) throws IOException {
+    setup(region);
 
-        GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
+    StorageParameter storageParameter =
+        new StorageParameter.Builder().setKind(new String[] {"android", "ios"}).build();
 
-        assertNotNull(getAppFiles.items);
-        assertNotNull(getAppFiles.totalItems);
-        getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
-    }
+    GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppFilesTestWithTwoKinds(Region region) throws IOException {
-        setup(region);
+    assertNotNull(getAppFiles.items);
+    assertNotNull(getAppFiles.totalItems);
+    getAppFiles.items.forEach(
+        item -> assertTrue(item.kind.equals("android") || item.kind.equals("ios")));
+  }
 
-        StorageParameter storageParameter = new StorageParameter.Builder()
-                .setKind(new String[]{"android", "ios"})
-                .build();
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
+    setup(region);
+    Map<String, Object> queryParameters = Map.of("q", "DemoApp", "per_page", "5");
+    GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
-        GetAppFiles getAppFiles = storage.get().getFiles(storageParameter.toMap());
+    assertNotNull(getAppFiles);
+    assertEquals(5, getAppFiles.perPage);
+    assertTrue(getAppFiles.links.self.contains("DemoApp"));
 
-        assertNotNull(getAppFiles.items);
-        assertNotNull(getAppFiles.totalItems);
-        getAppFiles.items.forEach(item -> assertTrue(item.kind.equals("android") || item.kind.equals("ios")));
-    }
+    queryParameters = Map.of("kind", "android");
+    getAppFiles = storage.get().getFiles(queryParameters);
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppFilesWithQueryParametersTest(Region region) throws IOException {
-        setup(region);
-        Map<String, Object> queryParameters = Map.of("q", "DemoApp", "per_page", "5");
-        GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
+    getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
 
-        assertNotNull(getAppFiles);
-        assertEquals(5, getAppFiles.perPage);
-        assertTrue(getAppFiles.links.self.contains("DemoApp"));
+    queryParameters = Map.of("kind", "ios");
+    getAppFiles = storage.get().getFiles(queryParameters);
 
-        queryParameters = Map.of("kind", "android");
-        getAppFiles = storage.get().getFiles(queryParameters);
+    getAppFiles.items.forEach(item -> assertEquals("ios", item.kind));
+  }
 
-        getAppFiles.items.forEach(item -> assertEquals("android", item.kind));
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppFilesWithQueryParametersTest_404(Region region) throws IOException {
+    setup(region);
+    Map<String, Object> queryParameters = Map.of("q", "abc123");
+    GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
 
-        queryParameters = Map.of("kind", "ios");
-        getAppFiles = storage.get().getFiles(queryParameters);
+    assertEquals(0, getAppFiles.items.size());
+  }
 
-        getAppFiles.items.forEach(item -> assertEquals("ios", item.kind));
-    }
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppGroupsTest(Region region) throws IOException {
+    setup(region);
+    GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppFilesWithQueryParametersTest_404(Region region) throws IOException {
-        setup(region);
-        Map<String, Object> queryParameters = Map.of("q", "abc123");
-        GetAppFiles getAppFiles = storage.get().getFiles(queryParameters);
+    assertNotNull(getAppStorageGroups);
+    assertTrue(getAppStorageGroups.items.size() > 0);
+  }
 
-        assertEquals(0, getAppFiles.items.size());
-    }
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
+    setup(region);
+    StorageParameter storageParameter =
+        new StorageParameter.Builder().setQ("DemoApp").setPerPage("5").build();
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppGroupsTest(Region region) throws IOException {
-        setup(region);
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
+    GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(storageParameter.toMap());
 
-        assertNotNull(getAppStorageGroups);
-        assertTrue(getAppStorageGroups.items.size() > 0);
-    }
+    assertNotNull(getAppStorageGroups);
+    getAppStorageGroups.items.forEach(
+        item -> assertTrue(item.name.toLowerCase().contains("demoapp")));
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppGroupsWithQueryParametersTest(Region region) throws IOException {
-        setup(region);
-        StorageParameter storageParameter = new StorageParameter.Builder()
-                .setQ("DemoApp")
-                .setPerPage("5")
-                .build();
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void updateAppGroupSettings(Region region) throws IOException {
+    setup(region);
 
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(storageParameter.toMap());
-
-        assertNotNull(getAppStorageGroups);
-        getAppStorageGroups.items.forEach(item -> assertTrue(item.name.contains("demoapp")));
-    }
-
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void updateAppGroupSettings(Region region) throws IOException {
-        setup(region);
-
-        // Get group ID first
-        GetAppStorageGroupsParameters groupsParameters = new GetAppStorageGroupsParameters.Builder()
+    // Get group ID first
+    GetAppStorageGroupsParameters groupsParameters =
+        new GetAppStorageGroupsParameters.Builder()
             .setKind("ios")
             .setQ("com.saucelabs.mydemoapp.rn")
             .build();
 
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(groupsParameters.toMap());
-        int groupId = getAppStorageGroups.items.get(0).id;
+    GetAppStorageGroups getAppStorageGroups = storage.get().getGroups(groupsParameters.toMap());
+    int groupId = getAppStorageGroups.items.get(0).id;
 
-        Settings settings = new Settings.Builder()
-            .setAudioCapture(true)
-            .build();
+    Settings settings = new Settings.Builder().setAudioCapture(true).build();
 
-        EditAppGroupSettings editAppGroupSettings1 = new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
+    EditAppGroupSettings editAppGroupSettings1 =
+        new EditAppGroupSettings.Builder(EditAppGroupSettings.Builder.Platform.IOS)
             .setSettings(settings)
             .build();
 
-        EditAppGroupSettings editAppGroupSettings = storage.get().updateAppStorageGroupSettings(groupId, editAppGroupSettings1);
+    EditAppGroupSettings editAppGroupSettings =
+        storage.get().updateAppStorageGroupSettings(groupId, editAppGroupSettings1);
 
-        assertTrue(editAppGroupSettings.settings.audioCapture);
-    }
+    assertTrue(editAppGroupSettings.settings.audioCapture);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void getAppGroupSettingsTest(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void getAppGroupSettingsTest(Region region) throws IOException {
+    setup(region);
 
-        // Call getGroups() to get the group ID first
-        GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
-        int groupId = getAppStorageGroups.items.get(0).id;
+    // Call getGroups() to get the group ID first
+    GetAppStorageGroups getAppStorageGroups = storage.get().getGroups();
+    int groupId = getAppStorageGroups.items.get(0).id;
 
-        GetAppStorageGroupSettings getGroupSettings = storage.get().getGroupSettings(groupId);
+    GetAppStorageGroupSettings getGroupSettings = storage.get().getGroupSettings(groupId);
 
-        assertNotNull(getGroupSettings);
-    }
+    assertNotNull(getGroupSettings);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void downloadAppTest(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void downloadAppTest(Region region) throws IOException {
+    setup(region);
 
-        // Call getFiles() to get a file ID so we can use it as a parameter
-        GetAppFiles getAppFiles = storage.get().getFiles(new StorageParameter.Builder().setQ("iOS-Real-Device-MyRNDemoApp.ipa").build().toMap());
-        String fileId = getAppFiles.items.get(0).id;
+    // Call getFiles() to get a file ID so we can use it as a parameter
+    GetAppFiles getAppFiles =
+        storage
+            .get()
+            .getFiles(
+                new StorageParameter.Builder()
+                    .setQ("iOS-Real-Device-MyRNDemoApp.ipa")
+                    .build()
+                    .toMap());
+    String fileId = getAppFiles.items.get(0).id;
 
-        storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
+    storage.get().downloadFile(fileId, Paths.get(tempDir + "/iOS.ipa"));
 
-        assertTrue(Files.exists(Paths.get(tempDir.toString(), "iOS.ipa")));
-        assertTrue(Files.size(Paths.get(tempDir.toString(), "iOS.ipa")) > 0);
-    }
+    assertTrue(Files.exists(Paths.get(tempDir.toString(), "iOS.ipa")));
+    assertTrue(Files.size(Paths.get(tempDir.toString(), "iOS.ipa")) > 0);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void updateAppFileDescription(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void updateAppFileDescription(Region region) throws IOException {
+    setup(region);
 
-        // Call getFiles() to get a file ID so we can use it as a parameter
-        GetAppFiles getAppFiles = storage.get().getFiles(new StorageParameter.Builder().setQ("iOS-Real-Device-MyRNDemoApp.ipa").build().toMap());
-        String fileId = getAppFiles.items.get(0).id;
+    // Call getFiles() to get a file ID so we can use it as a parameter
+    GetAppFiles getAppFiles =
+        storage
+            .get()
+            .getFiles(
+                new StorageParameter.Builder()
+                    .setQ("iOS-Real-Device-MyRNDemoApp.ipa")
+                    .build()
+                    .toMap());
+    String fileId = getAppFiles.items.get(0).id;
 
-        storage.get().updateFileDescription(fileId, "Updated through Integration Test");
-        GetAppFiles file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
+    storage.get().updateFileDescription(fileId, "Updated through Integration Test");
+    GetAppFiles file =
+        storage
+            .get()
+            .getFiles(
+                new StorageParameter.Builder().setFileId(new String[] {fileId}).build().toMap());
 
-        assertEquals("Updated through Integration Test", file.items.get(0).description);
+    assertEquals("Updated through Integration Test", file.items.get(0).description);
 
-        storage.get().updateFileDescription(fileId, "");
-        file = storage.get().getFiles(new StorageParameter.Builder().setFileId(new String[]{fileId}).build().toMap());
+    storage.get().updateFileDescription(fileId, "");
+    file =
+        storage
+            .get()
+            .getFiles(
+                new StorageParameter.Builder().setFileId(new String[] {fileId}).build().toMap());
 
-        assertEquals("", file.items.get(0).description);
-    }
+    assertEquals("", file.items.get(0).description);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void deleteAppFile(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void deleteAppFile(Region region) throws IOException {
+    setup(region);
 
-        // Upload app file, save file ID
-        UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
-        String fileId = uploadFileApp.item.id;
-        assertNotNull(fileId);
+    // Upload app file, save file ID
+    UploadFileApp uploadFileApp =
+        storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK));
+    String fileId = uploadFileApp.item.id;
+    assertNotNull(fileId);
 
-        DeleteAppFile deleteAppFile = storage.get().deleteFile(fileId);
-        String fileIdOfDeletedApp = deleteAppFile.item.id;
+    DeleteAppFile deleteAppFile = storage.get().deleteFile(fileId);
+    String fileIdOfDeletedApp = deleteAppFile.item.id;
 
-        assertEquals(fileIdOfDeletedApp, fileId);
-    }
+    assertEquals(fileIdOfDeletedApp, fileId);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void deleteAppGroup(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void deleteAppGroup(Region region) throws IOException {
+    setup(region);
 
-        // Upload app file, save file ID
-        UploadFileApp uploadFileApp = storage.get().uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
-        int groupId = uploadFileApp.item.groupId;
+    // Upload app file, save file ID
+    UploadFileApp uploadFileApp =
+        storage
+            .get()
+            .uploadFile(new StorageTestHelper().getAppFile(StorageTestHelper.AppFile.APK_NATIVE));
+    int groupId = uploadFileApp.item.groupId;
 
-        DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
-        int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
-        assertEquals(groupIdOfDeletedGroup, groupId);
-    }
+    DeleteAppGroupFiles deleteAppGroupFiles = storage.get().deleteFileGroup(groupId);
+    int groupIdOfDeletedGroup = deleteAppGroupFiles.item.id;
+    assertEquals(groupIdOfDeletedGroup, groupId);
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void appNotFoundTest(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void appNotFoundTest(Region region) throws IOException {
+    setup(region);
 
-        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFile("abc123"));
-    }
+    assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFile("abc123"));
+  }
 
-    @ParameterizedTest
-    @EnumSource(Region.class)
-    public void appGroupNotFoundTest(Region region) throws IOException {
-        setup(region);
+  @ParameterizedTest
+  @EnumSource(Region.class)
+  public void appGroupNotFoundTest(Region region) throws IOException {
+    setup(region);
 
-        assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFileGroup(123456789));
-    }
+    assertThrows(SauceException.NotFound.class, () -> storage.get().deleteFileGroup(123456789));
+  }
 
-    /**
-     * Use this instead of {@link com.saucelabs.saucerest.DataCenter} because not all regions support
-     * app files yet.
-     */
-    enum Region {
-        EU_CENTRAL, US_WEST
-    }
+  /**
+   * Use this instead of {@link com.saucelabs.saucerest.DataCenter} because not all regions support
+   * app files yet.
+   */
+  enum Region {
+    EU_CENTRAL,
+    US_WEST
+  }
 }
