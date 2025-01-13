@@ -15,6 +15,8 @@ class DataCenterTest {
         "us_WeSt,        US_WEST",
         "EU_CENTRAL,     EU_CENTRAL",
         "Eu_central,     EU_CENTRAL",
+        "US_EAST_4,      US_EAST_4",
+        "Us_EasT_4,      US_EAST_4",
     })
     void testFromString(String input, DataCenter expected) {
         assertEquals(expected, DataCenter.fromString(input));
@@ -69,5 +71,9 @@ class DataCenterTest {
         assertEquals("https://eu-central-1.saucelabs.com/", DataCenter.EU_CENTRAL.server());
         assertEquals("https://api.eu-central-1.saucelabs.com/", DataCenter.EU_CENTRAL.apiServer());
         assertEquals("https://app.eu-central-1.saucelabs.com/", DataCenter.EU_CENTRAL.appServer());
+
+        assertEquals("https://us-east-4.saucelabs.com/", DataCenter.US_EAST_4.server());
+        assertEquals("https://api.us-east-4.saucelabs.com/", DataCenter.US_EAST_4.apiServer());
+        assertEquals("https://app.us-east-4.saucelabs.com/", DataCenter.US_EAST_4.appServer());
     }
 }

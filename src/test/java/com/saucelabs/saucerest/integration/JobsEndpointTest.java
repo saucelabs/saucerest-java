@@ -1,6 +1,7 @@
 package com.saucelabs.saucerest.integration;
 
 import static com.saucelabs.saucerest.DataCenter.EU_CENTRAL;
+import static com.saucelabs.saucerest.DataCenter.US_EAST_4;
 import static com.saucelabs.saucerest.DataCenter.US_WEST;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,6 +76,11 @@ public class JobsEndpointTest {
       url = new URL("https://ondemand.us-west-1.saucelabs.com/wd/hub");
       driver.set(new RemoteWebDriver(url, options));
       jobs.set(new SauceREST(US_WEST).getJobsEndpoint());
+      sessionID.set(driver.get().getSessionId().toString());
+    } else if (US_EAST_4 == dataCenter) {
+      url = new URL("https://ondemand.us-east-4.saucelabs.com/wd/hub");
+      driver.set(new RemoteWebDriver(url, options));
+      jobs.set(new SauceREST(US_EAST_4).getJobsEndpoint());
       sessionID.set(driver.get().getSessionId().toString());
     }
   }
@@ -197,7 +203,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getDetails(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -220,7 +226,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void changeName(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
     String newName = "Newly Changed Name";
@@ -230,7 +236,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void changeBuild(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
     String newName = "Newly Changed Build";
@@ -240,7 +246,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void changeVisibility(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -250,7 +256,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void changeResultsTrue(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -260,7 +266,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void changeResultsFalse(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -270,7 +276,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void passed(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -280,7 +286,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void failed(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
 
@@ -290,7 +296,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void addTags(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
     List<String> tags = List.of("tag1", "tag2", "tag3");
@@ -301,7 +307,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void addCustomData(DataCenter param, TestInfo testInfo) throws IOException {
     runTest(param, testInfo);
       Map<String, String> customData = Map.of("key1", "value1", "key2", "value2", "key3", "value3");
@@ -312,7 +318,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getJobsTest(DataCenter dataCenter) throws IOException {
     SauceREST sauceREST = new SauceREST(DataCenter.fromString(dataCenter.toString()));
     JobsEndpoint job = sauceREST.getJobsEndpoint();
@@ -322,7 +328,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getJobsTestDirectly(DataCenter dataCenter) throws IOException {
     JobsEndpoint job = new JobsEndpoint(DataCenter.fromString(dataCenter.toString()));
     List<Job> jobList = job.getJobs();
@@ -331,7 +337,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getJobsWithParametersTest(DataCenter dataCenter) throws IOException {
     SauceREST sauceREST = new SauceREST(DataCenter.fromString(dataCenter.toString()));
     JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint();
@@ -344,7 +350,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getJobDetailsTest(DataCenter dataCenter) throws IOException {
     SauceREST sauceREST = new SauceREST(dataCenter);
     JobsEndpoint jobsEndpoint = sauceREST.getJobsEndpoint();
@@ -356,7 +362,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void updateJobTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -382,7 +388,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void stopJobTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     setup(dataCenter, testInfo, TestType.BROWSER);
     String sessionID;
@@ -409,7 +415,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void deleteJobTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -419,7 +425,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void listJobAssetsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -434,7 +440,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void listJobAssetsForEmulatorTest(DataCenter dataCenter, TestInfo testInfo)
       throws IOException {
     runEmulatorTest(dataCenter, testInfo);
@@ -450,7 +456,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void listJobAssetsForSimulatorTest(DataCenter dataCenter, TestInfo testInfo)
       throws IOException {
     runSimulatorTest(dataCenter, testInfo);
@@ -466,7 +472,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getJobAssetFileTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -480,7 +486,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getAllAssetsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -495,7 +501,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getAllEmulatorAssetsTest(DataCenter dataCenter, TestInfo testInfo)
       throws IOException {
     runEmulatorTest(dataCenter, testInfo);
@@ -512,7 +518,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getAllSimulatorAssetsTest(DataCenter dataCenter, TestInfo testInfo)
       throws IOException {
     runSimulatorTest(dataCenter, testInfo);
@@ -529,7 +535,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void getAllScreenshotsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
@@ -541,7 +547,7 @@ public class JobsEndpointTest {
   }
 
   @ParameterizedTest
-  @EnumSource(DataCenter.class)
+  @EnumSource(value = DataCenter.class, names = {"US_EAST_4"}, mode = EnumSource.Mode.EXCLUDE)
   public void deleteJobAssetsTest(DataCenter dataCenter, TestInfo testInfo) throws IOException {
     runTest(dataCenter, testInfo);
 
