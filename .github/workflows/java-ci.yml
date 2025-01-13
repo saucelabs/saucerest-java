@@ -2,13 +2,13 @@ name: Java CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   workflow_dispatch:
   schedule:
     # Run every 6 hours at minute 0: 06:00, 12:00, 18:00, 00:00
-    - cron: '0 6,12,18,0 * * *'
+    - cron: "0 6,12,18,0 * * *"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -21,7 +21,6 @@ env:
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
 
 jobs:
-
   unit_tests_job:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -31,9 +30,9 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
       - name: Build with Maven
         run: mvn clean test -Dtest="com.saucelabs.saucerest.unit.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -V
       - name: Upload JaCoCo report to Codecov
@@ -50,7 +49,7 @@ jobs:
 
   integration_tests_job:
     name: Integration Tests
-    needs: [ unit_tests_job, upload_apps_job ]
+    needs: [unit_tests_job, upload_apps_job]
     runs-on: ubuntu-latest
 
     steps:
@@ -71,9 +70,9 @@ jobs:
         uses: actions/setup-java@v4
         if: ${{ env.NOT_FROM_FORK }} == 'true'
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
 
       - name: Setup Sauce Connect US-West
         uses: saucelabs/sauce-connect-action@v2
@@ -90,6 +89,14 @@ jobs:
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
           tunnelName: github-action-tunnel-eu-central
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
+
+      - name: Setup Sauce Connect US East 4
+        uses: saucelabs/sauce-connect-action@v2
+        with:
+          username: ${{ secrets.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelName: github-action-tunnel-us-east-4
+          configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-east-4.yaml
 
       - name: Build and Run Integration Tests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
