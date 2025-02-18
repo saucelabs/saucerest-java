@@ -93,7 +93,7 @@ jobs:
 
       - name: Build and Run Integration Tests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
-        uses: nick-invision/retry@v3.0.0
+        uses: nick-invision/retry@v3.0.1
         with:
           timeout_minutes: 20
           max_attempts: 3
