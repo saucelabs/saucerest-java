@@ -396,13 +396,14 @@ public class JobsEndpointTest {
 
     String finalSessionID = sessionID;
 
-    // Stopping a job via the REST API finalizes (asset processing, teardown) more slowly than a
-    // client-side driver.quit(), so this needs a longer budget than the 20s used elsewhere in this
-    // class.
+    // Stopping a job via the REST API is treated by Sauce Labs as an abandoned session ("User
+    // Abandoned Test -- User terminated"), which goes through an idle-detection grace period
+    // before the job is finalized as "complete" -- observed consistently at ~67-70s against the
+    // live API, so this needs a longer budget than the 20s used elsewhere in this class.
     Assertions.assertDoesNotThrow(
         () ->
             Awaitility.await()
-                .atMost(Duration.ofSeconds(60))
+                .atMost(Duration.ofSeconds(90))
                 .pollInterval(Duration.ofSeconds(1))
                 .pollInSameThread()
                 .until(() -> "complete".equals(jobs.get().getJobDetails(finalSessionID).status)));
