@@ -396,10 +396,13 @@ public class JobsEndpointTest {
 
     String finalSessionID = sessionID;
 
+    // Stopping a job via the REST API finalizes (asset processing, teardown) more slowly than a
+    // client-side driver.quit(), so this needs a longer budget than the 20s used elsewhere in this
+    // class.
     Assertions.assertDoesNotThrow(
         () ->
             Awaitility.await()
-                .atMost(Duration.ofSeconds(20))
+                .atMost(Duration.ofSeconds(60))
                 .pollInterval(Duration.ofSeconds(1))
                 .pollInSameThread()
                 .until(() -> "complete".equals(jobs.get().getJobDetails(finalSessionID).status)));
