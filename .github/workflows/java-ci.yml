@@ -83,6 +83,7 @@ jobs:
           region: us-west-1
           tunnelName: github-action-tunnel-us-west
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-west.yaml
+          apiAddress: ':8032'
 
       - name: Setup Sauce Connect EU-Central
         uses: saucelabs/sauce-connect-action@v3
@@ -92,6 +93,7 @@ jobs:
           region: eu-central-1
           tunnelName: github-action-tunnel-eu-central
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
+          apiAddress: ':8033'
 
       - name: Build and Run Integration Tests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
