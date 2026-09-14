@@ -76,29 +76,29 @@ jobs:
           cache: 'maven'
 
       - name: Setup Sauce Connect US-West
-        uses: saucelabs/sauce-connect-action@v2
+        uses: saucelabs/sauce-connect-action@v3
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          region: us-west-1
           tunnelName: github-action-tunnel-us-west
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-us-west.yaml
+          apiAddress: ':8032'
 
       - name: Setup Sauce Connect EU-Central
-        uses: saucelabs/sauce-connect-action@v2
+        uses: saucelabs/sauce-connect-action@v3
         with:
           username: ${{ secrets.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          region: eu-central-1
           tunnelName: github-action-tunnel-eu-central
           configFile: ${{ github.workspace }}/src/test/resources/sauce-connect-config-eu-central.yaml
+          apiAddress: ':8033'
 
       - name: Build and Run Integration Tests
         if: ${{ env.NOT_FROM_FORK }} == 'true'
-        uses: nick-invision/retry@v4.0.0
-        with:
-          timeout_minutes: 20
-          max_attempts: 3
-          command: |
-            mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dsurefire.rerunFailingTestsCount=2 -V
+        timeout-minutes: 20
+        run: mvn clean test -Dtest="com.saucelabs.saucerest.integration.**" -Dgpg.skip -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dsurefire.rerunFailingTestsCount=2 -V
 
       - name: Upload JaCoCo report to Codecov
         uses: codecov/codecov-action@v5

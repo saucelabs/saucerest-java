@@ -399,7 +399,7 @@ public class JobsEndpointTest {
     Assertions.assertDoesNotThrow(
         () ->
             Awaitility.await()
-                .atMost(Duration.ofSeconds(20))
+                .atMost(Duration.ofSeconds(90))
                 .pollInterval(Duration.ofSeconds(1))
                 .pollInSameThread()
                 .until(() -> "complete".equals(jobs.get().getJobDetails(finalSessionID).status)));
