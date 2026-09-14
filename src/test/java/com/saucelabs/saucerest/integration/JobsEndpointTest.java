@@ -396,10 +396,6 @@ public class JobsEndpointTest {
 
     String finalSessionID = sessionID;
 
-    // Stopping a job via the REST API is treated by Sauce Labs as an abandoned session ("User
-    // Abandoned Test -- User terminated"), which goes through an idle-detection grace period
-    // before the job is finalized as "complete" -- observed consistently at ~67-70s against the
-    // live API, so this needs a longer budget than the 20s used elsewhere in this class.
     Assertions.assertDoesNotThrow(
         () ->
             Awaitility.await()
