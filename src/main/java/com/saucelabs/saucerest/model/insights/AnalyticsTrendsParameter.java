@@ -73,9 +73,6 @@ public class AnalyticsTrendsParameter {
         private String[] tag;
         private TagFilterMode tagFilterMode;
 
-        public Builder() {
-        }
-
         public Builder setStart(LocalDateTime val) {
             start = DateTimeUtils.toUtcString(val);
             return this;
