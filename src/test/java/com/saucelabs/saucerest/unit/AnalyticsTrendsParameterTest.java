@@ -28,4 +28,14 @@ public class AnalyticsTrendsParameterTest {
     public void testBuildThrowsWhenNeitherTimeRangeNorStartEndSet() {
         assertThrows(IllegalStateException.class, () -> new AnalyticsTrendsParameter.Builder().build());
     }
+
+    @Test
+    public void testToMapDefaultsIntervalWhenNotSet() {
+        AnalyticsTrendsParameter params = new AnalyticsTrendsParameter.Builder()
+                .setTimeRange(new TimeRange(1, Unit.H))
+                .build();
+
+        Map<String, Object> map = params.toMap();
+        assertEquals("1d", map.get("interval"));
+    }
 }
