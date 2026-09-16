@@ -143,6 +143,9 @@ public class AnalyticsTrendsParameter {
             if (isTimeRangeUsed && isStartEndUsed) {
                 throw new IllegalStateException("Only one of 'time_range' or 'start' and 'end' can be set, not both.");
             }
+            if (interval == null) {
+                interval = Interval.ONE_DAY;
+            }
 
             return new AnalyticsTrendsParameter(this);
         }
