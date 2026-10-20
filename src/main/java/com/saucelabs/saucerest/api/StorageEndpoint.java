@@ -267,6 +267,7 @@ public class StorageEndpoint extends AbstractEndpoint {
 
     Request request =
         new Request.Builder()
+            .header("User-Agent", userAgent)
             .header("Authorization", credentials)
             .url(url)
             .post(requestBody)
